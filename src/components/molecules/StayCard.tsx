@@ -21,12 +21,12 @@ export function StayCard({ stay, className }: StayCardProps) {
           {stay.type}
         </Badge>
       </div>
-      <div className="flex flex-col gap-0">
-        <h3 className="text-[10px] font-semibold text-[#222222] leading-tight line-clamp-1 group-hover:underline">
+      <div className="flex flex-col gap-0.5">
+        <h3 className="text-[13px] font-semibold text-[#222222] leading-tight line-clamp-1 group-hover:underline">
           {stay.name}
         </h3>
-        <span className="text-[10px] text-[#717171]">{stay.location}</span>
-        <span className="text-[10px] font-semibold text-[#222222]">
+        <span className="text-xs text-[#717171]">{stay.location}</span>
+        <span className="text-xs font-semibold text-[#222222]">
           {formatCurrency(stay.pricePerNight)}/guest • <span className="text-[#FF385C]">★</span> {stay.rating.toFixed(1)} ({stay.reviewCount})
         </span>
       </div>
