@@ -42,7 +42,7 @@ export function Header() {
       <div className="container-app flex items-center py-3">
         <div className="flex items-center">
           <Link href="/" className="text-2xl font-bold text-[#FF385C]">
-            Kiribati
+            Island Connects
           </Link>
         </div>
         <nav className="hidden flex-1 items-center justify-center gap-1 md:flex">
