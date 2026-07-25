@@ -2,22 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/src/store/authStore";
-import { AccountLayout } from "@/src/components/templates/AccountLayout";
 import { ReviewCard } from "@/src/components/molecules/ReviewCard";
+import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
 import { api } from "@/src/lib/api";
 import { cn } from "@/src/lib/utils";
-import { HiChatBubbleLeftRight, HiShoppingBag } from "react-icons/hi2";
-import type { Review, Order, Product } from "@/src/types";
+import { HiChatBubbleLeftRight, HiShoppingBag, HiStar, HiPencilSquare, HiTrash } from "react-icons/hi2";
+import type { Review, Product } from "@/src/types";
 
 const TABS = [
-  { key: "submitted", label: "Submitted" },
-  { key: "toreview", label: "To Review" },
+  { key: "given", label: "Given Reviews" },
+  { key: "pending", label: "Pending Reviews" },
 ];
 
 export default function ReviewsPage() {
   const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<"submitted" | "toreview">("submitted");
+  const [activeTab, setActiveTab] = useState<"given" | "pending">("given");
   const [reviews, setReviews] = useState<Review[]>([]);
   const [toReviewItems, setToReviewItems] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +30,6 @@ export default function ReviewsPage() {
       api.getOrders(user.id),
       api.getProducts({ pageSize: 50 }),
     ]).then(([userOrders, allProducts]) => {
-      const allReviews: Review[] = [];
       const reviewedIds = new Set<string>();
 
       const fetchedReviews = Promise.all(
@@ -58,18 +57,8 @@ export default function ReviewsPage() {
     });
   }, [user]);
 
-  if (!user) {
-    return (
-      <AccountLayout activeTab="reviews">
-        <div className="flex items-center justify-center py-16">
-          <p className="text-sm text-[#717171]">Please sign in to view your reviews.</p>
-        </div>
-      </AccountLayout>
-    );
-  }
-
   return (
-    <AccountLayout activeTab="reviews">
+    <>
       <h2 className="mb-4 text-lg font-bold text-[#222222]">My Reviews</h2>
 
       <div className="mb-6 flex gap-2">
@@ -93,7 +82,7 @@ export default function ReviewsPage() {
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
         </div>
-      ) : activeTab === "submitted" ? (
+      ) : activeTab === "given" ? (
         reviews.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#DDDDDD] py-16">
             <HiChatBubbleLeftRight className="mb-3 h-12 w-12 text-[#DDDDDD]" />
@@ -103,7 +92,17 @@ export default function ReviewsPage() {
         ) : (
           <div className="flex flex-col gap-4">
             {reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
+              <div key={review.id} className="group relative">
+                <ReviewCard review={review} />
+                <div className="absolute right-4 top-4 hidden gap-1 group-hover:flex">
+                  <button className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-[#717171] shadow-sm hover:text-[#222222]">
+                    <HiPencilSquare className="h-3.5 w-3.5" />
+                  </button>
+                  <button className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-[#717171] shadow-sm hover:text-red-500">
+                    <HiTrash className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         )
@@ -128,12 +127,19 @@ export default function ReviewsPage() {
               <div className="flex-1">
                 <p className="text-sm font-semibold text-[#222222]">{product.name}</p>
                 <p className="text-xs text-[#717171]">{product.vendorName}</p>
+                <div className="mt-1 flex items-center gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <HiStar key={i} className="h-3.5 w-3.5 text-[#DDDDDD]" />
+                  ))}
+                </div>
               </div>
-              <span className="text-xs text-[#FF385C]">Write a Review</span>
+              <Button size="sm" variant="outline" leftIcon={<HiPencilSquare className="h-3.5 w-3.5" />}>
+                Write a Review
+              </Button>
             </div>
           ))}
         </div>
       )}
-    </AccountLayout>
+    </>
   );
 }

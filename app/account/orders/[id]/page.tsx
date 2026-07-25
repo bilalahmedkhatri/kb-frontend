@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartStore } from "@/src/store/cartStore";
-import { AccountLayout } from "@/src/components/templates/AccountLayout";
 import { Button } from "@/src/components/atoms/Button";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Spinner } from "@/src/components/atoms/Spinner";
@@ -71,34 +70,28 @@ export default function OrderDetailPage() {
 
   if (!user) {
     return (
-      <AccountLayout activeTab="orders">
         <div className="flex items-center justify-center py-16">
           <p className="text-sm text-[#717171]">Please sign in.</p>
         </div>
-      </AccountLayout>
     );
   }
 
   if (loading) {
     return (
-      <AccountLayout activeTab="orders">
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
         </div>
-      </AccountLayout>
     );
   }
 
   if (notFound || !order) {
     return (
-      <AccountLayout activeTab="orders">
         <div className="flex flex-col items-center justify-center py-16">
           <p className="text-lg font-medium text-[#717171]">Order not found</p>
           <Link href="/account/orders" className="mt-4 text-sm text-[#FF385C] hover:underline">
             Back to orders
           </Link>
         </div>
-      </AccountLayout>
     );
   }
 
@@ -107,7 +100,6 @@ export default function OrderDetailPage() {
   );
 
   return (
-    <AccountLayout activeTab="orders">
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-2">
           <Link href="/account/orders" className="text-[#717171] hover:text-[#222222]">
@@ -232,6 +224,5 @@ export default function OrderDetailPage() {
           </Link>
         </div>
       </div>
-    </AccountLayout>
   );
 }

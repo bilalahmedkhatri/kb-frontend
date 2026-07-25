@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useAuthStore } from "@/src/store/authStore";
-import { VendorLayout } from "@/src/components/templates/VendorLayout";
 import { Button } from "@/src/components/atoms/Button";
 import { Input } from "@/src/components/atoms/Input";
 import { Checkbox } from "@/src/components/atoms/Checkbox";
@@ -27,7 +26,6 @@ export default function StoreSettingsPage() {
   };
 
   return (
-    <VendorLayout activeTab="settings">
       <div className="flex flex-col gap-6">
         <h2 className="text-lg font-bold text-[#222222]">Store Settings</h2>
 
@@ -81,6 +79,5 @@ export default function StoreSettingsPage() {
           </div>
         </div>
       </div>
-    </VendorLayout>
   );
 }

@@ -11,7 +11,7 @@ interaction-state table). These tasks implement that spec in code.
   - Files: `app/globals.css`, `src/components/**`
   - Verify: grep for `\[#` arbitrary hex classNames returns zero in `src/components`; `var(--rausch)` resolves in devtools.
 
-- [ ] **T2 (P1, human: ~2h / CC: ~20min)** — homepage — Build full-bleed Kiribati hero image + headline + search overlay (desktop + mobile)
+- [x] **T2 (P1, human: ~2h / CC: ~20min)** — homepage — Build full-bleed Kiribati hero image + headline + search overlay (desktop + mobile). DONE 2026-07-15: Hero organism built (full-bleed image, headline, TripSearch overlay, mobile "Where to?" sheet, "Explore stays" CTA). Fixed corrupted headline char. Placeholder hero image pending real licensed photo (T5 / asset gate).
   - Surfaced by: Pass 1/3/4 — hero had no imagery or brand narrative; client's core ask is "represent the beauty of his region."
   - Files: `app/page.tsx`, `src/components/molecules/TripSearch.tsx`
   - Verify: homepage above-the-fold shows a full-bleed Kiribati photo + "Island Connects" wordmark + headline + search pill; on 375px the hero is full-height with a "Where to?" button.

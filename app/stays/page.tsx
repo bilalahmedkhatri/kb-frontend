@@ -37,7 +37,7 @@ export default function StaysPage() {
     try {
       const res = await api.getStays({
         page,
-        pageSize: 10,
+        pageSize: 12,
         filters: {
           categories: activeType ? [activeType] : [],
           sort,
@@ -57,8 +57,6 @@ export default function StaysPage() {
 
   return (
     <div className="container-app py-8">
-      <h1 className="mb-6 text-2xl font-bold text-[#222222]">Stays</h1>
-
       <div className="mb-6 flex flex-wrap gap-2">
         {stayTypes.map((t) => (
           <TagPill

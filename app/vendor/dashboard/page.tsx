@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuthStore } from "@/src/store/authStore";
-import { VendorLayout } from "@/src/components/templates/VendorLayout";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
@@ -47,7 +46,6 @@ export default function VendorDashboardPage() {
   }, []);
 
   return (
-    <VendorLayout activeTab="dashboard">
       <div className="flex flex-col gap-6">
         <h2 className="text-lg font-bold text-[#222222]">
           Welcome back, {user?.name?.split(" ")[0] || "Vendor"}
@@ -144,6 +142,5 @@ export default function VendorDashboardPage() {
           </Link>
         </div>
       </div>
-    </VendorLayout>
   );
 }

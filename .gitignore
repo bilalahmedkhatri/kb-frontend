@@ -9,6 +9,10 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.skills/*
+.next/*
+.gstack/*
+
 
 # testing
 /coverage

@@ -42,9 +42,9 @@ function SearchPageContent() {
     try {
       const filters = { search: query };
       const [prodRes, stayRes, guideRes] = await Promise.all([
-        api.getProducts({ page, pageSize: 10, filters }),
-        api.getStays({ page, pageSize: 10, filters }),
-        api.getGuides({ page, pageSize: 10, filters }),
+        api.getProducts({ page, pageSize: 12, filters }),
+        api.getStays({ page, pageSize: 12, filters }),
+        api.getGuides({ page, pageSize: 12, filters }),
       ]);
       setProducts(prodRes);
       setStays(stayRes);

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/store/authStore";
+import { users } from "@/src/data/users";
 import { Button } from "@/src/components/atoms/Button";
 import { Input } from "@/src/components/atoms/Input";
 import { Checkbox } from "@/src/components/atoms/Checkbox";
@@ -27,18 +28,30 @@ export default function LoginPage() {
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    login({
-      id: "u-1",
-      name: "John Smith",
-      email: "john@example.com",
-      avatar: "",
-      role: "customer",
-      createdAt: "2024-01-10",
-    });
+    await new Promise((r) => setTimeout(r, 500));
+
+    const found = users.find((u) => u.email === email);
+    if (!found) {
+      setError("No account found with that email. Try one of the demo accounts below.");
+      setLoading(false);
+      return;
+    }
+
+    login(found);
     setLoading(false);
-    router.push("/");
+    router.push("/account");
   };
+
+  const demoLogin = (user: (typeof users)[0]) => {
+    login(user);
+    router.push("/account");
+  };
+
+  const demoAccounts = [
+    { label: "Customer", users: users.filter((u) => u.role === "customer").slice(0, 2) },
+    { label: "Vendor", users: users.filter((u) => u.role === "vendor").slice(0, 2) },
+    { label: "Admin", users: users.filter((u) => u.role === "admin") },
+  ];
 
   return (
     <div className="container-app flex min-h-[calc(100vh-8rem)] items-center justify-center py-16">
@@ -110,6 +123,35 @@ export default function LoginPage() {
             <Link href="/signup?role=vendor" className="font-medium text-[#FF385C] hover:underline">
               Become a vendor
             </Link>
+          </div>
+        </div>
+
+        <div className="mt-8 rounded-xl border border-[#DDDDDD] p-6">
+          <h2 className="mb-4 text-sm font-bold text-[#222222]">Demo Accounts</h2>
+          <p className="mb-4 text-xs text-[#717171]">Click any account to log in instantly (no password needed).</p>
+          <div className="flex flex-col gap-4">
+            {demoAccounts.map((group) => (
+              <div key={group.label}>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#717171]">{group.label}</p>
+                <div className="flex flex-wrap gap-2">
+                  {group.users.map((u) => (
+                    <button
+                      key={u.id}
+                      onClick={() => demoLogin(u)}
+                      className="flex items-center gap-2 rounded-lg border border-[#DDDDDD] px-3 py-2 text-left text-sm transition-colors hover:border-[#FF385C] hover:bg-[#FFF0F3]"
+                    >
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F7F7F7] text-xs font-bold text-[#717171]">
+                        {u.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                      </span>
+                      <div>
+                        <p className="font-medium text-[#222222]">{u.name}</p>
+                        <p className="text-xs text-[#717171]">{u.email}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

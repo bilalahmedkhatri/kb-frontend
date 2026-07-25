@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/src/store/authStore";
-import { VendorLayout } from "@/src/components/templates/VendorLayout";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Pagination } from "@/src/components/atoms/Pagination";
 import { Spinner } from "@/src/components/atoms/Spinner";
@@ -50,7 +49,6 @@ export default function VendorOrdersPage() {
   const paginatedOrders = orders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <VendorLayout activeTab="orders">
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-bold text-[#222222]">Orders</h2>
 
@@ -136,6 +134,5 @@ export default function VendorOrdersPage() {
           </>
         )}
       </div>
-    </VendorLayout>
   );
 }

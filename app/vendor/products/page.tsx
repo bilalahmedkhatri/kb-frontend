@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/src/store/authStore";
-import { VendorLayout } from "@/src/components/templates/VendorLayout";
 import { Button } from "@/src/components/atoms/Button";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Input } from "@/src/components/atoms/Input";
@@ -98,7 +97,6 @@ export default function VendorProductsPage() {
   const paginated = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <VendorLayout activeTab="products">
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-[#222222]">Products</h2>
@@ -205,6 +203,5 @@ export default function VendorProductsPage() {
           </>
         )}
       </div>
-    </VendorLayout>
   );
 }

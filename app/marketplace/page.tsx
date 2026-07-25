@@ -30,7 +30,7 @@ export default function MarketplacePage() {
     try {
       const res = await api.getProducts({
         page,
-        pageSize: 10,
+        pageSize: 12,
         filters: { categories: activeCategories, sort, priceRange },
       });
       setProducts(res);
@@ -63,45 +63,42 @@ export default function MarketplacePage() {
   );
 
   return (
-    <div>
-      <div className="container-app pt-8 pb-12">
-        <h1 className="mb-6 text-2xl font-bold text-[#222222]">Marketplace</h1>
-        <MarketplaceLayout sidebar={sidebar}>
-          <div className="flex flex-col gap-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-[#717171]">
-                {products ? `${products.total} product${products.total !== 1 ? "s" : ""} found` : ""}
-              </p>
-              <SortSelect
-                value={sort}
-                onChange={(s) => { setSort(s); setPage(1); }}
-                options={sortOptions}
-              />
-            </div>
-            {error ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <p className="mb-2 text-base font-medium text-[#222222]">{error}</p>
-                <button
-                  type="button"
-                  onClick={fetchProducts}
-                  className="mt-2 rounded-lg bg-[#222222] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#222222]/80"
-                >
-                  Try again
-                </button>
-              </div>
-            ) : (
-              <ProductGrid
-                products={products?.data || []}
-                isLoading={loading}
-                totalPages={products?.totalPages}
-                currentPage={products?.page}
-                onPageChange={setPage}
-                emptyMessage="No products found. Try adjusting your filters."
-              />
-            )}
+    <div className="container-app flex flex-col px-0 pt-8 pb-12">
+      <MarketplaceLayout sidebar={sidebar}>
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-[#717171]">
+              {products ? `${products.total} product${products.total !== 1 ? "s" : ""} found` : ""}
+            </p>
+            <SortSelect
+              value={sort}
+              onChange={(s) => { setSort(s); setPage(1); }}
+              options={sortOptions}
+            />
           </div>
-        </MarketplaceLayout>
-      </div>
+          {error ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <p className="mb-2 text-base font-medium text-[#222222]">{error}</p>
+              <button
+                type="button"
+                onClick={fetchProducts}
+                className="mt-2 rounded-lg bg-[#222222] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#222222]/80"
+              >
+                Try again
+              </button>
+            </div>
+          ) : (
+            <ProductGrid
+              products={products?.data || []}
+              isLoading={loading}
+              totalPages={products?.totalPages}
+              currentPage={products?.page}
+              onPageChange={setPage}
+              emptyMessage="No products found. Try adjusting your filters."
+            />
+          )}
+        </div>
+      </MarketplaceLayout>
     </div>
   );
 }

@@ -38,7 +38,7 @@ export default function CategoryPage() {
           api.getCategories("product"),
           api.getProducts({
             page,
-            pageSize: 10,
+            pageSize: 12,
             filters: { categories: [slug], sort },
           }),
         ]);
@@ -60,7 +60,7 @@ export default function CategoryPage() {
       try {
         const prodRes = await api.getProducts({
           page,
-          pageSize: 10,
+          pageSize: 12,
           filters: { categories: [slug, ...activeCategories], sort, priceRange },
         });
         setProducts(prodRes);

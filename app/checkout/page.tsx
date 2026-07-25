@@ -12,10 +12,24 @@ import type { Address } from "@/src/types";
 const steps = ["Shipping", "Payment", "Review"];
 
 const paymentMethods = [
-  { value: "credit-card", label: "Credit Card" },
-  { value: "paypal", label: "PayPal" },
-  { value: "bank-transfer", label: "Bank Transfer" },
-];
+  {
+    value: "card",
+    label: "Credit / Debit Card or Mobile Wallet",
+    description: "Visa, Mastercard, Amex, Apple Pay, Google Pay",
+    badge: "Instant Processing • Zero Buyer Conversion Fees",
+  },
+  {
+    value: "paypal",
+    label: "PayPal / Pay in 4",
+    description: "Pay securely using your PayPal balance, linked bank, or split payments.",
+  },
+  {
+    value: "wise",
+    label: "International Bank Transfer (Wise)",
+    description: "Direct transfer with real exchange rates and minimal fees (Best for large orders).",
+    badge: "Lowest Fee Option (~0.4%)",
+  },
+] as const;
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -30,7 +44,7 @@ export default function CheckoutPage() {
     country: "Kiribati",
     phone: "",
   });
-  const [paymentMethod, setPaymentMethod] = useState("credit-card");
+  const [paymentMethod, setPaymentMethod] = useState("card");
   const [submitting, setSubmitting] = useState(false);
 
   const updateShipping = (field: keyof Address, value: string) => {
@@ -124,17 +138,19 @@ export default function CheckoutPage() {
       )}
 
       {currentStep === 1 && (
-        <div className="flex flex-col gap-4">
-          <h2 className="text-xl font-bold text-[#222222]">Payment Method</h2>
-          <p className="text-sm text-[#717171]">Select a payment method (mock)</p>
-          <div className="flex flex-col gap-3">
+        <div className="mx-auto w-full max-w-xl">
+          <h2 className="mb-1 text-xl font-bold text-[#222222]">Select Payment Method</h2>
+          <p className="mb-6 text-sm text-[#717171]">
+            All transactions are encrypted and processed securely in <strong className="text-[#222222]">USD ($)</strong>.
+          </p>
+          <div className="flex flex-col gap-4">
             {paymentMethods.map((method) => (
               <label
                 key={method.value}
                 className={cn(
-                  "flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition-colors",
+                  "flex cursor-pointer items-start gap-4 rounded-xl border-2 p-4 transition-all",
                   paymentMethod === method.value
-                    ? "border-[#222222] bg-[#F7F7F7]"
+                    ? "border-[#FF385C] bg-[#FFF0F3]"
                     : "border-[#DDDDDD] hover:border-[#222222]"
                 )}
               >
@@ -144,13 +160,35 @@ export default function CheckoutPage() {
                   value={method.value}
                   checked={paymentMethod === method.value}
                   onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="h-4 w-4 accent-[#222222]"
+                  className="mt-0.5 h-4 w-4 accent-[#FF385C]"
                 />
-                <span className="text-sm font-medium text-[#222222]">{method.label}</span>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-[#222222]">{method.label}</p>
+                    <span className="shrink-0 text-xs font-bold tracking-wide text-[#717171]">
+                      {method.value === "card" && "VISA MC Pay"}
+                      {method.value === "paypal" && "PayPal"}
+                      {method.value === "wise" && "Wise"}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-[#717171]">{method.description}</p>
+                  {"badge" in method && method.badge && (
+                    <span
+                      className={cn(
+                        "mt-2 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium",
+                        method.value === "card"
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-blue-50 text-blue-700"
+                      )}
+                    >
+                      {method.badge}
+                    </span>
+                  )}
+                </div>
               </label>
             ))}
           </div>
-          <div className="mt-4 flex justify-between">
+          <div className="mt-8 flex items-center justify-between border-t border-[#DDDDDD] pt-4">
             <Button variant="outline" onClick={() => setCurrentStep(0)}>
               Back
             </Button>

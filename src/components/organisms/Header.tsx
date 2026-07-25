@@ -15,6 +15,7 @@ import { cn } from "@/src/lib/utils";
 import { Avatar } from "@/src/components/atoms/Avatar";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Button } from "@/src/components/atoms/Button";
+import { Logo } from "@/src/components/atoms/Logo";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartStore } from "@/src/store/cartStore";
 import { useUIStore } from "@/src/store/uiStore";
@@ -22,8 +23,9 @@ import { useEffect, useState } from "react";
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Marketplace", href: "/marketplace" },
   { label: "Stays", href: "/stays" },
+  { label: "Marketplace", href: "/marketplace" },
+  { label: "Experiences", href: "/experiences" },
   { label: "Guides", href: "/guides" },
 ];
 
@@ -38,12 +40,10 @@ export function Header() {
   const count = mounted ? itemCount() : 0;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#DDDDDD] bg-white">
-      <div className="container-app flex items-center py-3">
+    <header className="sticky top-0 z-50 border-b border-[var(--gray-300)] bg-white shadow-xs">
+      <div className="container-app flex items-center justify-between py-3">
         <div className="flex items-center">
-          <Link href="/" className="text-2xl font-bold text-[#FF385C]">
-            Island Connects
-          </Link>
+          <Logo className="hover:opacity-95 transition-opacity" />
         </div>
         <nav className="hidden flex-1 items-center justify-center gap-1 md:flex">
           {navLinks.map((link) => (
@@ -51,10 +51,10 @@ export function Header() {
               key={link.href}
               href={link.href}
               className={cn(
-                "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                pathname === link.href || pathname.startsWith(link.href + "/")
-                  ? "text-[#222222] underline underline-offset-4"
-                  : "text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]"
+                "rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors",
+                pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
+                  ? "text-[var(--ink)] underline underline-offset-8 decoration-[var(--rausch)] decoration-2 font-bold"
+                  : "text-[var(--gray-500)] hover:bg-[var(--gray-100)] hover:text-[var(--ink)]"
               )}
             >
               {link.label}
@@ -83,12 +83,14 @@ export function Header() {
             <HiHeart className="h-5 w-5" />
           </Link>
 
-          {isAuthenticated && user ? (
+          {!mounted ? (
+            <div className="h-9 w-20" />
+          ) : isAuthenticated && user ? (
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2 rounded-full border border-[#DDDDDD] p-1 pr-3 transition-colors hover:bg-[#F7F7F7]"
+                className="flex items-center gap-2 rounded-full bg-white px-1 py-1.5 transition-colors hover:bg-[#f6d9d9]"
               >
                 <Avatar src={user.avatar} name={user.name} size="sm" />
                 <HiChevronDown className="hidden h-4 w-4 text-[#717171] sm:block" />
@@ -144,8 +146,15 @@ export function Header() {
       </div>
 
       {isMobileNavOpen && (
-        <div className="fixed inset-0 z-40 bg-white md:hidden">
-          <div className="flex flex-col gap-2 px-6 pb-8 pt-4">
+        <div
+          className="fixed inset-0 z-40 md:hidden"
+          onClick={closeMobileNav}
+        >
+          <div className="h-full w-full bg-black/20" />
+          <div
+            className="absolute left-0 top-0 flex h-full w-72 max-w-[85vw] flex-col gap-2 bg-gray-100/95 px-6 pb-8 pt-4"
+            onClick={(event) => event.stopPropagation()}
+          >
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -154,7 +163,7 @@ export function Header() {
                 className={cn(
                   "rounded-lg px-4 py-3 text-base font-medium transition-colors",
                   pathname === link.href
-                    ? "bg-[#F7F7F7] text-[#222222]"
+                    ? "bg-red-200/90 text-[#222222]"
                     : "text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]"
                 )}
               >

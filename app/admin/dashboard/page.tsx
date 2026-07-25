@@ -142,7 +142,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4">
         <Link
           href="/admin/products"
           className="text-sm font-medium text-[#FF385C] hover:underline"
@@ -154,6 +154,12 @@ export default function AdminDashboardPage() {
           className="text-sm font-medium text-[#FF385C] hover:underline"
         >
           Manage Vendors →
+        </Link>
+        <Link
+          href="/admin/settings"
+          className="text-sm font-medium text-[#FF385C] hover:underline font-bold"
+        >
+          Platform Settings & Monetization →
         </Link>
       </div>
     </div>
