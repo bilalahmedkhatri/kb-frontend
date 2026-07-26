@@ -7,17 +7,23 @@ import type { Stay } from "@/src/types";
 interface StayCardProps {
   stay: Stay;
   className?: string;
+  /** next/image sizes hint — defaults to grid context; pass a narrow value for rail context */
+  sizes?: string;
 }
 
-export function StayCard({ stay, className }: StayCardProps) {
+export function StayCard({
+  stay,
+  className,
+  sizes = "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw",
+}: StayCardProps) {
   return (
-    <Link href={`/stay/${stay.id}`} className={cn("group flex flex-col gap-1", className)}>
-      <div className="relative aspect-[1/1] overflow-hidden rounded-lg bg-[#F7F7F7]">
+    <Link href={`/stay/${stay.id}`} className={cn("group flex w-full flex-col gap-1", className)}>
+      <div className="relative w-full aspect-[1/1] overflow-hidden rounded-lg bg-[#F7F7F7]">
         <Image
           src={stay.images[0] || "/placeholder.svg"}
           alt={stay.name}
           fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          sizes={sizes}
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <Badge variant="primary" className="absolute left-1 top-1 capitalize">

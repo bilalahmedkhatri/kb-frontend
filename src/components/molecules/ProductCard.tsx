@@ -15,9 +15,11 @@ interface ProductCardProps {
   product: Product;
   onAddToCart?: (id: string) => void;
   className?: string;
+  /** next/image sizes hint — defaults to grid context; pass a narrow value for rail context */
+  sizes?: string;
 }
 
-export function ProductCard({ product, onAddToCart, className }: ProductCardProps) {
+export function ProductCard({ product, onAddToCart, className, sizes }: ProductCardProps) {
   const { toggleItem, isWishlisted } = useWishlistStore();
   const { addItem } = useCartStore();
   const wishlisted = isWishlisted(product.id);
@@ -39,10 +41,10 @@ export function ProductCard({ product, onAddToCart, className }: ProductCardProp
   };
 
   return (
-    <div className={cn("group relative flex flex-col gap-1", className)}>
-      <div className="relative aspect-[1/1] overflow-hidden rounded-lg bg-[#F7F7F7]">
+    <div className={cn("group relative flex w-full flex-col gap-1", className)}>
+      <div className="relative w-full aspect-[1/1] overflow-hidden rounded-lg bg-[#F7F7F7]">
         <Link href={`/product/${product.id}`} className="absolute inset-0 z-0" aria-label={product.name} />
-        <ImageCarousel images={product.images} alt={product.name} />
+        <ImageCarousel images={product.images} alt={product.name} sizes={sizes} />
         <IconButton
           label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           size="sm"

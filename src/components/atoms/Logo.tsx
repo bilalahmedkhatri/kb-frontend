@@ -11,7 +11,7 @@ interface LogoProps {
 
 export function Logo({ href = "/", className, compact = false }: LogoProps) {
   const content = (
-    <div className={cn("flex items-center", className)}>
+    <div className={cn("flex items-center gap-1", className)}>
       {/* Icon — 32px mobile · 36px tablet · 40px desktop */}
       <div className="relative h-10 w-10 lg:h-13 lg:w-13 md:h-10 md:w-10 shrink-0 overflow-hidden transition-transform group-hover:scale-105">
         <Image

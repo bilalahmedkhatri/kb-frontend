@@ -76,11 +76,11 @@ export function FeaturedRail({ items, type, title, viewAllHref, className }: Fea
           className="flex gap-4 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {items.map((item) => (
-            <div key={item.id} className="max-w-[160px] flex-shrink-0 sm:max-w-[180px] lg:max-w-[200px]">
+            <div key={item.id} className="w-[160px] flex-shrink-0 sm:w-[180px] lg:w-[200px]">
               {type === "product" ? (
-                <ProductCard product={item as Product} />
+                <ProductCard product={item as Product} sizes="(max-width: 640px) 160px, (max-width: 1024px) 180px, 200px" />
               ) : (
-                <StayCard stay={item as Stay} />
+                <StayCard stay={item as Stay} sizes="(max-width: 640px) 160px, (max-width: 1024px) 180px, 200px" />
               )}
             </div>
           ))}

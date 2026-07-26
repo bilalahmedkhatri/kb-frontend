@@ -8,9 +8,16 @@ interface ImageCarouselProps {
   images: string[];
   alt: string;
   className?: string;
+  /** next/image sizes hint — passed down from the parent card */
+  sizes?: string;
 }
 
-export function ImageCarousel({ images, alt, className }: ImageCarouselProps) {
+export function ImageCarousel({
+  images,
+  alt,
+  className,
+  sizes = "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw",
+}: ImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
@@ -80,7 +87,7 @@ export function ImageCarousel({ images, alt, className }: ImageCarouselProps) {
           alt={`${alt} ${i + 1}`}
           fill
           priority={i === 0}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes={sizes}
           className={cn(
             "object-cover transition-opacity duration-300",
             i === activeIndex ? "opacity-100" : "pointer-events-none absolute inset-0 opacity-0"
