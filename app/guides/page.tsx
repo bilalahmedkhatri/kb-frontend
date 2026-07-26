@@ -5,7 +5,7 @@ import { GuideGrid } from "@/src/components/organisms/GuideGrid";
 import { TagPill } from "@/src/components/molecules/TagPill";
 import { Skeleton } from "@/src/components/atoms/Skeleton";
 import { api } from "@/src/lib/api";
-import type { Guide, PaginatedResponse } from "@/src/types";
+import type { Guide } from "@/src/types";
 
 const topics = ["Culture", "Food", "Adventure", "History"];
 
@@ -14,24 +14,27 @@ export default function GuidesIndexPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTopic, setActiveTopic] = useState("");
-
-  const fetchGuides = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const filters = activeTopic ? { categories: [activeTopic] } : undefined;
-      const res = await api.getGuides({ pageSize: 50, filters });
-      setGuides(res.data);
-    } catch {
-      setError("Could not load guides. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
-    fetchGuides();
-  }, [activeTopic]);
+    let cancelled = false;
+    setError(null);
+    const filters = activeTopic ? { categories: [activeTopic] } : undefined;
+    api.getGuides({ pageSize: 50, filters })
+      .then((res) => {
+        if (!cancelled) {
+          setGuides(res.data);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError("Could not load guides. Please try again.");
+          setLoading(false);
+        }
+      });
+    return () => { cancelled = true; };
+  }, [activeTopic, retryKey]);
 
   const filteredGuides = activeTopic
     ? guides.filter((g) => g.topic === activeTopic)
@@ -67,7 +70,7 @@ export default function GuidesIndexPage() {
           <p className="mb-2 text-base font-medium text-[#222222]">{error}</p>
           <button
             type="button"
-            onClick={fetchGuides}
+            onClick={() => { setError(null); setLoading(true); setRetryKey((k) => k + 1); }}
             className="mt-2 rounded-lg bg-[#222222] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#222222]/80"
           >
             Try again

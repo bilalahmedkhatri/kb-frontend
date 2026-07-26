@@ -13,7 +13,7 @@ interface SearchBarProps {
 export function SearchBar({ value, onChange, placeholder = "Search...", className }: SearchBarProps) {
   return (
     <div className={cn("relative", className)}>
-      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#717171]">
+      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#222222]">
         <HiMagnifyingGlass className="h-5 w-5" />
       </div>
       <input

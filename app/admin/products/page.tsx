@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Badge } from "@/src/components/atoms/Badge";
-import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
 import { api } from "@/src/lib/api";
 import { formatCurrency, cn } from "@/src/lib/utils";

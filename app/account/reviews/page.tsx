@@ -25,7 +25,6 @@ export default function ReviewsPage() {
 
   useEffect(() => {
     if (!user) return;
-    setLoading(true);
 
     Promise.all([
       api.getOrders(user.id),

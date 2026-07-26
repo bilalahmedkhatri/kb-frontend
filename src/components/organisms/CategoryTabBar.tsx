@@ -88,7 +88,7 @@ export function CategoryTabBar({
         </button>
         {categories.map((category) => {
           const isActive = activeCategory === category.slug;
-          const catImage = (category as any).image || `https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=200&q=80`;
+          const catImage = ((category as unknown as Record<string, unknown>).image as string | undefined) || `https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=200&q=80`;
           return (
             <button
               key={category.id}

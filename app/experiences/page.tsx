@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { EcoBadge } from "@/src/components/atoms/EcoBadge";
 import { WhatsAppInquireButton } from "@/src/components/atoms/WhatsAppInquireButton";
-import { HiMapPin, HiClock, HiUserGroup, HiStar, HiSparkles } from "react-icons/hi2";
+import { HiMapPin, HiClock, HiUserGroup, HiStar } from "react-icons/hi2";
+import { GiPolarStar } from "react-icons/gi";
 
 export const metadata = {
   title: "Cultural Experiences & Artisan Workshops | Island Connects Kiribati",
@@ -84,7 +85,7 @@ export default function ExperiencesPage() {
           <div className="container-app relative z-10">
             <div className="max-w-2xl">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1 text-xs font-bold backdrop-blur-md text-emerald-300 mb-4">
-                <HiSparkles className="h-4 w-4" /> Eco-Tourism & Cultural Immersion
+                <GiPolarStar className="h-4 w-4" /> Eco-Tourism & Cultural Immersion
               </span>
               <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight mb-4">
                 Immersive Kiribati Workshops & Eco-Tours

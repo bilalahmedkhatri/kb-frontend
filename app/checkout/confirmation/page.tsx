@@ -10,10 +10,9 @@ import { HiCheckCircle } from "react-icons/hi2";
 
 export default function OrderConfirmationPage() {
   const { items, subtotal, clearCart } = useCartStore();
-  const [orderNumber, setOrderNumber] = useState("");
+  const [orderNumber] = useState(() => `KB-${Date.now().toString(36).toUpperCase()}`);
 
   useEffect(() => {
-    setOrderNumber(`KB-${Date.now().toString(36).toUpperCase()}`);
     clearCart();
   }, [clearCart]);
 

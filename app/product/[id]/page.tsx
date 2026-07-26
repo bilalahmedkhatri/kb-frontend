@@ -2,10 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
-import { Rating } from "@/src/components/atoms/Rating";
-import { Badge } from "@/src/components/atoms/Badge";
-import { EcoBadge } from "@/src/components/atoms/EcoBadge";
 import { Avatar } from "@/src/components/atoms/Avatar";
 import { Button } from "@/src/components/atoms/Button";
 import { WhatsAppInquireButton } from "@/src/components/atoms/WhatsAppInquireButton";
@@ -25,10 +21,10 @@ import {
   HiShieldCheck,
   HiShare,
   HiHeart,
-  HiSparkles,
   HiCheckBadge,
   HiTruck,
 } from "react-icons/hi2";
+import { GiPolarStar } from "react-icons/gi";
 import type { Product, Review, User } from "@/src/types";
 
 export default function ProductDetailPage() {
@@ -163,7 +159,7 @@ export default function ProductDetailPage() {
           {/* Highlights & Eco Credentials */}
           <div className="flex flex-col gap-4 border-b border-[var(--gray-200)] pb-6">
             <div className="flex items-start gap-3">
-              <HiSparkles className="h-6 w-6 text-amber-500 shrink-0 mt-0.5" />
+              <GiPolarStar className="h-6 w-6 text-amber-500 shrink-0 mt-0.5" />
               <div>
                 <h3 className="text-sm font-bold text-[var(--ink)]">100% Authentic Island Fiber</h3>
                 <p className="text-xs text-[var(--gray-500)]">Hand-harvested pandanus leaves and natural dyes from outer Kiribati atolls.</p>

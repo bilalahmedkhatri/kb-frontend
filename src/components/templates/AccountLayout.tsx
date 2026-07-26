@@ -4,7 +4,7 @@ import Link from "next/link";
 import { cn } from "@/src/lib/utils";
 import { useAuthStore } from "@/src/store/authStore";
 import { Button } from "@/src/components/atoms/Button";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import {
   HiUser,
   HiCalendarDays,
@@ -31,16 +31,19 @@ const accountLinks = [
 
 export function AccountLayout({ children, activeTab }: AccountLayoutProps) {
   const { isAuthenticated, user } = useAuthStore();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   if (mounted && !isAuthenticated) {
     return (
       <div className="container-app overflow-x-hidden py-16">
-        <div className="mx-auto max-w-md rounded-xl border border-[#DDDDDD] p-8 text-center">
-          <HiArrowRightOnRectangle className="mx-auto mb-4 h-12 w-12 text-[#DDDDDD]" />
-          <h2 className="mb-2 text-xl font-bold text-[#222222]">Sign in to Your Account</h2>
-          <p className="mb-6 text-sm text-[#717171]">
+        <div className="mx-auto max-w-md rounded-xl border border-[var(--gray-300)] p-8 text-center">
+          <HiArrowRightOnRectangle className="mx-auto mb-4 h-12 w-12 text-[var(--gray-300)]" />
+          <h2 className="mb-2 text-xl font-bold text-[var(--ink)]">Sign in to Your Account</h2>
+          <p className="mb-6 text-sm text-[var(--gray-500)]">
             Access your profile, bookings, orders, saved items, and more.
           </p>
           <Link href="/login?redirect=/account">
@@ -55,7 +58,7 @@ export function AccountLayout({ children, activeTab }: AccountLayoutProps) {
 
   return (
     <div className="container-app overflow-x-hidden py-8">
-      <h1 className="mb-6 text-2xl font-bold text-[#222222]">My Account</h1>
+      <h1 className="mb-6 text-2xl font-bold text-[var(--ink)]">My Account</h1>
 
       <div className="flex flex-col gap-0 md:flex-row md:gap-8">
         <aside className="hidden w-56 flex-shrink-0 md:block">

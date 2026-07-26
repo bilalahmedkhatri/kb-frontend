@@ -7,7 +7,6 @@ import { Button } from "@/src/components/atoms/Button";
 import { Input } from "@/src/components/atoms/Input";
 import { Badge } from "@/src/components/atoms/Badge";
 import {
-  HiUser,
   HiPhone,
   HiMapPin,
   HiCheckCircle,
@@ -18,7 +17,6 @@ import {
   HiArrowRightOnRectangle,
   HiPlus,
   HiCreditCard,
-  HiStar,
   HiGlobeAlt,
   HiClock,
   HiCurrencyDollar,

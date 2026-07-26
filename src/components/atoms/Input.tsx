@@ -21,7 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="relative">
           {leftIcon && (
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#717171]">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#222222]">
               {leftIcon}
             </div>
           )}

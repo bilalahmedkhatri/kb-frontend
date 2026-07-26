@@ -52,7 +52,7 @@ export default function CategoryPage() {
       }
     }
     init();
-  }, [slug]);
+  }, [slug, page, sort]);
 
   useEffect(() => {
     async function refetch() {

@@ -6,7 +6,7 @@ import { FilterSidebar } from "@/src/components/organisms/FilterSidebar";
 import { ProductGrid } from "@/src/components/organisms/ProductGrid";
 import { SortSelect } from "@/src/components/molecules/SortSelect";
 import { api } from "@/src/lib/api";
-import type { Category, Product, PaginatedResponse } from "@/src/types";
+import type { Product, PaginatedResponse } from "@/src/types";
 
 const sortOptions = [
   { label: "Newest", value: "newest" },
@@ -23,27 +23,31 @@ export default function MarketplacePage() {
   const [sort, setSort] = useState("newest");
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-
-  const fetchProducts = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.getProducts({
-        page,
-        pageSize: 12,
-        filters: { categories: activeCategories, sort, priceRange },
-      });
-      setProducts(res);
-    } catch {
-      setError("Could not load products. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
-    fetchProducts();
-  }, [page, sort, activeCategories, priceRange]);
+    let cancelled = false;
+    api.getProducts({
+      page,
+      pageSize: 12,
+      filters: { categories: activeCategories, sort, priceRange },
+    })
+      .then((res) => {
+        if (!cancelled) {
+          setProducts(res);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError("Could not load products. Please try again.");
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [page, sort, activeCategories, priceRange, retryKey]);
 
   const sidebar = (
     <FilterSidebar
@@ -81,7 +85,7 @@ export default function MarketplacePage() {
               <p className="mb-2 text-base font-medium text-[#222222]">{error}</p>
               <button
                 type="button"
-                onClick={fetchProducts}
+                onClick={() => { setError(null); setLoading(true); setRetryKey((k) => k + 1); }}
                 className="mt-2 rounded-lg bg-[#222222] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#222222]/80"
               >
                 Try again

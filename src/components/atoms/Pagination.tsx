@@ -27,7 +27,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="flex h-9 w-9 items-center justify-center rounded-lg text-sm text-[#717171] hover:bg-[#F7F7F7] disabled:opacity-30 disabled:hover:bg-transparent"
+        className="flex h-9 w-9 items-center justify-center rounded-lg text-sm text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
         aria-label="Previous page"
       >
         <HiChevronLeft className="h-4 w-4" />
@@ -58,7 +58,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="flex h-9 w-9 items-center justify-center rounded-lg text-sm text-[#717171] hover:bg-[#F7F7F7] disabled:opacity-30 disabled:hover:bg-transparent"
+        className="flex h-9 w-9 items-center justify-center rounded-lg text-sm text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
         aria-label="Next page"
       >
         <HiChevronRight className="h-4 w-4" />

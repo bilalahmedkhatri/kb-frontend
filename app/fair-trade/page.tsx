@@ -3,7 +3,8 @@
 import { InfoLayout } from "@/src/components/templates/InfoLayout";
 import Link from "next/link";
 import { Button } from "@/src/components/atoms/Button";
-import { HiSparkles, HiShieldCheck, HiGlobeAmericas, HiCurrencyDollar, HiCheckCircle } from "react-icons/hi2";
+import { HiShieldCheck, HiGlobeAmericas, HiCurrencyDollar } from "react-icons/hi2";
+import { GiPolarStar } from "react-icons/gi";
 
 export default function FairTradePage() {
   return (
@@ -36,7 +37,7 @@ export default function FairTradePage() {
 
           <div className="flex flex-col gap-2 rounded-2xl border border-[var(--gray-200)] bg-[var(--gray-50)] p-5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
-              <HiSparkles className="h-6 w-6" />
+              <GiPolarStar className="h-6 w-6" />
             </div>
             <h3 className="text-base font-bold text-[var(--ink)]">Handmade Provenance</h3>
             <p className="text-xs text-[var(--gray-700)]">
@@ -112,7 +113,7 @@ export default function FairTradePage() {
             </p>
           </div>
           <Link href="/marketplace">
-            <Button variant="primary" size="md" rightIcon={<HiSparkles className="h-4 w-4" />}>
+            <Button variant="primary" size="md" rightIcon={<GiPolarStar className="h-4 w-4" />}>
               Shop Fair-Trade Marketplace
             </Button>
           </Link>

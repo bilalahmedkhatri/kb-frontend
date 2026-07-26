@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { SearchBar } from "@/src/components/molecules/SearchBar";
 import { ProductGrid } from "@/src/components/organisms/ProductGrid";
@@ -35,30 +35,34 @@ function SearchPageContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-
-  const fetchResults = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const filters = { search: query };
-      const [prodRes, stayRes, guideRes] = await Promise.all([
-        api.getProducts({ page, pageSize: 12, filters }),
-        api.getStays({ page, pageSize: 12, filters }),
-        api.getGuides({ page, pageSize: 12, filters }),
-      ]);
-      setProducts(prodRes);
-      setStays(stayRes);
-      setGuides(guideRes);
-    } catch {
-      setError("Could not load search results. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, [query, page]);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
-    fetchResults();
-  }, [fetchResults]);
+    let cancelled = false;
+    const filters = { search: query };
+    Promise.all([
+      api.getProducts({ page, pageSize: 12, filters }),
+      api.getStays({ page, pageSize: 12, filters }),
+      api.getGuides({ page, pageSize: 12, filters }),
+    ])
+      .then(([prodRes, stayRes, guideRes]) => {
+        if (!cancelled) {
+          setProducts(prodRes);
+          setStays(stayRes);
+          setGuides(guideRes);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError("Could not load search results. Please try again.");
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [query, page, retryKey]);
 
   const handleSearch = (val: string) => {
     setSearchValue(val);
@@ -122,7 +126,7 @@ function SearchPageContent() {
           <p className="mb-6 text-center text-[#717171]">{error}</p>
           <button
             type="button"
-            onClick={fetchResults}
+            onClick={() => { setError(null); setLoading(true); setRetryKey((k) => k + 1); }}
             className="rounded-lg bg-[#222222] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#222222]/80"
           >
             Try again

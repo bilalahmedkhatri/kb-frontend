@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { HiSparkles, HiShieldCheck, HiSun, HiGlobeAmericas } from "react-icons/hi2";
+import { HiShieldCheck, HiSun, HiGlobeAmericas } from "react-icons/hi2";
+import { GiPolarStar } from "react-icons/gi";
 import { cn } from "@/src/lib/utils";
 
 export type BadgeType = "eco" | "certified" | "solar" | "fairtrade" | "handmade";
@@ -15,7 +16,7 @@ interface EcoBadgeProps {
 const badgeConfig: Record<BadgeType, { defaultLabel: string; icon: React.ReactNode; bgClass: string; textClass: string }> = {
   eco: {
     defaultLabel: "100% Local Fiber",
-    icon: <HiSparkles className="h-3.5 w-3.5 text-emerald-600" />,
+    icon: <GiPolarStar className="h-3.5 w-3.5 text-emerald-600" />,
     bgClass: "bg-emerald-50 border-emerald-200",
     textClass: "text-emerald-800",
   },
@@ -39,7 +40,7 @@ const badgeConfig: Record<BadgeType, { defaultLabel: string; icon: React.ReactNo
   },
   handmade: {
     defaultLabel: "Handcrafted in Kiribati",
-    icon: <HiSparkles className="h-3.5 w-3.5 text-rose-600" />,
+    icon: <GiPolarStar className="h-3.5 w-3.5 text-rose-600" />,
     bgClass: "bg-rose-50 border-rose-200",
     textClass: "text-rose-800",
   },

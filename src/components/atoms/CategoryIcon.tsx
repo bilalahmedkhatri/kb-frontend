@@ -2,7 +2,6 @@
 
 import React from "react";
 import {
-  HiSparkles,
   HiShoppingBag,
   HiScissors,
   HiCube,
@@ -16,6 +15,7 @@ import {
   HiTag,
   HiSquares2X2,
 } from "react-icons/hi2";
+import { GiPolarStar } from "react-icons/gi";
 import { cn } from "@/src/lib/utils";
 
 interface CategoryIconProps {
@@ -24,7 +24,7 @@ interface CategoryIconProps {
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  HiSparkles,
+  GiPolarStar,
   HiShoppingBag,
   HiScissors,
   HiCube,

@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { HiMapPin, HiHome, HiShoppingBag, HiBookOpen, HiSparkles } from "react-icons/hi2";
+import { HiMapPin, HiHome, HiShoppingBag, HiBookOpen } from "react-icons/hi2";
+import { GiPolarStar } from "react-icons/gi";
 import { cn } from "@/src/lib/utils";
 import Link from "next/link";
 
@@ -73,9 +74,6 @@ export function IslandExplorer() {
       <div className="container-app">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
-            <div className="flex items-center gap-2 text-[var(--babu)] font-bold text-xs uppercase tracking-wider mb-2">
-              <HiSparkles className="h-4 w-4" /> Interactive Island Directory
-            </div>
             <h2 className="text-2xl md:text-3xl font-black text-[var(--ink)] tracking-tight">
               Explore Kiribati Archipelago
             </h2>
@@ -123,9 +121,6 @@ export function IslandExplorer() {
 
           <div className="lg:col-span-6 p-6 lg:p-8 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-[var(--rausch)] mb-1">
-                <HiMapPin className="h-4 w-4" /> Island Spotlight
-              </div>
               <h3 className="text-2xl font-black text-[var(--ink)] mb-3">{selectedIsland.name}</h3>
               <p className="text-sm text-[var(--gray-700)] leading-relaxed mb-6">
                 {selectedIsland.description}
@@ -142,7 +137,7 @@ export function IslandExplorer() {
                       key={idx}
                       className="rounded-lg bg-[var(--gray-100)] border border-[var(--gray-200)] px-3 py-1.5 text-xs font-semibold text-[var(--ink)]"
                     >
-                      ✨ {h}
+                      <GiPolarStar className="inline-block mr-1 h-3 w-3 text-amber-500" /> {h}
                     </span>
                   ))}
                 </div>

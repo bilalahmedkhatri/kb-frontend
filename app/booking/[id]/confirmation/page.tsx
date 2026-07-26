@@ -18,10 +18,9 @@ export default function BookingConfirmationPage() {
 
   const [stay, setStay] = useState<Stay | null>(null);
   const [loading, setLoading] = useState(true);
-  const [referenceNumber, setReferenceNumber] = useState("");
+  const [referenceNumber] = useState(() => `KBB-${Date.now().toString(36).toUpperCase()}`);
 
   useEffect(() => {
-    setReferenceNumber(`KBB-${Date.now().toString(36).toUpperCase()}`);
     async function load() {
       try {
         const data = await api.getStay(stayId);

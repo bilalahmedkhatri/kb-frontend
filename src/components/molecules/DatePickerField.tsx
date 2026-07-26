@@ -15,7 +15,7 @@ export function DatePickerField({ label, value, onChange, className }: DatePicke
     <div className={cn("flex flex-col gap-1.5", className)}>
       <label className="text-sm font-medium text-[#222222]">{label}</label>
       <div className="relative">
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#717171]">
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#222222]">
           <HiCalendarDays className="h-5 w-5" />
         </div>
         <input

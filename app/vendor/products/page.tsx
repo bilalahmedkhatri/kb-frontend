@@ -56,7 +56,7 @@ export default function VendorProductsPage() {
 
   useEffect(() => {
     if (!user) return;
-    setLoading(true);
+
     api.getVendorProducts(user.id).then((data) => {
       setProducts(data);
       setLoading(false);

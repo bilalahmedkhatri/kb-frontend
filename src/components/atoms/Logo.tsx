@@ -1,33 +1,36 @@
 import Link from "next/link";
 import { cn } from "@/src/lib/utils";
-import Image from "next/image"
+import Image from "next/image";
 
 interface LogoProps {
   href?: string;
   className?: string;
+  /** Hide the wordmark — show icon only. Useful for compact nav slots. */
   compact?: boolean;
 }
 
 export function Logo({ href = "/", className, compact = false }: LogoProps) {
   const content = (
-    <div className={cn("flex items-center gap-2.5 sm:gap-3", className)}>
-      <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden transition-transform group-hover:scale-105">
+    <div className={cn("flex items-center", className)}>
+      {/* Icon — 32px mobile · 36px tablet · 40px desktop */}
+      <div className="relative h-10 w-10 lg:h-13 lg:w-13 md:h-10 md:w-10 shrink-0 overflow-hidden transition-transform group-hover:scale-105">
         <Image
           src="/favicon.png"
           alt="Island Connects Logo"
-          width={80}
-          height={80}
+          width={40}
+          height={40}
           priority
-          className="h-full w-full object-contain p-1"
+          className="h-full w-full object-contain"
         />
       </div>
 
+      {/* Wordmark — hidden when compact */}
       {!compact && (
-        <div className="flex flex-col leading-none">
-          <span className="text-[0.95rem] font-black tracking-[-0.03em] text-[var(--ink)] sm:text-[1rem]">
+        <div className="flex flex-col leading-none gap-px">
+          <span className="text-[1rem] sm:text-[0.85rem] md:text-[0.9rem] font-black tracking-tight text-[var(--ink)]">
             Island
           </span>
-          <span className="text-[0.95rem] font-black tracking-[-0.03em] text-[var(--rausch)] sm:text-[1rem]">
+          <span className="text-[1rem] sm:text-[0.85rem] md:text-[0.9rem] font-black tracking-tight text-[var(--rausch)]">
             Connects
           </span>
         </div>

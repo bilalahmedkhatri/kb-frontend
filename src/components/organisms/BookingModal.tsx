@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Root, Trigger, Portal, Overlay, Content } from "@radix-ui/react-dialog";
+import { Root, Portal, Overlay, Content } from "@radix-ui/react-dialog";
 import {
   HiXMark,
   HiCalendarDays,
-  HiUser,
   HiEnvelope,
-  HiPhone,
   HiCheckCircle,
 } from "react-icons/hi2";
 import { cn, formatCurrency, formatDateRange } from "@/src/lib/utils";

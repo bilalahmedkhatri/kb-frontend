@@ -3,12 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Badge } from "@/src/components/atoms/Badge";
-import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
 import { api } from "@/src/lib/api";
 import { cn } from "@/src/lib/utils";
 import { HiBuildingStorefront, HiEye, HiNoSymbol } from "react-icons/hi2";
-import type { Product, User } from "@/src/types";
+import type { User } from "@/src/types";
 
 interface VendorWithCount extends User {
   productCount: number;

@@ -86,7 +86,7 @@ export default function HomePage() {
       <div className="container-app flex flex-col gap-14 py-12">
         {error ? (
           <div className="flex flex-col items-center justify-center rounded-3xl border border-rose-200 bg-rose-50/50 p-8 text-center my-6">
-            <h3 className="text-lg font-bold text-rose-900 mb-2">Couldn't Load Island Content</h3>
+            <h3 className="text-lg font-bold text-rose-900 mb-2">Couldn&apos;t Load Island Content</h3>
             <p className="text-sm text-rose-700 max-w-md mb-4">{error}</p>
             <Button variant="primary" onClick={() => window.location.reload()}>
               Retry Connection

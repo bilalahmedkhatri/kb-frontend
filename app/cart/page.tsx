@@ -4,17 +4,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/src/components/atoms/Button";
 import { QuantityStepper } from "@/src/components/molecules/QuantityStepper";
-import { cn, formatCurrency } from "@/src/lib/utils";
+import { formatCurrency } from "@/src/lib/utils";
 import { useCartStore } from "@/src/store/cartStore";
 import {
   HiTrash,
   HiShoppingCart,
   HiArrowRight,
-  HiHeart,
 } from "react-icons/hi2";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, subtotal, clearCart } = useCartStore();
+  const { items, removeItem, updateQuantity, subtotal } = useCartStore();
 
   if (items.length === 0) {
     return (

@@ -19,7 +19,7 @@ import { Logo } from "@/src/components/atoms/Logo";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartStore } from "@/src/store/cartStore";
 import { useUIStore } from "@/src/store/uiStore";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -35,8 +35,11 @@ export function Header() {
   const { itemCount } = useCartStore();
   const { isMobileNavOpen, toggleMobileNav, closeMobileNav, openCart } = useUIStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const count = mounted ? itemCount() : 0;
 
   return (
@@ -66,7 +69,7 @@ export function Header() {
           <button
             type="button"
             onClick={openCart}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#222222] transition-colors hover:bg-[#F7F7F7]"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#222222] transition-colors hover:bg-[#F7F7F7] hover:text-[#FF385C]"
             aria-label="Open cart"
           >
             <HiShoppingCart className="h-5 w-5" />
@@ -77,7 +80,7 @@ export function Header() {
 
           <Link
             href="/wishlist"
-            className="hidden h-10 w-10 items-center justify-center rounded-full text-[#222222] transition-colors hover:bg-[#F7F7F7] sm:flex"
+            className="hidden h-10 w-10 items-center justify-center rounded-full text-[#222222] transition-colors hover:bg-[#F7F7F7] hover:text-[#FF385C] sm:flex"
             aria-label="Wishlist"
           >
             <HiHeart className="h-5 w-5" />
@@ -127,7 +130,7 @@ export function Header() {
               )}
             </div>
           ) : (
-            <Link href="/login">
+            <Link href="/login" className="hidden sm:inline-block">
               <Button variant="outline" size="sm" className="px-2.5 sm:px-3.5 text-xs sm:text-sm" leftIcon={<HiUser className="h-4 w-4" />}>
                 Sign In
               </Button>
@@ -179,6 +182,35 @@ export function Header() {
               <HiHeart className="h-5 w-5" />
               Wishlist
             </Link>
+            {!mounted ? null : isAuthenticated && user ? (
+              <>
+                <Link
+                  href="/account"
+                  onClick={closeMobileNav}
+                  className="flex items-center gap-3 rounded-lg px-4 py-3 text-base text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]"
+                >
+                  <HiUser className="h-5 w-5" />
+                  My Account
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => { logout(); closeMobileNav(); }}
+                  className="flex items-center gap-3 w-full text-left rounded-lg px-4 py-3 text-base text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]"
+                >
+                  <HiArrowRightOnRectangle className="h-5 w-5" />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={closeMobileNav}
+                className="flex items-center gap-3 rounded-lg px-4 py-3 text-base text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]"
+              >
+                <HiUser className="h-5 w-5" />
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
       )}

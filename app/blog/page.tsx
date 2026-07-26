@@ -4,7 +4,7 @@ import { InfoLayout } from "@/src/components/templates/InfoLayout";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/src/components/atoms/Button";
-import { HiBookOpen, HiClock, HiUser, HiArrowRight } from "react-icons/hi2";
+import { HiClock, HiArrowRight } from "react-icons/hi2";
 
 interface Article {
   id: string;

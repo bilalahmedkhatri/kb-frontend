@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { StayGrid } from "@/src/components/organisms/StayGrid";
 import { SortSelect } from "@/src/components/molecules/SortSelect";
 import { TagPill } from "@/src/components/molecules/TagPill";
-import { Skeleton } from "@/src/components/atoms/Skeleton";
 import { api } from "@/src/lib/api";
 import type { Stay, PaginatedResponse } from "@/src/types";
 
@@ -30,30 +29,34 @@ export default function StaysPage() {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("newest");
   const [activeType, setActiveType] = useState("");
-
-  const fetchStays = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.getStays({
-        page,
-        pageSize: 12,
-        filters: {
-          categories: activeType ? [activeType] : [],
-          sort,
-        },
-      });
-      setStays(res);
-    } catch {
-      setError("Could not load stays. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, sort, activeType]);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
-    fetchStays();
-  }, [fetchStays]);
+    let cancelled = false;
+    api.getStays({
+      page,
+      pageSize: 12,
+      filters: {
+        categories: activeType ? [activeType] : [],
+        sort,
+      },
+    })
+      .then((res) => {
+        if (!cancelled) {
+          setStays(res);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError("Could not load stays. Please try again.");
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [page, sort, activeType, retryKey]);
 
   return (
     <div className="container-app py-8">
@@ -84,7 +87,7 @@ export default function StaysPage() {
           <p className="mb-2 text-base font-medium text-[#222222]">{error}</p>
           <button
             type="button"
-            onClick={fetchStays}
+            onClick={() => { setError(null); setLoading(true); setRetryKey((k) => k + 1); }}
             className="mt-2 rounded-lg bg-[#222222] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#222222]/80"
           >
             Try again

@@ -15,7 +15,7 @@ import {
   HiChatBubbleLeftRight,
   HiEye,
 } from "react-icons/hi2";
-import type { Order, Product } from "@/src/types";
+import type { Order } from "@/src/types";
 
 const statCards = [
   { key: "sales", label: "Total Sales", icon: HiBuildingStorefront, value: "$12,450" },

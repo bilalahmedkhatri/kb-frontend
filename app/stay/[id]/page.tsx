@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Rating } from "@/src/components/atoms/Rating";
-import { Badge } from "@/src/components/atoms/Badge";
-import { EcoBadge } from "@/src/components/atoms/EcoBadge";
 import { Avatar } from "@/src/components/atoms/Avatar";
 import { Button } from "@/src/components/atoms/Button";
 import { WhatsAppInquireButton } from "@/src/components/atoms/WhatsAppInquireButton";
@@ -20,15 +17,13 @@ import { useUIStore } from "@/src/store/uiStore";
 import {
   HiCheck,
   HiMapPin,
-  HiUserGroup,
-  HiHome,
   HiShieldCheck,
   HiHeart,
   HiShare,
-  HiSparkles,
   HiArrowPath,
   HiCheckBadge,
 } from "react-icons/hi2";
+import { GiPolarStar } from "react-icons/gi";
 import type { Stay, Review } from "@/src/types";
 
 export default function StayDetailPage() {
@@ -154,7 +149,7 @@ export default function StayDetailPage() {
           {/* Highlights & Eco Credentials */}
           <div className="flex flex-col gap-4 border-b border-[var(--gray-200)] pb-6">
             <div className="flex items-start gap-3">
-              <HiSparkles className="h-6 w-6 text-amber-500 shrink-0 mt-0.5" />
+              <GiPolarStar className="h-6 w-6 text-amber-500 shrink-0 mt-0.5" />
               <div>
                 <h3 className="text-sm font-bold text-[var(--ink)]">100% Eco-Certified Lodge</h3>
                 <p className="text-xs text-[var(--gray-500)]">Powered by solar energy and local fresh coconut spring water.</p>
@@ -268,7 +263,7 @@ export default function StayDetailPage() {
               />
             </div>
 
-            <p className="text-center text-xs text-[var(--gray-500)] mb-4">You won't be charged yet</p>
+            <p className="text-center text-xs text-[var(--gray-500)] mb-4">You won&apos;t be charged yet</p>
 
             {/* Price Calculation Breakdown */}
             <div className="flex flex-col gap-2 text-xs text-[var(--gray-700)] border-t border-[var(--gray-200)] pt-4">

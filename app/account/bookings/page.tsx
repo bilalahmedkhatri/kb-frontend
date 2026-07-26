@@ -12,7 +12,6 @@ import {
   HiDocumentArrowDown,
   HiXCircle,
   HiXMark,
-  HiCheckCircle,
   HiPhone,
   HiEnvelope,
   HiShieldExclamation,
@@ -161,10 +160,11 @@ function CancelModal({
   onClose: () => void;
   onConfirm: () => void;
 }) {
+  const [now] = useState(() => Date.now());
   const refundPercent =
     booking.status === "cancelled"
       ? 0
-      : new Date(booking.checkIn).getTime() - Date.now() > 7 * 24 * 60 * 60 * 1000
+      : new Date(booking.checkIn).getTime() - now > 7 * 24 * 60 * 60 * 1000
         ? 100
         : 50;
   const refundAmount = (booking.total * refundPercent) / 100;

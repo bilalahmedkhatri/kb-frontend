@@ -14,9 +14,7 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [images]);
+  // In React 19, use derived state or clamp index during render instead of useEffect
 
   const goTo = useCallback((index: number) => {
     if (index < 0) setActiveIndex(images.length - 1);

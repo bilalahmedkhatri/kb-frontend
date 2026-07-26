@@ -39,7 +39,6 @@ export default function AdminDashboardPage() {
     });
   }, []);
 
-  const totalVendors = 8;
   const totalStays = 16;
   const totalUsers = 9;
 

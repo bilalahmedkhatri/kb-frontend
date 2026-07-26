@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuthStore } from "@/src/store/authStore";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Pagination } from "@/src/components/atoms/Pagination";
 import { Spinner } from "@/src/components/atoms/Spinner";
@@ -11,24 +10,14 @@ import { HiClipboardDocumentList } from "react-icons/hi2";
 import type { Order } from "@/src/types";
 
 const statusOptions = ["pending", "confirmed", "shipped", "delivered"] as const;
-const statusVariant: Record<string, "warning" | "primary" | "success" | "default" | "error"> = {
-  pending: "warning",
-  confirmed: "primary",
-  shipped: "primary",
-  delivered: "success",
-  cancelled: "error",
-};
-
 const PAGE_SIZE = 10;
 
 export default function VendorOrdersPage() {
-  const { user } = useAuthStore();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    setLoading(true);
     api.getOrders().then((data) => {
       setOrders(data);
       setLoading(false);
@@ -79,9 +68,6 @@ export default function VendorOrdersPage() {
                 <tbody>
                   {paginatedOrders.map((order) => {
                     const customerName = order.shippingAddress.fullName;
-                    const currentIdx = statusOptions.indexOf(
-                      order.status as typeof statusOptions[number]
-                    );
 
                     return (
                       <tr key={order.id} className="border-b border-[#DDDDDD]">

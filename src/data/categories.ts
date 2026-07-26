@@ -6,9 +6,9 @@ export interface EnhancedCategory extends Category {
 
 export const categories: (Category & { image?: string })[] = [
   // Authentic Kiribati Handicrafts & Products
-  { id: "cat-1", name: "Woven Fine Mats", slug: "woven-mats", icon: "HiSparkles", type: "product", count: 12, image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=300&q=80" },
+  { id: "cat-1", name: "Woven Fine Mats", slug: "woven-mats", icon: "GiPolarStar", type: "product", count: 12, image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=300&q=80" },
   { id: "cat-2", name: "Pandanus Baskets", slug: "pandanus-baskets", icon: "HiShoppingBag", type: "product", count: 9, image: "https://images.unsplash.com/photo-1606744888344-493238951221?auto=format&fit=crop&w=300&q=80" },
-  { id: "cat-3", name: "Seashell Jewelry", slug: "seashell-jewelry", icon: "HiSparkles", type: "product", count: 14, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=300&q=80" },
+  { id: "cat-3", name: "Seashell Jewelry", slug: "seashell-jewelry", icon: "GiPolarStar", type: "product", count: 14, image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=300&q=80" },
   { id: "cat-4", name: "Wood Carvings", slug: "wood-carvings", icon: "HiScissors", type: "product", count: 7, image: "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=300&q=80" },
   { id: "cat-5", name: "Coconut Crafts", slug: "coconut-crafts", icon: "HiCube", type: "product", count: 8, image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=300&q=80" },
 
