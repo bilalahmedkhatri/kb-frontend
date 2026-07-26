@@ -160,7 +160,7 @@ export default function OrdersPage() {
       <h2 className="mb-4 text-lg font-bold text-ink">Order History</h2>
 
       <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="relative flex-1">
+        <div className="relative flex-1 md:pb-4">
           <HiMagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
           <input
             value={search}
@@ -175,7 +175,7 @@ export default function OrdersPage() {
               key={f}
               onClick={() => { setStatusFilter(f); setPage(1); }}
               className={cn(
-                "whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "whitespace-nowrap rounded-lg px-3 mb-4 py-2 text-sm font-medium transition-colors",
                 statusFilter === f
                   ? "bg-ink text-white"
                   : "bg-gray-100 text-gray-500 hover:text-ink"

@@ -27,7 +27,7 @@ export function Footer() {
   return (
     <footer className="border-t border-[var(--gray-300)] bg-white text-[var(--ink)]">
       <div className="container-app py-12">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
           <div className="flex flex-col gap-4">
             <Logo compact={false} className="mb-1" />
             <p className="text-xs leading-relaxed text-[var(--gray-500)]">

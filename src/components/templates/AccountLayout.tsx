@@ -32,7 +32,7 @@ const accountLinks = [
 export function AccountLayout({ children, activeTab }: AccountLayoutProps) {
   const { isAuthenticated, user } = useAuthStore();
   const mounted = useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     () => true,
     () => false
   );
@@ -102,7 +102,7 @@ export function AccountLayout({ children, activeTab }: AccountLayoutProps) {
 
         <div className="w-full min-w-0 md:hidden">
           <div className="mb-6 overflow-x-auto">
-            <div className="flex gap-2">
+            <div className="flex gap-2 pb-4">
               {accountLinks.map((link) => {
                 const Icon = link.icon;
                 const isActive = activeTab === link.key;

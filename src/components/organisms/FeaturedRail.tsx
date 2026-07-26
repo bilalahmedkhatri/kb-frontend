@@ -47,12 +47,12 @@ export function FeaturedRail({ items, type, title, viewAllHref, className }: Fea
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <h2 className="text-xl font-bold text-[#222222]">{title}</h2>
         {viewAllHref && (
           <Link
             href={viewAllHref}
-            className="flex items-center gap-1 text-sm font-semibold text-[#FF385C] transition-colors hover:text-[#E31C5F]"
+            className="flex items-center gap-1 shrink-0 whitespace-nowrap text-sm font-semibold text-[#FF385C] transition-colors hover:text-[#E31C5F]"
           >
             View all
             <HiArrowRight className="h-4 w-4" />

@@ -213,9 +213,6 @@ export default function AccountPage() {
               <div className="flex flex-col gap-1.5">
                 <span className="text-sm font-medium text-[#222222]">{user?.name || "User"}</span>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" leftIcon={<HiCamera className="h-3.5 w-3.5" />}>
-                    Change Photo
-                  </Button>
                   <Button size="sm" variant="ghost" leftIcon={<HiTrash className="h-3.5 w-3.5" />}>
                     Remove
                   </Button>
