@@ -10,6 +10,7 @@ import { ArtisanStoryClip } from "@/src/components/molecules/ArtisanStoryClip";
 import { Skeleton } from "@/src/components/atoms/Skeleton";
 import { Button } from "@/src/components/atoms/Button";
 import { api } from "@/src/lib/api";
+import { JsonLd } from "@/src/components/atoms/JsonLd";
 import type { Category, Product, Stay, Guide } from "@/src/types";
 
 export default function HomePage() {
@@ -54,6 +55,31 @@ export default function HomePage() {
     };
   }, []);
 
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Island Connects",
+    "url": "https://islandconnects.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://islandconnects.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Island Connects",
+    "url": "https://islandconnects.com",
+    "logo": "https://islandconnects.com/favicon.png",
+    "description": "Ethical marketplace and travel booking platform for authentic Kiribati handicrafts, cultural experiences, and stays.",
+    "sameAs": [
+      "https://www.facebook.com/islandconnects",
+      "https://www.instagram.com/islandconnects"
+    ]
+  };
+
   const handleTripSearch = (query: { where: string; checkIn: string; checkOut: string; guests: number }) => {
     const params = new URLSearchParams();
     if (query.where) params.set("q", query.where);
@@ -65,6 +91,8 @@ export default function HomePage() {
 
   return (
     <div className="relative">
+      <JsonLd data={websiteSchema} />
+      <JsonLd data={organizationSchema} />
       <Hero onSearch={handleTripSearch} />
 
       <div className="container-app py-8">

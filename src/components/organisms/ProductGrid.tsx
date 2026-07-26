@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/src/lib/utils";
 import { ProductCard } from "@/src/components/molecules/ProductCard";
 import { ProductCardSkeleton } from "@/src/components/atoms/Skeleton";

@@ -1,8 +1,12 @@
-"use client";
-
+import type { Metadata } from "next";
 import { InfoLayout } from "@/src/components/templates/InfoLayout";
 import Link from "next/link";
 import { Button } from "@/src/components/atoms/Button";
+
+export const metadata: Metadata = {
+  title: "Fair Trade Commitment | Island Connects",
+  description: "Ensuring direct, ethical financial returns for Kiribati island craftswomen, master weavers, and outer atoll families.",
+};
 import { HiShieldCheck, HiGlobeAmericas, HiCurrencyDollar } from "react-icons/hi2";
 import { GiPolarStar } from "react-icons/gi";
 

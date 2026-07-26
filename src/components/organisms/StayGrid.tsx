@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/src/lib/utils";
 import { StayCard } from "@/src/components/molecules/StayCard";
 import { StayCardSkeleton } from "@/src/components/atoms/Skeleton";

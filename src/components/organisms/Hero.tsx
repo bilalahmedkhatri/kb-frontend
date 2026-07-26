@@ -35,7 +35,7 @@ export function Hero({ onSearch }: HeroProps) {
 
       <div className="relative flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center sm:min-h-[80vh] md:min-h-[85vh]">
         <h1 className="max-w-4xl text-[clamp(32px,5vw,56px)] font-extrabold leading-tight text-white">
-          Discover Kiribati — islands, stays &amp; handmade heritage
+          Discover Kiribati - islands, stays &amp; handmade heritage
         </h1>
 
         <div className="hidden w-full max-w-3xl sm:block">
@@ -48,12 +48,12 @@ export function Hero({ onSearch }: HeroProps) {
               <div className="flex items-center justify-between border-b border-[#DDDDDD] px-4 py-3">
                 <span className="text-base font-semibold text-[#222222]">Search stays</span>
                 <button
-  type="button"
-  onClick={() => setShowMobileSearch(false)}
-  className="flex h-8 w-8 items-center justify-center rounded-full border border-[#DDDDDD] bg-white text-sm font-medium text-[#222222] transition-colors hover:bg-[#F7F7F7]"
->
-  <HiXMark className="h-4 w-4" />
-</button>
+                  type="button"
+                  onClick={() => setShowMobileSearch(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-[#DDDDDD] bg-white text-sm font-medium text-[#222222] transition-colors hover:bg-[#F7F7F7]"
+                >
+                  <HiXMark className="h-4 w-4" />
+                </button>
               </div>
               <div className="flex-1 overflow-y-auto px-4 pt-6">
                 <TripSearch onSearch={handleSearch} />

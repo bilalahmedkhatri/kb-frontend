@@ -1,6 +1,10 @@
-"use client";
-
+import type { Metadata } from "next";
 import { InfoLayout } from "@/src/components/templates/InfoLayout";
+
+export const metadata: Metadata = {
+  title: "Careers | Island Connects",
+  description: "Join our mission to empower Pacific island communities through sustainable digital innovation.",
+};
 
 export default function CareersPage() {
   return (

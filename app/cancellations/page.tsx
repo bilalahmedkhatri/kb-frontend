@@ -1,6 +1,10 @@
-"use client";
-
+import type { Metadata } from "next";
 import { InfoLayout } from "@/src/components/templates/InfoLayout";
+
+export const metadata: Metadata = {
+  title: "Cancellations & Refund Policy | Island Connects",
+  description: "Clear, fair policies designed for remote island accommodation bookings and handmade craft orders in Kiribati.",
+};
 
 export default function CancellationsPage() {
   return (

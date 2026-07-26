@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/src/lib/utils";
 import { HiCheck } from "react-icons/hi2";
 

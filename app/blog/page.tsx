@@ -1,9 +1,13 @@
-"use client";
-
+import type { Metadata } from "next";
 import { InfoLayout } from "@/src/components/templates/InfoLayout";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/src/components/atoms/Button";
+
+export const metadata: Metadata = {
+  title: "Island Blog — Stories & Culture from Kiribati | Island Connects",
+  description: "Explore articles, travel guides, culture, and artisan stories from across Kiribati.",
+};
 import { HiClock, HiArrowRight } from "react-icons/hi2";
 
 interface Article {

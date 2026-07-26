@@ -128,7 +128,7 @@ export function Footer() {
       <div className="border-t border-[var(--gray-200)] bg-[var(--gray-50)]">
         <div className="container-app flex flex-col sm:flex-row items-center justify-between py-4 gap-2">
           <p className="text-xs text-[var(--gray-500)]">
-            &copy; {new Date().getFullYear()} Island Connects (`islandconnects.com`). All rights reserved.
+            &copy; {new Date().getFullYear()} Island Connects <Link href="https://islandconnects.com">islandconnects.com</Link>. All rights reserved.
           </p>
           <p className="text-xs font-medium text-[var(--gray-500)]">
             100% Direct Island Community Fair-Trade Platform

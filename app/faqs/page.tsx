@@ -1,6 +1,11 @@
-"use client";
-
+import type { Metadata } from "next";
 import { InfoLayout } from "@/src/components/templates/InfoLayout";
+import { JsonLd } from "@/src/components/atoms/JsonLd";
+
+export const metadata: Metadata = {
+  title: "Frequently Asked Questions | Island Connects",
+  description: "Find answers to common questions about Kiribati homestays, handicrafts, shipping, and payment.",
+};
 
 const FAQS = [
   {
@@ -22,11 +27,25 @@ const FAQS = [
 ];
 
 export default function FAQsPage() {
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQS.map((faq) => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a,
+      },
+    })),
+  };
+
   return (
     <InfoLayout
       title="Frequently Asked Questions"
       subtitle="Find answers to common questions about traveling to Kiribati, purchasing authentic crafts, and platform policies."
     >
+      <JsonLd data={faqSchema} />
       <div className="flex flex-col gap-6">
         {FAQS.map((faq, idx) => (
           <div key={idx} className="rounded-2xl border border-[var(--gray-200)] p-5 bg-[var(--gray-50)]">

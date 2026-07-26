@@ -1,6 +1,10 @@
-"use client";
-
+import type { Metadata } from "next";
 import { InfoLayout } from "@/src/components/templates/InfoLayout";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | Island Connects",
+  description: "How Island Connects protects and manages your personal information.",
+};
 
 export default function PrivacyPage() {
   return (

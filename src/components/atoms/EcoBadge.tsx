@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { HiShieldCheck, HiSun, HiGlobeAmericas } from "react-icons/hi2";
 import { GiPolarStar } from "react-icons/gi";

@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { cn } from "@/src/lib/utils";
 import type { Order } from "@/src/types";

@@ -6,6 +6,7 @@ import { FilterSidebar } from "@/src/components/organisms/FilterSidebar";
 import { ProductGrid } from "@/src/components/organisms/ProductGrid";
 import { SortSelect } from "@/src/components/molecules/SortSelect";
 import { api } from "@/src/lib/api";
+import { JsonLd } from "@/src/components/atoms/JsonLd";
 import type { Product, PaginatedResponse } from "@/src/types";
 
 const sortOptions = [
@@ -66,8 +67,32 @@ export default function MarketplacePage() {
     />
   );
 
+  const itemListSchema = products?.data
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "Kiribati Handicrafts Marketplace",
+        "itemListElement": products.data.map((product, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": "Product",
+            "name": product.name,
+            "url": `https://islandconnects.com/product/${product.id}`,
+            "image": product.images[0],
+            "offers": {
+              "@type": "Offer",
+              "priceCurrency": "AUD",
+              "price": product.price,
+            },
+          },
+        })),
+      }
+    : null;
+
   return (
     <div className="container-app flex flex-col px-0 pt-8 pb-12">
+      {itemListSchema && <JsonLd data={itemListSchema} />}
       <MarketplaceLayout sidebar={sidebar}>
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
