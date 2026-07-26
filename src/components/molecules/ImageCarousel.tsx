@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import Image from "next/image";
 import { cn } from "@/src/lib/utils";
 
 interface ImageCarouselProps {
@@ -11,33 +12,45 @@ interface ImageCarouselProps {
 
 export function ImageCarousel({ images, alt, className }: ImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const touchStartX = useRef(0);
-  const touchEndX = useRef(0);
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
 
   const goTo = useCallback(
-    (index: number, e?: React.MouseEvent) => {
-      e?.stopPropagation();
-      e?.preventDefault();
+    (index: number, e?: React.SyntheticEvent) => {
+      if (e) e.stopPropagation();
+      if (!images || images.length === 0) return;
       if (index < 0) setActiveIndex(images.length - 1);
       else if (index >= images.length) setActiveIndex(0);
       else setActiveIndex(index);
     },
-    [images.length]
+    [images]
   );
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
+    touchStartX.current = e.targetTouches[0].clientX;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.touches[0].clientX;
+    touchEndX.current = e.targetTouches[0].clientX;
   };
 
   const handleTouchEnd = () => {
-    const diff = touchStartX.current - touchEndX.current;
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) goTo(activeIndex + 1);
-      else goTo(activeIndex - 1);
+    if (touchStartX.current !== null && touchEndX.current !== null) {
+      const diff = touchStartX.current - touchEndX.current;
+      if (diff > 50) goTo(activeIndex + 1);
+      else if (diff < -50) goTo(activeIndex - 1);
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      goTo(activeIndex - 1);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      goTo(activeIndex + 1);
     }
   };
 
@@ -55,15 +68,21 @@ export function ImageCarousel({ images, alt, className }: ImageCarouselProps) {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="region"
+      aria-label={`${alt} image carousel`}
     >
       {images.map((src, i) => (
-        <img
+        <Image
           key={i}
           src={src}
           alt={`${alt} ${i + 1}`}
-          loading={i === 0 ? "eager" : "lazy"}
+          fill
+          priority={i === 0}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className={cn(
-            "h-full w-full object-cover transition-opacity duration-300",
+            "object-cover transition-opacity duration-300",
             i === activeIndex ? "opacity-100" : "pointer-events-none absolute inset-0 opacity-0"
           )}
         />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Hero } from "@/src/components/organisms/Hero";
 import { CategoryTabBar } from "@/src/components/organisms/CategoryTabBar";
 import { FeaturedRail } from "@/src/components/organisms/FeaturedRail";
@@ -146,10 +147,12 @@ export default function HomePage() {
                       href={`/guides/${guide.slug}`}
                       className="group relative flex min-h-[260px] flex-col overflow-hidden rounded-2xl bg-[var(--gray-100)] border border-[var(--gray-200)] shadow-xs transition-all hover:shadow-lg"
                     >
-                      <img
+                      <Image
                         src={guide.image}
                         alt={guide.title}
-                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 25vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                       <span className="absolute left-3 top-3 z-10 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-[var(--ink)] shadow-xs">

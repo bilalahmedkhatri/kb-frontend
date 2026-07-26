@@ -62,7 +62,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={openCart}
@@ -128,7 +128,7 @@ export function Header() {
             </div>
           ) : (
             <Link href="/login">
-              <Button variant="outline" size="sm" leftIcon={<HiUser className="h-4 w-4" />}>
+              <Button variant="outline" size="sm" className="px-2.5 sm:px-3.5 text-xs sm:text-sm" leftIcon={<HiUser className="h-4 w-4" />}>
                 Sign In
               </Button>
             </Link>

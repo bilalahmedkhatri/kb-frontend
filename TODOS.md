@@ -6,7 +6,7 @@ interaction-state table). These tasks implement that spec in code.
 
 ## Phase A (Showpiece) — P1, blocks a polished launch
 
-- [ ] **T1 (P1, human: ~3-4h / CC: ~30min)** — design-system — Wire DESIGN.md color tokens as CSS variables and refactor components off hardcoded hex
+- [x] **T1 (P1, human: ~3-4h / CC: ~30min)** — design-system — Wire DESIGN.md color tokens as CSS variables and refactor components off hardcoded hex
   - Surfaced by: Pass 5 (Design System Alignment) — code hardcodes `#DDDDDD`/`#222222` instead of `--rausch`/`--ink` tokens; the design system in DESIGN.md is not actually applied.
   - Files: `app/globals.css`, `src/components/**`
   - Verify: grep for `\[#` arbitrary hex classNames returns zero in `src/components`; `var(--rausch)` resolves in devtools.
@@ -18,7 +18,7 @@ interaction-state table). These tasks implement that spec in code.
 
 ## Lower priority
 
-- [ ] **T4 (P3, human: ~10min / CC: ~2min)** — brand — Fix header wordmark to "Island Connects"
+- [x] **T4 (P3, human: ~10min / CC: ~2min)** — brand — Fix header wordmark to "Island Connects"
   - Surfaced by: Pass 5 / D1 decision — header currently reads "Kiribati", mismatches domain `islandconnects.com`.
   - Files: `src/components/organisms/Header.tsx`
 

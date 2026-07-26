@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { HiMapPin, HiHome, HiShoppingBag, HiBookOpen, HiSparkles } from "react-icons/hi2";
 import { cn } from "@/src/lib/utils";
 import Link from "next/link";
@@ -106,10 +107,12 @@ export function IslandExplorer() {
         {/* Selected Island Highlight Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch rounded-3xl border border-[var(--gray-300)] bg-white overflow-hidden shadow-lg">
           <div className="lg:col-span-6 relative min-h-[300px] overflow-hidden">
-            <img
+            <Image
               src={selectedIsland.image}
               alt={selectedIsland.name}
-              className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover transition-transform duration-700 hover:scale-105"
             />
             <div className="absolute top-4 left-4">
               <span className="rounded-full bg-black/60 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">

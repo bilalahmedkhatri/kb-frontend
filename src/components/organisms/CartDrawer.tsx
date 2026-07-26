@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Root, Trigger, Portal, Overlay, Content } from "@radix-ui/react-dialog";
+import Image from "next/image";
+import { Root, Portal, Overlay, Content } from "@radix-ui/react-dialog";
 import { HiXMark, HiShoppingCart, HiArrowRight } from "react-icons/hi2";
-import { cn, formatCurrency } from "@/src/lib/utils";
+import { formatCurrency } from "@/src/lib/utils";
 import { Button } from "@/src/components/atoms/Button";
 import { QuantityStepper } from "@/src/components/molecules/QuantityStepper";
 import { useCartStore } from "@/src/store/cartStore";
@@ -48,9 +49,11 @@ export function CartDrawer() {
                 {items.map((item) => (
                   <div key={item.id} className="flex gap-3 rounded-xl border border-[#DDDDDD] p-3">
                     <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-[#F7F7F7]">
-                      <img
+                      <Image
                         src={item.image || "/placeholder.svg"}
                         alt={item.name}
+                        width={80}
+                        height={80}
                         className="h-full w-full object-cover"
                       />
                     </div>

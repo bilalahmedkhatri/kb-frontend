@@ -1,4 +1,5 @@
 import { cn } from "@/src/lib/utils";
+import Image from "next/image";
 import { HiUser } from "react-icons/hi2";
 
 interface AvatarProps {
@@ -10,16 +11,19 @@ interface AvatarProps {
 
 export function Avatar({ src, name, size = "md", className }: AvatarProps) {
   const sizeClass = { sm: "h-8 w-8", md: "h-10 w-10", lg: "h-12 w-12" }[size];
+  const sizePx = { sm: 32, md: 40, lg: 48 }[size];
   const initials = name
     ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
     : undefined;
 
   if (src) {
     return (
-      <img
+      <Image
         src={src}
         alt={name || "Avatar"}
-        className={cn("rounded-full object-cover", sizeClass, className)}
+        width={sizePx}
+        height={sizePx}
+        className={cn("rounded-full object-cover shrink-0", sizeClass, className)}
       />
     );
   }

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "@/src/components/organisms/Header";
@@ -7,15 +6,15 @@ import { Footer } from "@/src/components/organisms/Footer";
 import { CartDrawer } from "@/src/components/organisms/CartDrawer";
 import { WhatsAppInquireButton } from "@/src/components/atoms/WhatsAppInquireButton";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: "Island Connects — Kiribati Stays, Handicrafts & Experiences",
   description:
     "Explore the authentic beauty of Kiribati Islands. Book homestays, shop handmade pandanus crafts, and experience local artisan workshops.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
@@ -24,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.className} h-full antialiased`}>
+    <html lang="en" className="h-full font-sans antialiased">
       <body className="min-h-full flex flex-col bg-white">
         <Providers>
           <Header />

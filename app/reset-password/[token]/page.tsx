@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/src/components/atoms/Button";
 import { Input } from "@/src/components/atoms/Input";
 import { HiLockClosed, HiCheckCircle } from "react-icons/hi2";
+import { Logo } from "@/src/components/atoms/Logo";
 
 export default function ResetPasswordPage() {
   const params = useParams();
@@ -33,7 +34,6 @@ export default function ResetPasswordPage() {
       setError("Password must be at least 6 characters");
       return;
     }
-
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1000));
     setLoading(false);
@@ -46,6 +46,9 @@ export default function ResetPasswordPage() {
       <div className="container-app flex min-h-[calc(100vh-8rem)] items-center justify-center py-16">
         <div className="w-full max-w-md">
           <div className="rounded-xl border border-[#DDDDDD] p-8 text-center">
+            <div className="mb-6 flex justify-center">
+              <Logo />
+            </div>
             <HiCheckCircle className="mx-auto mb-4 h-12 w-12 text-green-500" />
             <h1 className="mb-2 text-2xl font-bold text-[#222222]">Password reset successful</h1>
             <p className="text-sm text-[#717171]">Redirecting you to login...</p>
@@ -59,7 +62,10 @@ export default function ResetPasswordPage() {
     <div className="container-app flex min-h-[calc(100vh-8rem)] items-center justify-center py-16">
       <div className="w-full max-w-md">
         <div className="rounded-xl border border-[#DDDDDD] p-8">
-          <h1 className="mb-6 text-2xl font-bold text-[#222222]">Set new password</h1>
+          <div className="mb-6 flex justify-center">
+            <Logo />
+          </div>
+          <h1 className="mb-6 text-center text-2xl font-bold text-[#222222]">Set new password</h1>
           <p className="mb-6 text-sm text-[#717171]">
             Token: <span className="font-mono text-xs">{token.slice(0, 8)}...</span>
           </p>

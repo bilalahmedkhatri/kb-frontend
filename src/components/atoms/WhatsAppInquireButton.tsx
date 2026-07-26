@@ -48,11 +48,11 @@ export function WhatsAppInquireButton({
       rel="noopener noreferrer"
       aria-label="Quick WhatsApp Inquiry"
       className={cn(
-        "fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-xl transition-all hover:scale-110 hover:bg-emerald-600 focus:outline-hidden focus:ring-4 focus:ring-emerald-300 active:scale-95",
+        "fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-xl transition-all hover:scale-110 hover:bg-emerald-600 focus:outline-hidden focus:ring-4 focus:ring-emerald-300 active:scale-95",
         className
       )}
     >
-      <FaWhatsapp className="h-7 w-7" />
+      <FaWhatsapp className="h-5 w-5 sm:h-7 sm:w-7" />
     </a>
   );
 }

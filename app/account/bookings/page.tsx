@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/src/components/atoms/Button";
 import { Badge } from "@/src/components/atoms/Badge";
 import {
@@ -81,7 +82,7 @@ function VoucherModal({
 
         <div className="mb-6 rounded-xl bg-[#F7F7F7] p-4">
           <div className="mb-3 flex items-center gap-3">
-            <img src={booking.image} alt={booking.stayName} className="h-16 w-16 rounded-lg object-cover" />
+            <Image src={booking.image || "/placeholder.svg"} alt={booking.stayName} width={64} height={64} className="h-16 w-16 shrink-0 rounded-lg object-cover" />
             <div>
               <h4 className="text-base font-bold text-[#222222]">{booking.stayName}</h4>
               <div className="flex items-center gap-1 text-xs text-[#717171]">
@@ -281,10 +282,12 @@ export default function BookingsPage() {
               className="flex flex-col overflow-hidden rounded-xl border border-[#DDDDDD] md:flex-row"
             >
               <div className="relative h-48 w-full flex-shrink-0 md:h-auto md:w-56">
-                <img
-                  src={booking.image}
+                <Image
+                  src={booking.image || "/placeholder.svg"}
                   alt={booking.stayName}
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover"
                 />
                 <div className="absolute left-2 top-2">
                   <Badge

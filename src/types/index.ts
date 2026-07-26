@@ -139,7 +139,7 @@ export interface Category {
   name: string;
   slug: string;
   icon: string;
-  type: "product" | "stay" | "guide";
+  type: "product" | "stay" | "guide" | "experience";
   count: number;
 }
 

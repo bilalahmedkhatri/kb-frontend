@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { HiClock, HiUser } from "react-icons/hi2";
 import { cn, truncate } from "@/src/lib/utils";
 import type { Guide } from "@/src/types";
@@ -19,10 +20,12 @@ export function GuideCard({ guide, variant = "default", className }: GuideCardPr
         className
       )}
     >
-      <img
+      <Image
         src={guide.image || "/placeholder.svg"}
         alt={guide.title}
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        fill
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+        className="object-cover transition-transform duration-300 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
       <span className="absolute left-2 top-2 z-10 inline-flex items-center rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-[#222222] backdrop-blur-sm">

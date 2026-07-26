@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Root, Trigger, Portal, Overlay, Content } from "@radix-ui/react-dialog";
 import {
   HiXMark,
@@ -178,9 +179,11 @@ export function BookingModal({ stay }: BookingModalProps) {
                       <h3 className="text-lg font-bold text-[#222222]">Review your booking</h3>
                       <div className="space-y-3 rounded-xl bg-[#F7F7F7] p-4">
                         <div className="flex items-center gap-3">
-                          <img
+                          <Image
                             src={stay.images[0] || "/placeholder.svg"}
                             alt={stay.name}
+                            width={56}
+                            height={56}
                             className="h-14 w-14 rounded-lg object-cover"
                           />
                           <div>

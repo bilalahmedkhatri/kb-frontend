@@ -5,14 +5,16 @@ import { useParams } from "next/navigation";
 import { Rating } from "@/src/components/atoms/Rating";
 import { Badge } from "@/src/components/atoms/Badge";
 import { EcoBadge } from "@/src/components/atoms/EcoBadge";
+import { Avatar } from "@/src/components/atoms/Avatar";
 import { Button } from "@/src/components/atoms/Button";
 import { WhatsAppInquireButton } from "@/src/components/atoms/WhatsAppInquireButton";
 import { QuantityStepper } from "@/src/components/molecules/QuantityStepper";
 import { ReviewList } from "@/src/components/organisms/ReviewList";
 import { BookingModal } from "@/src/components/organisms/BookingModal";
 import { FeaturedRail } from "@/src/components/organisms/FeaturedRail";
+import { HeroGallery } from "@/src/components/molecules/HeroGallery";
 import { Skeleton } from "@/src/components/atoms/Skeleton";
-import { cn, formatCurrency } from "@/src/lib/utils";
+import { formatCurrency } from "@/src/lib/utils";
 import { api } from "@/src/lib/api";
 import { useUIStore } from "@/src/store/uiStore";
 import {
@@ -21,6 +23,11 @@ import {
   HiUserGroup,
   HiHome,
   HiShieldCheck,
+  HiHeart,
+  HiShare,
+  HiSparkles,
+  HiArrowPath,
+  HiCheckBadge,
 } from "react-icons/hi2";
 import type { Stay, Review } from "@/src/types";
 
@@ -33,7 +40,6 @@ export default function StayDetailPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [relatedStays, setRelatedStays] = useState<Stay[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState(0);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(1);
@@ -66,25 +72,30 @@ export default function StayDetailPage() {
     if (stay) openBookingModal(stay.id);
   };
 
+  // Calculate nights difference for price breakdown
+  const calculateNights = () => {
+    if (!checkIn || !checkOut) return 1;
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const diff = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+    return diff;
+  };
+
+  const nights = calculateNights();
+  const baseTotal = stay ? stay.pricePerNight * nights : 0;
+
   if (loading || !stay) {
     return (
       <div className="container-app py-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div>
-            <Skeleton variant="rectangular" className="aspect-[3/2] w-full rounded-2xl" />
-            <div className="mt-3 flex gap-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} variant="rectangular" className="h-16 w-16 rounded-xl" />
-              ))}
-            </div>
+        <Skeleton className="h-10 w-2/3 mb-4" />
+        <Skeleton variant="rectangular" className="aspect-[2/1] w-full rounded-2xl mb-8" />
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+          <div className="lg:col-span-8 flex flex-col gap-6">
+            <Skeleton className="h-16 w-full rounded-2xl" />
+            <Skeleton className="h-32 w-full rounded-2xl" />
           </div>
-          <div className="flex flex-col gap-4">
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-5 w-1/2" />
-            <Skeleton className="h-10 w-1/4" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-12 w-full" />
+          <div className="lg:col-span-4">
+            <Skeleton variant="rectangular" className="h-96 w-full rounded-2xl" />
           </div>
         </div>
       </div>
@@ -93,123 +104,160 @@ export default function StayDetailPage() {
 
   return (
     <div className="container-app py-8">
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-        <div className="lg:col-span-7 flex flex-col gap-3">
-          <div className="aspect-[3/2] overflow-hidden rounded-3xl bg-[var(--gray-100)] border border-[var(--gray-200)] shadow-xs">
-            <img
-              src={stay.images[selectedImage] || "/placeholder.svg"}
-              alt={stay.name}
-              className="h-full w-full object-cover transition-all duration-300"
-            />
+      {/* 1. Airbnb Header Title & Meta Actions */}
+      <div className="mb-6 flex flex-col gap-2">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--ink)] tracking-tight">{stay.name}</h1>
+        <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-semibold text-[var(--ink)]">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="flex items-center gap-1 font-bold">
+              ★ {stay.rating.toFixed(1)} <span className="underline font-normal text-[var(--gray-700)]">({stay.reviewCount} reviews)</span>
+            </span>
+            <span>·</span>
+            <span className="flex items-center gap-1 underline text-[var(--gray-700)]">
+              <HiMapPin className="h-4 w-4 text-[var(--rausch)]" /> {stay.location}, {stay.island} Atoll, Kiribati
+            </span>
           </div>
-          {stay.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-              {stay.images.map((img, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setSelectedImage(i)}
-                  className={cn(
-                    "h-18 w-18 shrink-0 overflow-hidden rounded-xl border-2 transition-all",
-                    i === selectedImage ? "border-[var(--rausch)] scale-105 shadow-xs" : "border-transparent opacity-75 hover:opacity-100"
-                  )}
-                >
-                  <img
-                    src={img}
-                    alt={`${stay.name} ${i + 1}`}
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
+
+          <div className="flex items-center gap-3 text-xs">
+            <button className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-[var(--gray-100)] underline font-medium">
+              <HiShare className="h-4 w-4" /> Share
+            </button>
+            <button className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-[var(--gray-100)] underline font-medium">
+              <HiHeart className="h-4 w-4 text-[var(--rausch)]" /> Save
+            </button>
+          </div>
         </div>
+      </div>
 
-        <div className="lg:col-span-5 flex flex-col gap-5">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="primary" className="capitalize">{stay.type}</Badge>
-            <EcoBadge type="solar" />
-            <EcoBadge type="certified" label="Verified Island Host" />
+      {/* 2. Airbnb 5-Photo Mosaic Gallery */}
+      <div className="mb-10">
+        <HeroGallery images={stay.images} alt={stay.name} />
+      </div>
+
+      {/* 3. Main 2-Column Split Section */}
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+        {/* Left Main Content (8 Columns) */}
+        <div className="lg:col-span-8 flex flex-col gap-8">
+          {/* Host & Accommodation Summary */}
+          <div className="flex items-center justify-between border-b border-[var(--gray-200)] pb-6">
+            <div>
+              <h2 className="text-xl font-bold text-[var(--ink)]">
+                Entire {stay.type} hosted by Kiribati Island Host
+              </h2>
+              <p className="text-xs text-[var(--gray-500)] mt-1 font-medium">
+                Up to {stay.maxGuests} guests · {stay.bedrooms} bedroom(s) · Private Atoll Lagoon Access
+              </p>
+            </div>
+            <Avatar name={stay.name} size="lg" />
           </div>
 
-          <h1 className="text-2xl font-black text-[var(--ink)] lg:text-3xl tracking-tight">{stay.name}</h1>
-
-          <div className="flex items-center gap-2 text-sm font-semibold text-[var(--ink)]">
-            <HiMapPin className="h-4 w-4 text-[var(--rausch)]" />
-            <span>{stay.location}, {stay.island} Atoll</span>
+          {/* Highlights & Eco Credentials */}
+          <div className="flex flex-col gap-4 border-b border-[var(--gray-200)] pb-6">
+            <div className="flex items-start gap-3">
+              <HiSparkles className="h-6 w-6 text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-bold text-[var(--ink)]">100% Eco-Certified Lodge</h3>
+                <p className="text-xs text-[var(--gray-500)]">Powered by solar energy and local fresh coconut spring water.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <HiShieldCheck className="h-6 w-6 text-[var(--babu)] shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-bold text-[var(--ink)]">Verified Atoll Homestay</h3>
+                <p className="text-xs text-[var(--gray-500)]">Direct fair-trade payout to local Kiribati island families.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <HiArrowPath className="h-6 w-6 text-emerald-600 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-bold text-[var(--ink)]">Free Cancellation</h3>
+                <p className="text-xs text-[var(--gray-500)]">Cancel up to 48 hours before check-in for a full refund.</p>
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Rating value={stay.rating} count={stay.reviewCount} size="md" />
-          </div>
-
-          <div className="text-3xl font-black text-[var(--ink)]">
-            {formatCurrency(stay.pricePerNight)}{" "}
-            <span className="text-xs font-medium text-[var(--gray-500)]">/ night (Inquiry Booking)</span>
-          </div>
-
-          <div className="flex flex-wrap gap-4 text-xs font-semibold text-[var(--gray-700)] bg-[var(--gray-50)] p-4 rounded-2xl border border-[var(--gray-200)]">
-            <span className="flex items-center gap-1.5">
-              <HiHome className="h-4 w-4 text-[var(--babu)]" /> {stay.bedrooms} Bed(s)
+          {/* AirCover Guarantee */}
+          <div className="rounded-2xl bg-rose-50/70 border border-rose-200 p-5 flex flex-col gap-2">
+            <span className="text-base font-black tracking-tight text-[var(--rausch)] flex items-center gap-1">
+              <HiCheckBadge className="h-5 w-5" /> Island Cover Protection
             </span>
-            <span className="flex items-center gap-1.5">
-              <HiUserGroup className="h-4 w-4 text-[var(--rausch)]" /> Up to {stay.maxGuests} Guests
-            </span>
+            <p className="text-xs text-rose-950 leading-relaxed">
+              Every booking includes free protection from host cancellations, listing inaccuracies, and check-in assistance via our WhatsApp support desk.
+            </p>
           </div>
 
-          <div>
-            <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-[var(--ink)]">Stay Amenities</h3>
-            <div className="grid grid-cols-2 gap-2">
+          {/* Description */}
+          <div className="border-b border-[var(--gray-200)] pb-6">
+            <h3 className="text-lg font-bold text-[var(--ink)] mb-3">About this stay</h3>
+            <p className="leading-relaxed text-sm text-[var(--gray-700)] whitespace-pre-line">{stay.description}</p>
+          </div>
+
+          {/* Amenities Grid */}
+          <div className="border-b border-[var(--gray-200)] pb-6">
+            <h3 className="text-lg font-bold text-[var(--ink)] mb-4">What this stay offers</h3>
+            <div className="grid grid-cols-2 gap-3">
               {stay.amenities.map((amenity) => (
-                <div key={amenity} className="flex items-center gap-2 text-xs text-[var(--gray-700)] font-medium">
-                  <HiCheck className="h-4 w-4 text-emerald-600" />
+                <div key={amenity} className="flex items-center gap-2.5 text-xs text-[var(--gray-700)] font-medium">
+                  <HiCheck className="h-4 w-4 text-emerald-600 shrink-0" />
                   <span>{amenity}</span>
                 </div>
               ))}
             </div>
           </div>
+        </div>
 
-          <p className="leading-relaxed text-sm text-[var(--gray-700)]">{stay.description}</p>
-
-          {/* Booking Card */}
-          <div className="flex flex-col gap-4 rounded-3xl border border-[var(--gray-300)] bg-white p-6 shadow-md">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[var(--ink)]">Reserve Stay Inquiry</h3>
-              <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1">
-                <HiShieldCheck className="h-3.5 w-3.5" /> Instant Host WhatsApp
+        {/* Right Sticky Floating Reservation Card (4 Columns) */}
+        <div className="lg:col-span-4">
+          <div className="sticky top-24 rounded-3xl border border-[var(--gray-300)] bg-white p-6 shadow-xl">
+            {/* Card Price Header */}
+            <div className="flex items-baseline justify-between mb-4">
+              <div>
+                <span className="text-2xl font-black text-[var(--ink)]">{formatCurrency(stay.pricePerNight)}</span>
+                <span className="text-xs font-semibold text-[var(--gray-500)]"> / night</span>
+              </div>
+              <span className="text-xs font-bold text-[var(--ink)] flex items-center gap-1">
+                ★ {stay.rating.toFixed(1)} · <span className="underline text-[var(--gray-500)]">{stay.reviewCount} reviews</span>
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="mb-1 block text-xs font-bold text-[var(--gray-700)]">Check-in Date</label>
-                <input
-                  type="date"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  className="w-full rounded-xl border border-[var(--gray-300)] px-3 py-2 text-xs focus:border-[var(--ink)] focus:outline-hidden"
-                />
+            {/* Airbnb Single Bordered Date & Guest Inputs Box */}
+            <div className="rounded-xl border border-[var(--gray-300)] overflow-hidden mb-4 bg-white">
+              <div className="grid grid-cols-2 border-b border-[var(--gray-300)]">
+                <div className="p-2.5 border-r border-[var(--gray-300)]">
+                  <label className="block text-[10px] font-bold uppercase text-[var(--ink)]">CHECK-IN</label>
+                  <input
+                    type="date"
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    className="w-full text-xs font-semibold text-[var(--ink)] bg-transparent focus:outline-hidden"
+                  />
+                </div>
+                <div className="p-2.5">
+                  <label className="block text-[10px] font-bold uppercase text-[var(--ink)]">CHECKOUT</label>
+                  <input
+                    type="date"
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    min={checkIn || undefined}
+                    className="w-full text-xs font-semibold text-[var(--ink)] bg-transparent focus:outline-hidden"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="mb-1 block text-xs font-bold text-[var(--gray-700)]">Check-out Date</label>
-                <input
-                  type="date"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  min={checkIn || undefined}
-                  className="w-full rounded-xl border border-[var(--gray-300)] px-3 py-2 text-xs focus:border-[var(--ink)] focus:outline-hidden"
-                />
+              <div className="p-2.5">
+                <label className="block text-[10px] font-bold uppercase text-[var(--ink)]">GUESTS</label>
+                <div className="mt-1">
+                  <QuantityStepper value={guests} onChange={setGuests} min={1} max={stay.maxGuests} />
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="mb-1 block text-xs font-bold text-[var(--gray-700)]">Guests</label>
-              <QuantityStepper value={guests} onChange={setGuests} min={1} max={stay.maxGuests} />
-            </div>
-
-            <div className="flex flex-col gap-2 pt-2">
-              <Button onClick={handleRequestBooking} variant="primary" className="w-full py-3 font-bold">
-                Request to Book Stay
+            {/* CTAs */}
+            <div className="flex flex-col gap-2.5 mb-4">
+              <Button
+                onClick={handleRequestBooking}
+                className="w-full py-3.5 text-sm font-bold bg-[var(--rausch)] hover:bg-[var(--rausch-dark)] text-white shadow-md rounded-xl"
+              >
+                Reserve Stay Inquiry
               </Button>
 
               <WhatsAppInquireButton
@@ -219,16 +267,36 @@ export default function StayDetailPage() {
                 className="w-full py-3 text-xs"
               />
             </div>
+
+            <p className="text-center text-xs text-[var(--gray-500)] mb-4">You won't be charged yet</p>
+
+            {/* Price Calculation Breakdown */}
+            <div className="flex flex-col gap-2 text-xs text-[var(--gray-700)] border-t border-[var(--gray-200)] pt-4">
+              <div className="flex justify-between">
+                <span>{formatCurrency(stay.pricePerNight)} x {nights} night(s)</span>
+                <span>{formatCurrency(baseTotal)} AUD</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Island Eco & Clean Energy Fee</span>
+                <span className="text-emerald-700 font-bold">FREE</span>
+              </div>
+              <div className="flex justify-between font-extrabold text-[var(--ink)] text-sm border-t border-[var(--gray-200)] pt-3 mt-1">
+                <span>Total AUD</span>
+                <span>{formatCurrency(baseTotal)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-12">
+      {/* Reviews */}
+      <div className="mt-16 border-t border-[var(--gray-200)] pt-12">
         <ReviewList reviews={reviews} />
       </div>
 
+      {/* Similar Stays Rail */}
       {relatedStays.length > 0 && (
-        <div className="mt-12">
+        <div className="mt-16">
           <FeaturedRail
             items={relatedStays}
             type="stay"

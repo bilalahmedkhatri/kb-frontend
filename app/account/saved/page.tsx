@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/src/components/atoms/Button";
 import { Badge } from "@/src/components/atoms/Badge";
 import { stays } from "@/src/data/stays";
@@ -71,7 +72,7 @@ export default function SavedPage() {
             {savedStays.map((stay) => (
               <div key={stay.id} className="group flex flex-col rounded-xl border border-[#DDDDDD] overflow-hidden">
                 <div className="relative h-44">
-                  <img src={stay.images[0]} alt={stay.name} className="h-full w-full object-cover" />
+                  <Image src={stay.images[0] || "/placeholder.svg"} alt={stay.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
                   <button
                     onClick={() => setSavedStayIds((prev) => prev.filter((id) => id !== stay.id))}
                     className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-[#FF385C] hover:bg-white"
@@ -118,7 +119,7 @@ export default function SavedPage() {
             {savedProducts.map((product) => (
               <div key={product.id} className="group flex flex-col rounded-xl border border-[#DDDDDD] overflow-hidden">
                 <div className="relative h-44">
-                  <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
+                  <Image src={product.images[0] || "/placeholder.svg"} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
                   <button
                     onClick={() => setSavedProductIds((prev) => prev.filter((id) => id !== product.id))}
                     className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-[#FF385C] hover:bg-white"
@@ -157,9 +158,11 @@ export default function SavedPage() {
           <div className="flex flex-col gap-3">
             {savedGuideItems.map((guide) => (
               <div key={guide.id} className="flex items-center gap-4 rounded-xl border border-[#DDDDDD] p-4">
-                <img
+                <Image
                   src={guide.image}
                   alt={guide.title}
+                  width={112}
+                  height={80}
                   className="h-20 w-28 flex-shrink-0 rounded-lg object-cover"
                 />
                 <div className="flex-1 min-w-0">

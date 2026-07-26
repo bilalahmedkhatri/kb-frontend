@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { CheckoutLayout } from "@/src/components/templates/CheckoutLayout";
 import { Button } from "@/src/components/atoms/Button";
 import { Input } from "@/src/components/atoms/Input";
@@ -208,10 +209,12 @@ export default function CheckoutPage() {
             <div className="space-y-3">
               {items.map((item) => (
                 <div key={item.id} className="flex items-center gap-3">
-                  <img
+                  <Image
                     src={item.image || "/placeholder.svg"}
                     alt={item.name}
-                    className="h-12 w-12 rounded-lg object-cover"
+                    width={48}
+                    height={48}
+                    className="h-12 w-12 rounded-lg object-cover shrink-0"
                   />
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[#222222]">{item.name}</p>

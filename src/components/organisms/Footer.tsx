@@ -29,7 +29,7 @@ export function Footer() {
       <div className="container-app py-12">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col gap-4">
-            <Logo compact={true} className="mb-1" />
+            <Logo compact={false} className="mb-1" />
             <p className="text-xs leading-relaxed text-[var(--gray-500)]">
               Connecting conscious travelers directly with local Kiribati homestays, master handicraft artisans, and authentic island experiences across the Pacific atolls.
             </p>

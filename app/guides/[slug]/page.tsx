@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Avatar } from "@/src/components/atoms/Avatar";
 import { FeaturedRail } from "@/src/components/organisms/FeaturedRail";
@@ -62,10 +63,13 @@ export default function GuideDetailPage() {
   return (
     <div className="container-app py-8">
       <div className="relative mb-8 h-72 overflow-hidden rounded-xl md:h-96">
-        <img
+        <Image
           src={guide.image}
           alt={guide.title}
-          className="h-full w-full object-cover"
+          fill
+          sizes="100vw"
+          priority
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
@@ -124,10 +128,12 @@ export default function GuideDetailPage() {
                 href={`/guides/${related.slug}`}
                 className="group relative flex min-h-[260px] flex-col overflow-hidden rounded-xl bg-[#F7F7F7]"
               >
-                <img
+                <Image
                   src={related.image}
                   alt={related.title}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 25vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
                 <span className="absolute left-3 top-3 z-10 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-[#222222] backdrop-blur-sm">

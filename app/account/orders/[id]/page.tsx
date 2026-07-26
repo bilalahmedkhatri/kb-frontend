@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartStore } from "@/src/store/cartStore";
@@ -14,11 +15,11 @@ import {
   HiChevronLeft,
   HiShoppingCart,
   HiMapPin,
+  HiArrowPath,
 } from "react-icons/hi2";
 import type { Order } from "@/src/types";
 
-const statusSteps = ["pending", "confirmed", "shipped", "delivered"] as const;
-const statusVariant: Record<string, "warning" | "primary" | "success" | "default" | "error"> = {
+const statusVariants: Record<Order["status"], "warning" | "primary" | "success" | "default" | "error"> = {
   pending: "warning",
   confirmed: "primary",
   shipped: "primary",
@@ -26,28 +27,36 @@ const statusVariant: Record<string, "warning" | "primary" | "success" | "default
   cancelled: "error",
 };
 
+const statusSteps: Order["status"][] = ["pending", "confirmed", "shipped", "delivered"];
+
 export default function OrderDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuthStore();
-  const { addItem } = useCartStore();
+  const user = useAuthStore((s) => s.user);
+  const addItem = useCartStore((s) => s.addItem);
+
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [reordering, setReordering] = useState(false);
-  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!params.id) return;
-    setLoading(true);
-    api.getOrder(params.id as string).then((data) => {
-      if (!data) {
-        setNotFound(true);
-      } else {
-        setOrder(data);
+    const rawId = params?.id;
+    if (!rawId) return;
+    const orderId = Array.isArray(rawId) ? rawId[0] : rawId;
+    if (!orderId) return;
+
+    async function fetchOrder() {
+      try {
+        const data = await api.getOrder(orderId);
+        setOrder(data || null);
+      } catch (err) {
+        console.error("Failed to fetch order:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
-  }, [params.id]);
+    }
+    fetchOrder();
+  }, [params]);
 
   const handleReorder = () => {
     if (!order) return;
@@ -78,48 +87,58 @@ export default function OrderDetailPage() {
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center py-16">
-          <Spinner size="lg" />
-        </div>
+      <div className="flex h-48 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
     );
   }
 
-  if (notFound || !order) {
+  if (!order) {
     return (
-        <div className="flex flex-col items-center justify-center py-16">
-          <p className="text-lg font-medium text-[#717171]">Order not found</p>
-          <Link href="/account/orders" className="mt-4 text-sm text-[#FF385C] hover:underline">
-            Back to orders
-          </Link>
-        </div>
+      <div className="flex flex-col items-center justify-center py-16">
+        <p className="text-base font-medium text-[#717171]">Order not found</p>
+        <Link href="/account/orders" className="mt-4">
+          <Button variant="outline">Back to Orders</Button>
+        </Link>
+      </div>
     );
   }
 
-  const currentStepIndex = statusSteps.indexOf(
-    order.status === "cancelled" ? "pending" : (order.status as typeof statusSteps[number])
-  );
+  const currentStepIndex = statusSteps.indexOf(order.status);
 
   return (
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-2">
-          <Link href="/account/orders" className="text-[#717171] hover:text-[#222222]">
-            <HiChevronLeft className="h-5 w-5" />
-          </Link>
-          <div>
-            <h2 className="text-lg font-bold text-[#222222]">
-              Order {order.id.toUpperCase()}
-            </h2>
-            <p className="text-sm text-[#717171]">{formatDate(order.createdAt)}</p>
-          </div>
-          <div className="ml-auto">
-            <Badge variant={statusVariant[order.status] || "default"}>
-              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-            </Badge>
-          </div>
-        </div>
+    <div className="flex flex-col gap-6">
+      <Link
+        href="/account/orders"
+        className="inline-flex items-center gap-1 text-sm font-semibold text-[#222222] hover:underline"
+      >
+        <HiChevronLeft className="h-4 w-4" />
+        Back to Orders
+      </Link>
 
-        {order.status !== "cancelled" && (
-          <div className="flex items-center justify-between rounded-xl bg-[#F7F7F7] px-6 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-[#222222]">Order #{order.id}</h1>
+          <p className="text-sm text-[#717171]">Placed on {formatDate(order.createdAt)}</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Badge variant={statusVariants[order.status]}>
+            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+          </Badge>
+          <Button
+            size="sm"
+            onClick={handleReorder}
+            disabled={reordering}
+          >
+            <HiArrowPath className="mr-1.5 h-4 w-4" />
+            {reordering ? "Adding..." : "Reorder All"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-6">
+        {currentStepIndex >= 0 && (
+          <div className="flex items-center justify-between rounded-xl border border-[#DDDDDD] p-4">
             {statusSteps.map((step, i) => {
               const isActive = i <= currentStepIndex;
               const isLast = i < statusSteps.length - 1;
@@ -160,10 +179,12 @@ export default function OrderDetailPage() {
                 key={item.productId}
                 className="flex items-center gap-4 rounded-xl border border-[#DDDDDD] p-4"
               >
-                <img
-                  src={item.productImage}
+                <Image
+                  src={item.productImage || "/placeholder.svg"}
                   alt={item.productName}
-                  className="h-16 w-16 flex-shrink-0 rounded-lg object-cover"
+                  width={64}
+                  height={64}
+                  className="h-16 w-16 shrink-0 rounded-lg object-cover"
                 />
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-[#222222]">{item.productName}</p>
@@ -224,5 +245,6 @@ export default function OrderDetailPage() {
           </Link>
         </div>
       </div>
+    </div>
   );
 }

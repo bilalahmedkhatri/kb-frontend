@@ -1,19 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { HiPlay, HiXMark, HiSparkles, HiCheckCircle } from "react-icons/hi2";
 import { Avatar } from "@/src/components/atoms/Avatar";
 import { EcoBadge } from "@/src/components/atoms/EcoBadge";
 
 interface ArtisanStoryClipProps {
-  artisanName: string;
+  artisanName?: string;
   artisanAvatar?: string;
   artisanRole?: string;
-  islandOrigin: string;
-  craftName: string;
-  quote?: string;
+  islandOrigin?: string;
+  craftName?: string;
   videoPoster?: string;
   videoUrl?: string;
+  quote?: string;
 }
 
 export function ArtisanStoryClip({
@@ -22,9 +23,9 @@ export function ArtisanStoryClip({
   artisanRole = "Master Pandanus Weaver",
   islandOrigin = "Kiritimati (Christmas Island)",
   craftName = "Traditional Kiribati Woven Fine Mat",
-  quote = "Each strand of natural pandanus fiber represents our ancestors' connection to the ocean and ocean reef winds.",
   videoPoster = "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=800&q=80",
   videoUrl,
+  quote = "Each strand of natural pandanus fiber represents our ancestors' connection to the ocean and ocean reef winds.",
 }: ArtisanStoryClipProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -35,11 +36,15 @@ export function ArtisanStoryClip({
         onClick={() => setIsOpen(true)}
         className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[var(--gray-300)] bg-linear-to-br from-emerald-900 to-teal-950 text-white shadow-md transition-all hover:shadow-xl hover:scale-[1.01]"
       >
-        <img
-          src={videoPoster}
-          alt={craftName}
-          className="h-48 w-full object-cover opacity-65 transition-transform duration-500 group-hover:scale-105"
-        />
+        <div className="relative h-48 w-full overflow-hidden">
+          <Image
+            src={videoPoster}
+            alt={craftName}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover opacity-65 transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <EcoBadge type="handmade" label="Artisan Story Clip" />
@@ -89,7 +94,7 @@ export function ArtisanStoryClip({
                 <video src={videoUrl} controls autoPlay className="h-full w-full object-cover" />
               ) : (
                 <div className="relative h-full w-full">
-                  <img src={videoPoster} alt={craftName} className="h-full w-full object-cover opacity-80" />
+                  <Image src={videoPoster} alt={craftName} fill sizes="100vw" className="object-cover opacity-80" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 p-6 text-center text-white">
                     <HiSparkles className="h-12 w-12 text-amber-400 mb-2 animate-bounce" />
                     <h4 className="text-xl font-black mb-1">Authentic Kiribati Craftsmanship</h4>

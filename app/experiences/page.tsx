@@ -1,7 +1,4 @@
-import React from "react";
-import Link from "next/link";
-import { Header } from "@/src/components/organisms/Header";
-import { Footer } from "@/src/components/organisms/Footer";
+import Image from "next/image";
 import { EcoBadge } from "@/src/components/atoms/EcoBadge";
 import { WhatsAppInquireButton } from "@/src/components/atoms/WhatsAppInquireButton";
 import { HiMapPin, HiClock, HiUserGroup, HiStar, HiSparkles } from "react-icons/hi2";
@@ -121,10 +118,12 @@ export default function ExperiencesPage() {
                   className="group flex flex-col rounded-3xl border border-[var(--gray-300)] bg-white overflow-hidden shadow-md transition-all hover:shadow-xl hover:border-[var(--ink)]"
                 >
                   <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
-                    <img
+                    <Image
                       src={exp.image}
                       alt={exp.title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute top-4 left-4">
                       <EcoBadge type={exp.badgeType} label={exp.badgeLabel} />

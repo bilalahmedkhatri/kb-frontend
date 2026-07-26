@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { TripSearch } from "@/src/components/molecules/TripSearch";
 import { Button } from "@/src/components/atoms/Button";
 import { HiMagnifyingGlass, HiXMark } from "react-icons/hi2";
@@ -21,10 +22,13 @@ export function Hero({ onSearch }: HeroProps) {
     <section className="relative min-h-[60vh] overflow-hidden sm:min-h-[80vh] md:min-h-[85vh]">
       {/* TODO(asset-gate): replace with licensed Kiribati photography per office-hours Phase A gate */}
       <div className="absolute inset-0">
-        <img
+        <Image
           src="https://picsum.photos/seed/kiribati-hero/1600/900"
           alt="Kiribati lagoon at golden hour"
-          className="h-full w-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/40 sm:via-black/20" />
       </div>

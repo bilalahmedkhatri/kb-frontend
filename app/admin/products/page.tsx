@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
@@ -98,9 +99,11 @@ export default function AdminProductsPage() {
                 <tr key={product.id} className="border-b border-[#DDDDDD]">
                   <td className="py-3">
                     <div className="flex items-center gap-3">
-                      <img
+                      <Image
                         src={product.images[0]}
                         alt={product.name}
+                        width={40}
+                        height={40}
                         className="h-10 w-10 flex-shrink-0 rounded-lg object-cover"
                       />
                       <div>

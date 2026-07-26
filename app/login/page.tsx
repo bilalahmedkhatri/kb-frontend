@@ -9,6 +9,7 @@ import { Button } from "@/src/components/atoms/Button";
 import { Input } from "@/src/components/atoms/Input";
 import { Checkbox } from "@/src/components/atoms/Checkbox";
 import { HiEnvelope, HiLockClosed } from "react-icons/hi2";
+import { Logo } from "@/src/components/atoms/Logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -57,7 +58,10 @@ export default function LoginPage() {
     <div className="container-app flex min-h-[calc(100vh-8rem)] items-center justify-center py-16">
       <div className="w-full max-w-md">
         <div className="rounded-xl border border-[#DDDDDD] p-8">
-          <h1 className="mb-6 text-2xl font-bold text-[#222222]">Welcome back</h1>
+          <div className="mb-6 flex justify-center">
+            <Logo />
+          </div>
+          <h1 className="mb-6 text-center text-2xl font-bold text-[#222222]">Welcome back</h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>

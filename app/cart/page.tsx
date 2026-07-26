@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/src/components/atoms/Button";
 import { QuantityStepper } from "@/src/components/molecules/QuantityStepper";
 import { cn, formatCurrency } from "@/src/lib/utils";
@@ -18,15 +18,13 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="container-app flex flex-col items-center justify-center py-20">
-        <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-[#F7F7F7]">
-          <HiShoppingCart className="h-12 w-12 text-[#DDDDDD]" />
-        </div>
-        <h2 className="mb-2 text-xl font-bold text-[#222222]">Your cart is empty</h2>
-        <p className="mb-6 text-center text-sm text-[#717171]">
-          Looks like you haven&rsquo;t added anything yet. Browse our marketplace for handmade crafts or find your perfect stay.
+      <div className="container-app flex flex-col items-center justify-center py-20 text-center">
+        <HiShoppingCart className="mb-4 h-16 w-16 text-[#717171]" />
+        <h1 className="mb-2 text-2xl font-bold text-[#222222]">Your Cart is Empty</h1>
+        <p className="mb-6 text-sm text-[#717171]">
+          Looks like you haven&apos;t added anything to your cart yet.
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
+        <div className="flex gap-3">
           <Link href="/marketplace">
             <Button>Browse Products</Button>
           </Link>
@@ -52,9 +50,11 @@ export default function CartPage() {
               className="flex gap-4 rounded-xl border border-[#DDDDDD] p-4 transition-shadow hover:shadow-sm"
             >
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-[#F7F7F7]">
-                <img
+                <Image
                   src={item.image || "/placeholder.svg"}
                   alt={item.name}
+                  width={96}
+                  height={96}
                   className="h-full w-full object-cover"
                 />
               </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useAuthStore } from "@/src/store/authStore";
 import { ReviewCard } from "@/src/components/molecules/ReviewCard";
 import { Button } from "@/src/components/atoms/Button";
@@ -119,9 +120,11 @@ export default function ReviewsPage() {
               key={product.id}
               className="flex items-center gap-4 rounded-xl border border-[#DDDDDD] p-4"
             >
-              <img
+              <Image
                 src={product.images[0]}
                 alt={product.name}
+                width={64}
+                height={64}
                 className="h-16 w-16 flex-shrink-0 rounded-lg object-cover"
               />
               <div className="flex-1">

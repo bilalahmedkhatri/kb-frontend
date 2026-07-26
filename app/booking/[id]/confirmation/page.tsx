@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/src/components/atoms/Button";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Skeleton } from "@/src/components/atoms/Skeleton";
@@ -13,20 +14,20 @@ import type { Stay } from "@/src/types";
 
 export default function BookingConfirmationPage() {
   const params = useParams();
-  const stayId = params.id as string;
+  const stayId = typeof params.id === "string" ? params.id : "";
 
   const [stay, setStay] = useState<Stay | null>(null);
   const [loading, setLoading] = useState(true);
   const [referenceNumber, setReferenceNumber] = useState("");
 
   useEffect(() => {
-    setReferenceNumber(`BK-${Date.now().toString(36).toUpperCase()}`);
+    setReferenceNumber(`KBB-${Date.now().toString(36).toUpperCase()}`);
     async function load() {
       try {
-        const s = await api.getStay(stayId);
-        setStay(s || null);
+        const data = await api.getStay(stayId);
+        setStay(data || null);
       } catch {
-        // silently fail
+        setStay(null);
       } finally {
         setLoading(false);
       }
@@ -62,10 +63,12 @@ export default function BookingConfirmationPage() {
       {stay && (
         <div className="mb-8 w-full max-w-md rounded-xl border border-[#DDDDDD] p-4">
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src={stay.images[0] || "/placeholder.svg"}
               alt={stay.name}
-              className="h-16 w-16 rounded-lg object-cover"
+              width={64}
+              height={64}
+              className="h-16 w-16 rounded-lg object-cover shrink-0"
             />
             <div>
               <p className="text-sm font-semibold text-[#222222]">{stay.name}</p>

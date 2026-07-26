@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Avatar } from "@/src/components/atoms/Avatar";
 import { cn, formatDate } from "@/src/lib/utils";
-import { HiMagnifyingGlass, HiPaperAirplane, HiPhoto, HiFaceSmile, HiChevronLeft } from "react-icons/hi2";
+import { HiMagnifyingGlass, HiPaperAirplane, HiPhoto, HiFaceSmile, HiChevronLeft, HiOutlineArrowPath } from "react-icons/hi2";
 
 interface Message {
   id: string;
@@ -234,10 +234,7 @@ function ChatView({
               className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-[#FF385C] p-1.5 text-white transition-colors hover:bg-[#E31C5F] disabled:bg-[#DDDDDD] disabled:cursor-not-allowed"
             >
               {isTyping ? (
-                <svg className="h-4 w-4 animate-spin text-white" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
+                <HiOutlineArrowPath className="h-4 w-4 animate-spin text-white" />
               ) : (
                 <HiPaperAirplane className="h-4 w-4" />
               )}

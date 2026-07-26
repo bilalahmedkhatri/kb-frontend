@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { cn, formatCurrency } from "@/src/lib/utils";
 import { Badge } from "@/src/components/atoms/Badge";
 import type { Stay } from "@/src/types";
@@ -12,10 +13,12 @@ export function StayCard({ stay, className }: StayCardProps) {
   return (
     <Link href={`/stay/${stay.id}`} className={cn("group flex flex-col gap-1", className)}>
       <div className="relative aspect-[1/1] overflow-hidden rounded-lg bg-[#F7F7F7]">
-        <img
+        <Image
           src={stay.images[0] || "/placeholder.svg"}
           alt={stay.name}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <Badge variant="primary" className="absolute left-1 top-1 capitalize">
           {stay.type}

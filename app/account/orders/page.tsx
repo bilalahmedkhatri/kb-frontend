@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartStore } from "@/src/store/cartStore";
 import { Badge } from "@/src/components/atoms/Badge";
@@ -70,7 +71,7 @@ function OrderDetailModal({
           <h4 className="text-sm font-semibold text-[#222222]">Items</h4>
           {order.items.map((item, i) => (
             <div key={i} className="flex items-center gap-3 rounded-lg bg-[#F7F7F7] p-3">
-              <img src={item.productImage} alt={item.productName} className="h-14 w-14 flex-shrink-0 rounded-lg object-cover" />
+              <Image src={item.productImage || "/placeholder.svg"} alt={item.productName} width={56} height={56} className="h-14 w-14 shrink-0 rounded-lg object-cover" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-[#222222]">{item.productName}</p>
                 <p className="text-xs text-[#717171]">Qty: {item.quantity}</p>
@@ -275,10 +276,12 @@ export default function OrdersPage() {
                 <div className="flex flex-col gap-2">
                   {order.items.map((item, i) => (
                     <div key={i} className="flex items-center gap-3 rounded-lg bg-[#F7F7F7] p-3">
-                      <img
-                        src={item.productImage}
+                      <Image
+                        src={item.productImage || "/placeholder.svg"}
                         alt={item.productName}
-                        className="h-12 w-12 flex-shrink-0 rounded-lg object-cover"
+                        width={48}
+                        height={48}
+                        className="h-12 w-12 shrink-0 rounded-lg object-cover"
                       />
                       <div className="flex-1 min-w-0">
                         <p className="truncate text-sm font-medium text-[#222222]">{item.productName}</p>

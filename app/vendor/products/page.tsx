@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useAuthStore } from "@/src/store/authStore";
 import { Button } from "@/src/components/atoms/Button";
 import { Badge } from "@/src/components/atoms/Badge";
@@ -161,9 +162,11 @@ export default function VendorProductsPage() {
                     <tr key={product.id} className="border-b border-[#DDDDDD]">
                       <td className="py-3">
                         <div className="flex items-center gap-3">
-                          <img
+                          <Image
                             src={product.images[0]}
                             alt={product.name}
+                            width={40}
+                            height={40}
                             className="h-10 w-10 flex-shrink-0 rounded-lg object-cover"
                           />
                           <span className="font-medium text-[#222222]">{product.name}</span>

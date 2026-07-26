@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/src/lib/utils";
+import Image from "next/image";
 import { HiPhoto, HiChevronLeft, HiChevronRight, HiXMark } from "react-icons/hi2";
 
 interface HeroGalleryProps {
@@ -58,10 +59,13 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
             onClick={() => { setActiveIndex(0); setLightboxOpen(true); }}
             className="col-span-2 relative cursor-pointer overflow-hidden group"
           >
-            <img
+            <Image
               src={displayImages[0]}
               alt={`${alt} main`}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
           </div>
@@ -74,10 +78,12 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
                 onClick={() => { setActiveIndex(idx + 1); setLightboxOpen(true); }}
                 className="relative cursor-pointer overflow-hidden group h-full"
               >
-                <img
+                <Image
                   src={img}
                   alt={`${alt} view ${idx + 2}`}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 25vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
               </div>
@@ -98,10 +104,13 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
 
       {/* Mobile Single Photo Carousel */}
       <div className="relative block md:hidden aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--gray-100)]">
-        <img
+        <Image
           src={images[activeIndex]}
           alt={`${alt} ${activeIndex + 1}`}
-          className="h-full w-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
           onClick={() => setLightboxOpen(true)}
         />
         {images.length > 1 && (
@@ -137,11 +146,13 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
             </div>
 
             {/* Photo Viewport */}
-            <div className="relative flex flex-1 items-center justify-center w-full my-4">
-              <img
+            <div className="relative flex flex-1 items-center justify-center w-full h-[78vh] my-4">
+              <Image
                 src={images[activeIndex]}
                 alt={`${alt} ${activeIndex + 1}`}
-                className="max-h-[78vh] max-w-full rounded-xl object-contain shadow-2xl"
+                fill
+                sizes="100vw"
+                className="rounded-xl object-contain shadow-2xl"
               />
 
               {images.length > 1 && (
@@ -179,7 +190,7 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
                       i === activeIndex ? "border-white scale-105 opacity-100" : "border-transparent opacity-50 hover:opacity-90"
                     )}
                   >
-                    <img src={img} alt={`${alt} thumb ${i + 1}`} className="h-full w-full object-cover" />
+                    <Image src={img} alt={`${alt} thumb ${i + 1}`} width={56} height={56} className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
