@@ -62,37 +62,6 @@ export function VendorLayout({ children, activeTab }: VendorLayoutProps) {
 
   return (
     <div className="container-app py-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-ink">Vendor Workspace</h1>
-            <span className="rounded-full bg-[#FFF0F3] px-3 py-0.5 text-xs font-bold text-[#FF385C]">
-              Seller Mode
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Manage your handicraft catalog, fulfill island orders, and edit storefront details.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Link
-            href="/account"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-gray-50"
-          >
-            <IconUser className="h-4 w-4 text-gray-500" />
-            Customer Account
-          </Link>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-ink px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-black"
-          >
-            <HiEye className="h-4 w-4" />
-            View Storefront
-          </Link>
-        </div>
-      </div>
-
       <div className="flex flex-col gap-0 md:flex-row md:gap-8">
         <aside className="hidden w-60 flex-shrink-0 md:block">
           <nav className="flex flex-col gap-1">

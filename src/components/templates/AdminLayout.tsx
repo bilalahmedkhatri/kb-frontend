@@ -29,7 +29,7 @@ const adminLinks = [
 export function AdminLayout({ children, activeTab }: AdminLayoutProps) {
   const { isAuthenticated, user } = useAuthStore();
   const mounted = useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     () => true,
     () => false
   );
@@ -53,37 +53,6 @@ export function AdminLayout({ children, activeTab }: AdminLayoutProps) {
 
   return (
     <div className="container-app py-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-ink">Admin Control Center</h1>
-            <span className="rounded-full bg-red-100 px-3 py-0.5 text-xs font-bold text-red-700">
-              Platform Admin
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Moderate vendor handicraft listings, manage merchant approvals, and set platform rules.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Link
-            href="/account"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-gray-50"
-          >
-            <HiUser className="h-4 w-4 text-gray-500" />
-            Customer View
-          </Link>
-          <Link
-            href="/vendor/dashboard"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-ink px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-black"
-          >
-            <HiBuildingStorefront className="h-4 w-4" />
-            Vendor View
-          </Link>
-        </div>
-      </div>
-
       <div className="flex flex-col gap-0 md:flex-row md:gap-8">
         <aside className="hidden w-60 flex-shrink-0 md:block">
           <nav className="flex flex-col gap-1">

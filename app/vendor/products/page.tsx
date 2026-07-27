@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { VendorLayout } from "@/src/components/templates/VendorLayout";
+import Link from "next/link";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
@@ -11,8 +11,10 @@ import {
   HiPlus,
   HiMagnifyingGlass,
   HiCube,
-  HiXMark,
-  HiCheckCircle,
+  HiChevronLeft,
+  HiChevronRight,
+  HiArrowTopRightOnSquare,
+  HiPencilSquare,
 } from "react-icons/hi2";
 import type { Product } from "@/src/types";
 
@@ -21,21 +23,10 @@ export default function VendorProductsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  // Form State
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("10");
-  const [category, setCategory] = useState("Handicrafts");
-  const [origin, setOrigin] = useState("Tarawa");
-  const [description, setDescription] = useState("");
-
-  const triggerToast = (msg: string) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3000);
-  };
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   useEffect(() => {
     api.getProducts({ pageSize: 50 }).then((res) => {
@@ -44,94 +35,93 @@ export default function VendorProductsPage() {
     });
   }, []);
 
-  const handleCreateProduct = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !price) return;
-
-    const newProd: Product = {
-      id: `p-${Date.now()}`,
-      name,
-      price: parseFloat(price),
-      currency: "AUD",
-      images: ["/favicon.png"],
-      category,
-      vendorId: "v-1",
-      vendorName: "Tebwa Artisans",
-      rating: 5.0,
-      reviewCount: 0,
-      stock: parseInt(stock) || 1,
-      status: "pending", // New listings submit for admin approval
-      description: description || "Authentic handmade Kiribati handicraft.",
-      origin: origin || "Tarawa",
-      material: "Natural Fiber",
-      createdAt: new Date().toISOString(),
-    };
-
-    setProducts([newProd, ...products]);
-    setShowAddModal(false);
-    setName("");
-    setPrice("");
-    setDescription("");
-    triggerToast("Product submitted! Sent to Admin queue for moderation.");
-  };
-
+  // Filter products based on search & status
   const filteredProducts = products.filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch =
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.category.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "all" || p.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
+  // Calculate pagination slice
+  const totalItems = filteredProducts.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handleFilterChange = (st: string) => {
+    setStatusFilter(st);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
+    setCurrentPage(1);
+  };
+
   return (
-    <VendorLayout activeTab="products">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-bold text-ink">My Products & Inventory</h2>
-            <p className="text-xs text-gray-500">Manage your product listings, inventory levels, and submission status.</p>
-          </div>
-          <Button onClick={() => setShowAddModal(true)} leftIcon={<HiPlus className="h-4 w-4" />}>
+    <div className="flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-bold text-ink">My Products & Inventory</h2>
+          <p className="text-xs text-gray-500">Manage your product listings, inventory levels, and submission status.</p>
+        </div>
+        <Link href="/vendor/products/new">
+          <Button leftIcon={<HiPlus className="h-4 w-4" />}>
             Add New Product
           </Button>
-        </div>
+        </Link>
+      </div>
 
-        {/* Filters & Search */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between">
-          <div className="relative flex-1">
-            <HiMagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search product name or category..."
-              className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-ink placeholder:text-gray-400 focus:border-ink focus:outline-none"
-            />
-          </div>
-          <div className="flex gap-2">
-            {["all", "active", "pending", "rejected"].map((st) => (
-              <button
-                key={st}
-                onClick={() => setStatusFilter(st)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${
-                  statusFilter === st ? "bg-ink text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+      {/* Filters & Search */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between">
+        <div className="relative flex-1">
+          <HiMagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            value={search}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            placeholder="Search product name or category..."
+            className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-ink placeholder:text-gray-400 focus:border-ink focus:outline-none"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {["all", "active", "pending", "draft", "rejected"].map((st) => (
+            <button
+              key={st}
+              onClick={() => handleFilterChange(st)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${statusFilter === st
+                ? "bg-ink text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
-              >
-                {st}
-              </button>
-            ))}
-          </div>
+            >
+              {st === "pending" ? "Pending Approval" : st}
+            </button>
+          ))}
         </div>
+      </div>
 
-        {/* Product Table */}
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <Spinner />
-            </div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="py-12 text-center text-gray-500">
-              <HiCube className="mx-auto mb-2 h-10 w-10 text-gray-300" />
-              <p className="text-sm">No products found matching filters.</p>
-            </div>
-          ) : (
+      {/* Product Table Container */}
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col">
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Spinner />
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="py-12 text-center text-gray-500">
+            <HiCube className="mx-auto mb-2 h-10 w-10 text-gray-300" />
+            <p className="text-sm">No products found matching filters.</p>
+          </div>
+        ) : (
+          <>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
@@ -142,10 +132,11 @@ export default function VendorProductsPage() {
                     <th className="p-3 font-semibold">Stock</th>
                     <th className="p-3 font-semibold">Status</th>
                     <th className="p-3 font-semibold">Origin</th>
+                    <th className="p-3 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredProducts.map((product) => (
+                  {currentProducts.map((product) => (
                     <tr key={product.id} className="hover:bg-gray-50/50">
                       <td className="p-3 font-semibold text-ink">{product.name}</td>
                       <td className="p-3 text-gray-600">{product.category}</td>
@@ -157,8 +148,10 @@ export default function VendorProductsPage() {
                             product.status === "active"
                               ? "success"
                               : product.status === "pending"
-                              ? "warning"
-                              : "error"
+                                ? "warning"
+                                : product.status === "draft"
+                                  ? "default"
+                                  : "error"
                           }
                           className="capitalize"
                         >
@@ -166,117 +159,98 @@ export default function VendorProductsPage() {
                         </Badge>
                       </td>
                       <td className="p-3 text-gray-500">{product.origin}</td>
+                      <td className="p-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/product/${product.id}`}
+                            target="_blank"
+                            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 hover:text-ink"
+                            title="View Public Listing"
+                          >
+                            <HiArrowTopRightOnSquare className="h-3.5 w-3.5 text-gray-400" />
+                            View
+                          </Link>
+                          <Link
+                            href={`/vendor/products/new`}
+                            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-[#FF385C] hover:bg-red-50"
+                            title="Edit Product"
+                          >
+                            <HiPencilSquare className="h-3.5 w-3.5" />
+                            Edit
+                          </Link>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          )}
-        </div>
 
-        {/* Add Product Modal */}
-        {showAddModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowAddModal(false)}>
-            <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-              <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-3">
-                <h3 className="text-lg font-bold text-ink">Add New Product</h3>
-                <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-ink">
-                  <HiXMark className="h-5 w-5" />
-                </button>
+            {/* Pagination Controls Footer */}
+            <div className="flex flex-col gap-3 border-t border-gray-200 bg-gray-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                <span>
+                  Showing <strong className="text-ink">{startIndex + 1}</strong> to{" "}
+                  <strong className="text-ink">{endIndex}</strong> of{" "}
+                  <strong className="text-ink">{totalItems}</strong> products
+                </span>
+
+                <div className="flex items-center gap-1.5">
+                  <span>Per page:</span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="rounded-md border border-gray-200 bg-white p-1 text-xs font-semibold text-ink focus:border-ink focus:outline-none"
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                  </select>
+                </div>
               </div>
 
-              <form onSubmit={handleCreateProduct} className="flex flex-col gap-4">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">Product Name</label>
-                  <input
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Hand-woven Kiribati Mat"
-                    className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
-                  />
-                </div>
+              {/* Numbered Page Buttons & Prev/Next Controls */}
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="mr-2 text-xs"
+                >
+                  <HiChevronLeft className="h-3.5 w-3.5" />
+                </Button>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-gray-700">Price (AUD)</label>
-                    <input
-                      required
-                      type="number"
-                      step="0.01"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      placeholder="45.00"
-                      className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-gray-700">Stock Units</label>
-                    <input
-                      type="number"
-                      value={stock}
-                      onChange={(e) => setStock(e.target.value)}
-                      placeholder="10"
-                      className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
-                    />
-                  </div>
-                </div>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`h-7 w-7 rounded-lg text-xs font-bold transition-all ${currentPage === pageNum
+                      ? "bg-[#FF385C] text-white shadow-xs"
+                      : "bg-white text-gray-700 hover:bg-gray-200/60 border border-gray-200"
+                      }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-gray-700">Category</label>
-                    <select
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none bg-white"
-                    >
-                      <option value="Handicrafts">Handicrafts</option>
-                      <option value="Jewelry">Jewelry</option>
-                      <option value="Woodwork">Woodwork</option>
-                      <option value="Apparel">Apparel</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-gray-700">Island Origin</label>
-                    <input
-                      value={origin}
-                      onChange={(e) => setOrigin(e.target.value)}
-                      placeholder="Tarawa"
-                      className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">Description</label>
-                  <textarea
-                    rows={3}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Craft story, materials, and island traditions..."
-                    className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
-                  />
-                </div>
-
-                <div className="mt-2 flex justify-end gap-3 border-t border-gray-200 pt-3">
-                  <Button type="button" variant="outline" onClick={() => setShowAddModal(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit">Submit Product</Button>
-                </div>
-              </form>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="ml-2 text-xs"
+                >
+                  <HiChevronRight className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Toast */}
-        {toastMsg && (
-          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-[#222222] px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
-            <HiCheckCircle className="h-5 w-5 text-green-400" />
-            <span>{toastMsg}</span>
-          </div>
+          </>
         )}
       </div>
-    </VendorLayout>
+    </div>
   );
 }

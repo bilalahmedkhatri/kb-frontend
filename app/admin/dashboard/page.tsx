@@ -54,10 +54,10 @@ export default function AdminDashboardPage() {
   ];
 
   const stats = [
-    { label: "Total Platform Users", value: totalUsers, icon: HiUserGroup, color: "text-blue-500" },
-    { label: "Total Products", value: allProducts.length, icon: HiCube, color: "text-green-500" },
-    { label: "Total Island Stays", value: totalStays, icon: HiHome, color: "text-purple-500" },
-    { label: "Total Platform Orders", value: orders.length, icon: HiClipboardDocumentList, color: "text-[#FF385C]" },
+    { label: "Total Platform Users", value: totalUsers, icon: HiUserGroup, color: "text-gray-500" },
+    { label: "Total Products", value: allProducts.length, icon: HiCube, color: "text-gray-500" },
+    { label: "Total Island Stays", value: totalStays, icon: HiHome, color: "text-gray-500" },
+    { label: "Total Platform Orders", value: orders.length, icon: HiClipboardDocumentList, color: "text-gray-500" },
   ];
 
   return (
@@ -134,7 +134,7 @@ export default function AdminDashboardPage() {
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {recentVendors.map((vendor) => (
                   <div key={vendor.id} className="flex items-start gap-3 rounded-lg border border-gray-200 p-3 bg-gray-50/50">
-                    <HiBuildingStorefront className="mt-0.5 h-7 w-7 flex-shrink-0 text-red-600" />
+                    <HiBuildingStorefront className="mt-0.5 h-7 w-7 flex-shrink-0 text-gray-500" />
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-ink truncate">{vendor.name}</p>
                       <p className="text-[11px] text-gray-500 truncate">{vendor.email}</p>
