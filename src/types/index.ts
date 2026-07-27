@@ -136,3 +136,20 @@ export interface Review {
   comment: string;
   createdAt: string;
 }
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string;
+  itemCount?: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasMore: boolean;
+}
