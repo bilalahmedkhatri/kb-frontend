@@ -9,7 +9,7 @@ import { Spinner } from "@/src/components/atoms/Spinner";
 import { api } from "@/src/lib/api";
 import { cn } from "@/src/lib/utils";
 import { HiChatBubbleLeftRight, HiShoppingBag, HiStar, HiPencilSquare, HiTrash } from "react-icons/hi2";
-import type { Review, Product } from "@/src/types";
+import type { Review, Product, Order, OrderItem } from "@/src/types";
 
 const TABS = [
   { key: "given", label: "Given Reviews" },
@@ -33,23 +33,23 @@ export default function ReviewsPage() {
       const reviewedIds = new Set<string>();
 
       const fetchedReviews = Promise.all(
-        [...new Set(allProducts.data.map((p) => p.id))].map((pid) =>
+        [...new Set(allProducts.data.map((p: Product) => p.id))].map((pid: string) =>
           api.getReviews(pid, "product")
         )
       );
 
-      fetchedReviews.then((reviewArrays) => {
+      fetchedReviews.then((reviewArrays: Review[][]) => {
         const flat = reviewArrays.flat();
-        const userReviews = flat.filter((r) => r.userId === user.id);
+        const userReviews = flat.filter((r: Review) => r.userId === user.id);
         setReviews(userReviews);
-        userReviews.forEach((r) => reviewedIds.add(r.targetId));
+        userReviews.forEach((r: Review) => reviewedIds.add(r.targetId));
 
         const purchasedProductIds = new Set(
-          userOrders.flatMap((o) => o.items.map((i) => i.productId))
+          userOrders.flatMap((o: Order) => o.items.map((i: OrderItem) => i.productId))
         );
 
         const unreviewed = allProducts.data.filter(
-          (p) => purchasedProductIds.has(p.id) && !reviewedIds.has(p.id)
+          (p: Product) => purchasedProductIds.has(p.id) && !reviewedIds.has(p.id)
         );
         setToReviewItems(unreviewed);
         setLoading(false);
