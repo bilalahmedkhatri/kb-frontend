@@ -142,8 +142,10 @@ export interface Category {
   name: string;
   slug: string;
   icon?: string;
+  type?: "product" | "stay";
   count?: number;
   itemCount?: number;
+  image?: string;
 }
 
 export interface PaginatedResponse<T> {
