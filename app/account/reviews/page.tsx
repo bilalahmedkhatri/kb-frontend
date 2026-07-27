@@ -32,10 +32,9 @@ export default function ReviewsPage() {
     ]).then(([userOrders, allProducts]) => {
       const reviewedIds = new Set<string>();
 
+      const productIds = Array.from(new Set(allProducts.data.map((p: Product) => p.id)));
       const fetchedReviews = Promise.all(
-        [...new Set(allProducts.data.map((p: Product) => p.id))].map((pid: string) =>
-          api.getReviews(pid, "product")
-        )
+        productIds.map((pid: string) => api.getReviews(pid, "product"))
       );
 
       fetchedReviews.then((reviewArrays: Review[][]) => {
