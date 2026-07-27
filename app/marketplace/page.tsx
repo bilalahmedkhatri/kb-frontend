@@ -91,7 +91,8 @@ export default function MarketplacePage() {
     : null;
 
   return (
-    <div className="container-app flex flex-col px-0 pt-8 pb-12">
+    // <div className="container-app flex flex-col px-0 pt-8 pb-12">
+    <>
       {itemListSchema && <JsonLd data={itemListSchema} />}
       <MarketplaceLayout sidebar={sidebar}>
         <div className="flex flex-col gap-6">
@@ -128,6 +129,6 @@ export default function MarketplacePage() {
           )}
         </div>
       </MarketplaceLayout>
-    </div>
+    </>
   );
 }
