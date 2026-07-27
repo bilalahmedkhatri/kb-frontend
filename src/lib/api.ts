@@ -35,12 +35,14 @@ function paginate<T>(
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
   const data = items.slice(start, end);
+  const totalPages = Math.ceil(items.length / pageSize);
   return {
     data,
     total: items.length,
     page,
     pageSize,
-    totalPages: Math.ceil(items.length / pageSize),
+    totalPages,
+    hasMore: page < totalPages,
   };
 }
 
