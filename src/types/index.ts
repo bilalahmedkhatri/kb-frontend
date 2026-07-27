@@ -123,3 +123,16 @@ export interface CartItem {
   checkOut?: string;
   guests?: number;
 }
+
+export interface Review {
+  id: string;
+  targetId: string;
+  targetType: "product" | "stay";
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  rating: number;
+  title: string;
+  comment: string;
+  createdAt: string;
+}
