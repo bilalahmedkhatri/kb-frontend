@@ -156,3 +156,16 @@ export interface PaginatedResponse<T> {
   totalPages: number;
   hasMore: boolean;
 }
+
+export interface FilterState {
+  search?: string;
+  categories?: string[];
+  priceRange?: [number, number];
+  sort?: "newest" | "price-asc" | "price-desc" | "rating" | string;
+  island?: string;
+  guests?: number;
+  checkIn?: string;
+  checkOut?: string;
+  type?: string;
+  topic?: string;
+}
