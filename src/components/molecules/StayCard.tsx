@@ -7,7 +7,7 @@ import type { Stay } from "@/src/types";
 interface StayCardProps {
   stay: Stay;
   className?: string;
-  /** next/image sizes hint — defaults to grid context; pass a narrow value for rail context */
+  /** next/image sizes hint - defaults to grid context; pass a narrow value for rail context */
   sizes?: string;
 }
 

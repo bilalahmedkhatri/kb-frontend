@@ -4,6 +4,7 @@ import { cn, formatCurrency } from "@/src/lib/utils";
 export interface OrderSummaryCardProps {
   subtotal: number;
   shipping?: number;
+  deliveryFee?: number;
   total: number;
   currency?: string;
   title?: string;
@@ -12,12 +13,16 @@ export interface OrderSummaryCardProps {
 
 export function OrderSummaryCard({
   subtotal,
-  shipping = 0,
+  shipping,
+  deliveryFee,
   total,
   currency = "USD",
   title = "Order Summary",
   className,
 }: OrderSummaryCardProps) {
+  // Use deliveryFee if specified, otherwise fallback to shipping or 0
+  const finalFee = deliveryFee !== undefined ? deliveryFee : (shipping !== undefined ? shipping : 0);
+
   return (
     <div
       className={cn(
@@ -32,9 +37,13 @@ export function OrderSummaryCard({
           <span>{formatCurrency(subtotal, currency)}</span>
         </div>
         <div className="flex justify-between text-sm text-gray-500">
-          <span>Shipping</span>
+          <span>Delivery Fee</span>
           <span>
-            {shipping === 0 ? "Free" : formatCurrency(shipping, currency)}
+            {finalFee === 0 ? (
+              <span className="font-semibold text-green-600">Free</span>
+            ) : (
+              formatCurrency(finalFee, currency)
+            )}
           </span>
         </div>
         <div className="flex justify-between border-t border-gray-200 pt-2 text-sm font-bold text-ink">

@@ -193,9 +193,9 @@ function CancelModal({
               <p className="text-sm font-semibold text-amber-800">Cancellation Policy</p>
               <p className="text-xs text-amber-700">
                 {refundPercent >= 100
-                  ? "Free cancellation — full refund available"
+                  ? "Free cancellation - full refund available"
                   : refundPercent >= 50
-                    ? "Partial refund — 50% of total will be returned"
+                    ? "Partial refund - 50% of total will be returned"
                     : "No refund available for this booking"}
               </p>
             </div>
@@ -270,8 +270,8 @@ export default function BookingsPage() {
             {activeTab === "upcoming"
               ? "Book a stay to see it here."
               : activeTab === "completed"
-              ? "Your completed trips will appear here."
-              : "No canceled bookings."}
+                ? "Your completed trips will appear here."
+                : "No canceled bookings."}
           </p>
         </div>
       ) : (
@@ -293,7 +293,7 @@ export default function BookingsPage() {
                   <Badge
                     variant={
                       booking.status === "upcoming" ? "success" :
-                      booking.status === "completed" ? "primary" : "error"
+                        booking.status === "completed" ? "primary" : "error"
                     }
                   >
                     {booking.status.charAt(0).toUpperCase()}{booking.status.slice(1)}

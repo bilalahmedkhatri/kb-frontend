@@ -9,7 +9,7 @@ import { WhatsAppInquireButton } from "@/src/components/atoms/WhatsAppInquireBut
 export const metadata: Metadata = {
   metadataBase: new URL("https://islandconnects.com"),
   title: {
-    default: "Island Connects — Kiribati Stays, Handicrafts & Experiences",
+    default: "Island Connects - Kiribati Stays, Handicrafts & Experiences",
     template: "%s | Island Connects",
   },
   description:
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     apple: "/favicon.png",
   },
   openGraph: {
-    title: "Island Connects — Kiribati Stays, Handicrafts & Experiences",
+    title: "Island Connects - Kiribati Stays, Handicrafts & Experiences",
     description: "Explore the authentic beauty of Kiribati Islands. Book homestays, shop handmade pandanus crafts, and experience local artisan workshops.",
     url: "https://islandconnects.com",
     siteName: "Island Connects",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Island Connects — Kiribati Stays, Handicrafts & Experiences",
+    title: "Island Connects - Kiribati Stays, Handicrafts & Experiences",
     description: "Explore the authentic beauty of Kiribati Islands. Book homestays, shop handmade pandanus crafts, and experience local artisan workshops.",
     images: ["/og-image.png"],
   },

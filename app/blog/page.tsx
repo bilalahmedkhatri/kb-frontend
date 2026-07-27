@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/src/components/atoms/Button";
 
 export const metadata: Metadata = {
-  title: "Island Blog — Stories & Culture from Kiribati | Island Connects",
+  title: "Island Blog - Stories & Culture from Kiribati | Island Connects",
   description: "Explore articles, travel guides, culture, and artisan stories from across Kiribati.",
 };
 import { HiClock, HiArrowRight } from "react-icons/hi2";

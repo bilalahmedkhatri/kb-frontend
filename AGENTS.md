@@ -1,4 +1,4 @@
-# Kiribati Islands Platform (`islandconnects.com`) — AI Agent Coding & Architecture Rules
+# Kiribati Islands Platform (`islandconnects.com`) - AI Agent Coding & Architecture Rules
 
 This document defines the mandatory architectural principles, design system tokens, atomic component rules, interaction-state requirements, and future component creation protocols for the Kiribati Islands Platform (`islandconnects.com`). Every AI agent working in this repository MUST adhere to these rules without exception.
 
@@ -6,7 +6,7 @@ This document defines the mandatory architectural principles, design system toke
 
 ## 0. Next.js 16 & Modern Stack Mandates
 
-- **Next.js 16 App Router**: This version has breaking changes — APIs, conventions, and file structure differ from older Next.js versions. Read the relevant guide in `node_modules/next/dist/docs/` before writing code and heed all deprecation notices.
+- **Next.js 16 App Router**: This version has breaking changes - APIs, conventions, and file structure differ from older Next.js versions. Read the relevant guide in `node_modules/next/dist/docs/` before writing code and heed all deprecation notices.
 - **React 19 & Tailwind CSS v4**: Use React 19 standards and Tailwind CSS v4 conventions. Do not use legacy v3 utility syntax where v4 differs.
 - **Core Stack**: Next.js 16 (App Router), React 19, Tailwind CSS v4, Radix UI primitives, Zustand (`src/store/`), React Query (`@tanstack/react-query`), TypeScript.
 
@@ -44,10 +44,10 @@ The following 12 architectural decisions are locked and MUST NOT be modified or 
 - All styles MUST use CSS variables defined in `app/globals.css` (`:root`) via Tailwind theme tokens (`bg-rausch`, `text-ink`, `border-line`, etc.) or `var(--token)`.
 - **NEVER use arbitrary inline hex colors** (e.g., `[#DDDDDD]`, `[#222222]`, `[#FF385C]`) in component `className` attributes. Any inline hex color is considered a lint/rule violation and must be refactored immediately.
 - **Color Tokens**:
-  - `--rausch: #FF385C` — Primary accent (primary CTAs, active price/tag emphasis).
-  - `--rausch-dark: #E31C5F` — Primary button hover/pressed state.
-  - `--babu: #00A699` — Secondary teal accent (verified vendor badge, trust cues).
-  - `--ink: #222222` — Primary text, active/selected tabs and pills.
+  - `--rausch: #FF385C` - Primary accent (primary CTAs, active price/tag emphasis).
+  - `--rausch-dark: #E31C5F` - Primary button hover/pressed state.
+  - `--babu: #00A699` - Secondary teal accent (verified vendor badge, trust cues).
+  - `--ink: #222222` - Primary text, active/selected tabs and pills.
   - Neutral scale: `--gray-700`, `--gray-500`, `--gray-300`, `--gray-200`, `--gray-100`, `--gray-50`, `--white`.
 - **Typography**: Inter is the documented typeface substitution for Airbnb Cereal. Headings use 800 weight with tight letter-spacing (`-0.02em`). Body/meta pair a bold title with a quiet `--gray-500` subtitle line.
 

@@ -1,14 +1,14 @@
-# Island Connects — islandconnects.com
+# Island Connects - islandconnects.com
 
 ## About
 Island Connects is an ethical marketplace and travel platform for the Kiribati Islands (Gilbert, Line, and Phoenix groups in the Central Pacific). It serves as a direct bridge connecting travelers and global buyers with local outer-atoll weavers, master woodcarvers, eco-lodges, and cultural guides.
 
 ## Key Sections
-- /marketplace — Authentic handmade Kiribati handicrafts (pandanus mats, shell jewelry, wood carvings)
-- /stays — Handpicked eco-lodges and island homestays (solar powered, traditional structure)
-- /experiences — Immersive local workshops (weaving classes, lagoon tours, outrigger sailing)
-- /guides — Cultural, travel, and environmental guides written by local Kiribati authors
-- /fair-trade — Transparent pricing showing direct AUD payouts to island artisans
+- /marketplace - Authentic handmade Kiribati handicrafts (pandanus mats, shell jewelry, wood carvings)
+- /stays - Handpicked eco-lodges and island homestays (solar powered, traditional structure)
+- /experiences - Immersive local workshops (weaving classes, lagoon tours, outrigger sailing)
+- /guides - Cultural, travel, and environmental guides written by local Kiribati authors
+- /fair-trade - Transparent pricing showing direct AUD payouts to island artisans
 
 ## Platform Mechanics & Core Constraints
 - **Currency:** AUD only.

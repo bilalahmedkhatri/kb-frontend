@@ -137,7 +137,7 @@ export default function AdminProductsPage() {
                         </button>
                       </div>
                     ) : (
-                      <span className="text-xs text-[#717171]">—</span>
+                      <span className="text-xs text-[#717171]">-</span>
                     )}
                   </td>
                 </tr>

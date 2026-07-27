@@ -34,7 +34,7 @@ export function PriceRangeInput({ min, max, value, onChange, className }: PriceR
             />
           </div>
         </div>
-        <span className="mt-5 text-[#717171]">—</span>
+        <span className="mt-5 text-[#717171]">-</span>
         <div className="flex-1">
           <label className="mb-1 block text-xs text-[#717171]">Max</label>
           <div className="relative">

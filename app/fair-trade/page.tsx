@@ -101,7 +101,7 @@ export default function FairTradePage() {
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-bold text-[var(--ink)]">Why Outer Island Fair-Trade Matters</h2>
           <p>
-            In the remote Gilbert and Line Islands, weaving fine pandanus mats (<em>kie n Kiribati</em>) is more than a cultural art form—it is often a family&apos;s primary source of cash income for school fees, solar lanterns, and inter-island transport.
+            In the remote Gilbert and Line Islands, weaving fine pandanus mats (<em>kie n Kiribati</em>) is more than a cultural art form-it is often a family&apos;s primary source of cash income for school fees, solar lanterns, and inter-island transport.
           </p>
           <p>
             By booking through Island Connects, you ensure that every dollar directly empowers Kiribati craftswomen to pass on their ancestral weaving knowledge to the next generation without leaving their lagoon villages.

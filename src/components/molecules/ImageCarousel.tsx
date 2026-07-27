@@ -8,7 +8,7 @@ interface ImageCarouselProps {
   images: string[];
   alt: string;
   className?: string;
-  /** next/image sizes hint — passed down from the parent card */
+  /** next/image sizes hint - passed down from the parent card */
   sizes?: string;
 }
 

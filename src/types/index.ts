@@ -82,6 +82,8 @@ export interface Order {
   currency: string;
   status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
   shippingAddress: Address;
+  deliveryFee?: number;
+  shippingFee?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -119,41 +121,5 @@ export interface CartItem {
   vendorName?: string;
   checkIn?: string;
   checkOut?: string;
-}
-
-export interface Review {
-  id: string;
-  targetId: string;
-  targetType: "product" | "stay";
-  userId: string;
-  userName: string;
-  userAvatar: string;
-  rating: number;
-  title: string;
-  comment: string;
-  createdAt: string;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  icon: string;
-  type: "product" | "stay" | "guide" | "experience";
-  count: number;
-}
-
-export interface FilterState {
-  categories: string[];
-  priceRange: [number, number];
-  sort: string;
-  search: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
+  guests?: number;
 }

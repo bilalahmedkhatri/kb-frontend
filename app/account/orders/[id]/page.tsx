@@ -1,27 +1,18 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useAuthStore } from "@/src/store/authStore";
-import { useCartStore } from "@/src/store/cartStore";
-import { Button } from "@/src/components/atoms/Button";
+import { notFound } from "next/navigation";
+import { orders } from "@/src/data/orders";
+import { decodeOrderIdBase256 } from "@/src/lib/security";
 import { Badge } from "@/src/components/atoms/Badge";
-import { Spinner } from "@/src/components/atoms/Spinner";
-import { OrderStatusStepper } from "@/src/components/molecules/OrderStatusStepper";
 import { OrderItemRow } from "@/src/components/molecules/OrderItemRow";
 import { OrderSummaryCard } from "@/src/components/molecules/OrderSummaryCard";
 import { ShippingAddressCard } from "@/src/components/molecules/ShippingAddressCard";
-import { api } from "@/src/lib/api";
+import { OrderStatusStepper } from "@/src/components/molecules/OrderStatusStepper";
+import { OrderActions } from "./_components/OrderActions";
 import { formatDate } from "@/src/lib/utils";
-import {
-  HiChevronLeft,
-  HiShoppingCart,
-  HiArrowPath,
-} from "react-icons/hi2";
+import { HiArrowLeft, HiCalendar, HiTruck, HiXCircle } from "react-icons/hi2";
 import type { Order } from "@/src/types";
 
-const statusVariants: Record<Order["status"], "warning" | "primary" | "success" | "default" | "error"> = {
+const statusVariants: Record<Order["status"], "default" | "primary" | "success" | "warning" | "error"> = {
   pending: "warning",
   confirmed: "primary",
   shipped: "primary",
@@ -29,151 +20,113 @@ const statusVariants: Record<Order["status"], "warning" | "primary" | "success" 
   cancelled: "error",
 };
 
-export default function OrderDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const user = useAuthStore((s) => s.user);
-  const addItem = useCartStore((s) => s.addItem);
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
-  const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [reordering, setReordering] = useState(false);
+export default async function OrderDetailsPage({ params }: PageProps) {
+  const { id: token } = await params;
+  
+  // Decode Base256 URL token
+  const rawOrderId = decodeOrderIdBase256(token);
+  
+  // Find order matching ID
+  const order = orders.find((o) => o.id === rawOrderId || o.id === token);
 
-  useEffect(() => {
-    const rawId = params?.id;
-    if (!rawId) return;
-    const orderId = Array.isArray(rawId) ? rawId[0] : rawId;
-    if (!orderId) return;
-
-    let cancelled = false;
-    async function fetchOrder() {
-      try {
-        const data = await api.getOrder(orderId);
-        if (!cancelled) {
-          setOrder(data || null);
-          setLoading(false);
-        }
-      } catch (err) {
-        console.error("Failed to fetch order:", err);
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-    fetchOrder();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [params]);
-
-  const handleReorder = () => {
-    if (!order) return;
-    setReordering(true);
-    order.items.forEach((item) => {
-      addItem({
-        id: item.productId,
-        type: "product",
-        name: item.productName,
-        price: item.price,
-        quantity: item.quantity,
-        image: item.productImage,
-      });
-    });
-    setTimeout(() => {
-      setReordering(false);
-      router.push("/cart");
-    }, 500);
-  };
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <p className="text-sm text-gray-500">Please sign in.</p>
-      </div>
-    );
+  // Security check: If order not found or unauthorized, trigger Next.js notFound()
+  if (!order || (order.userId !== "u-1" && order.userId !== "user-1")) {
+    notFound();
   }
 
-  if (loading) {
-    return (
-      <div className="flex h-48 items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
-  if (!order) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <p className="text-base font-medium text-gray-500">Order not found</p>
-        <Link href="/account/orders" className="mt-4">
-          <Button variant="outline">Back to Orders</Button>
-        </Link>
-      </div>
-    );
-  }
+  // Calculate items subtotal and delivery fee
+  const itemsSubtotal = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const deliveryFee = order.deliveryFee ?? order.shippingFee ?? Math.max(0, order.total - itemsSubtotal);
 
   return (
-    <div className="flex flex-col gap-6">
-      <Link
-        href="/account/orders"
-        className="inline-flex items-center gap-1 text-sm font-semibold text-ink hover:underline"
-      >
-        <HiChevronLeft className="h-4 w-4" />
-        Back to Orders
-      </Link>
+    <div className="flex flex-col gap-8 pb-10">
+      {/* Navigation & Header */}
+      <div className="flex flex-col gap-4 border-b border-gray-200 pb-6">
+        <Link
+          href="/account/orders"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-ink transition-colors w-fit"
+        >
+          <HiArrowLeft className="h-4 w-4" />
+          Back to Order History
+        </Link>
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Order #{order.id}</h1>
-          <p className="text-sm text-gray-500">Placed on {formatDate(order.createdAt)}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Badge variant={statusVariants[order.status]}>
-            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-          </Badge>
-          <Button
-            size="sm"
-            onClick={handleReorder}
-            disabled={reordering}
-          >
-            <HiArrowPath className="mr-1.5 h-4 w-4" />
-            {reordering ? "Adding..." : "Reorder All"}
-          </Button>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-ink">Order #{order.id}</h1>
+              <Badge variant={statusVariants[order.status] || "default"} className="capitalize">
+                {order.status}
+              </Badge>
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <HiCalendar className="h-4 w-4 text-gray-400" />
+                Placed on {formatDate(order.createdAt)}
+              </span>
+            </div>
+          </div>
+
+          <OrderActions order={order} />
         </div>
       </div>
 
-      <div className="flex flex-col gap-6">
-        <OrderStatusStepper currentStatus={order.status} />
-
-        <section>
-          <h3 className="mb-3 text-sm font-semibold text-ink">Items</h3>
-          <div className="flex flex-col gap-3">
-            {order.items.map((item) => (
-              <OrderItemRow key={item.productId} item={item} currency={order.currency} />
-            ))}
+      {/* Shipment Progress Stepper (Conditional: Hide if Cancelled) */}
+      {order.status !== "cancelled" ? (
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-ink">
+            <HiTruck className="h-5 w-5 text-gray-500" />
+            Shipment Progress
+          </h2>
+          <OrderStatusStepper currentStatus={order.status} className="border-0 p-0 shadow-none" />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800 shadow-sm">
+          <HiXCircle className="h-6 w-6 text-red-600 shrink-0" />
+          <div>
+            <h3 className="text-sm font-bold">Order Cancelled</h3>
+            <p className="text-xs text-red-600">
+              This order has been cancelled and will not be processed or shipped. If you have questions, please reach out to customer support.
+            </p>
           </div>
-        </section>
+        </div>
+      )}
 
-        <ShippingAddressCard address={order.shippingAddress} />
+      {/* Ordered Items Table / List */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-base font-bold text-ink">
+          Order Items ({order.items.length})
+        </h2>
+        <div className="divide-y divide-gray-100">
+          {order.items.map((item, index) => (
+            <div key={`${item.productId}-${index}`} className="py-3 first:pt-0 last:pb-0">
+              <OrderItemRow item={item} currency={order.currency} />
+            </div>
+          ))}
+        </div>
+      </div>
 
-        <OrderSummaryCard
-          subtotal={order.total}
-          total={order.total}
-          currency={order.currency}
-        />
+      {/* Grid: Shipping Address & Order Summary */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Shipping Address */}
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-base font-bold text-ink">Shipping Address</h2>
+          <ShippingAddressCard address={order.shippingAddress} className="border-0 p-0 shadow-none" />
+        </div>
 
-        <div className="flex gap-3">
-          <Button
-            leftIcon={<HiShoppingCart className="h-4 w-4" />}
-            isLoading={reordering}
-            onClick={handleReorder}
-          >
-            Reorder
-          </Button>
-          <Link href="/account/orders">
-            <Button variant="outline">Back to Orders</Button>
-          </Link>
+        {/* Order Payment Summary with Delivery Fee */}
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-base font-bold text-ink">Order Summary</h2>
+          <OrderSummaryCard
+            subtotal={itemsSubtotal}
+            deliveryFee={deliveryFee}
+            total={order.total}
+            currency={order.currency}
+            className="border-0 p-0 shadow-none"
+          />
         </div>
       </div>
     </div>

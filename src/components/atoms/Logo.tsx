@@ -5,14 +5,14 @@ import Image from "next/image";
 interface LogoProps {
   href?: string;
   className?: string;
-  /** Hide the wordmark — show icon only. Useful for compact nav slots. */
+  /** Hide the wordmark - show icon only. Useful for compact nav slots. */
   compact?: boolean;
 }
 
 export function Logo({ href = "/", className, compact = false }: LogoProps) {
   const content = (
     <div className={cn("flex items-center gap-1", className)}>
-      {/* Icon — 32px mobile · 36px tablet · 40px desktop */}
+      {/* Icon - 32px mobile · 36px tablet · 40px desktop */}
       <div className="relative h-10 w-10 lg:h-13 lg:w-13 md:h-10 md:w-10 shrink-0 overflow-hidden transition-transform group-hover:scale-105">
         <Image
           src="/favicon.png"
@@ -24,7 +24,7 @@ export function Logo({ href = "/", className, compact = false }: LogoProps) {
         />
       </div>
 
-      {/* Wordmark — hidden when compact */}
+      {/* Wordmark - hidden when compact */}
       {!compact && (
         <div className="flex flex-col leading-none gap-px">
           <span className="text-[1rem] sm:text-[0.85rem] md:text-[0.9rem] font-black tracking-tight text-[var(--ink)]">

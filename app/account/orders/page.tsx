@@ -1,18 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartStore } from "@/src/store/cartStore";
-import { Badge } from "@/src/components/atoms/Badge";
 import { Pagination } from "@/src/components/atoms/Pagination";
 import { Spinner } from "@/src/components/atoms/Spinner";
 import { OrderCard } from "@/src/components/molecules/OrderCard";
-import { OrderItemRow } from "@/src/components/molecules/OrderItemRow";
-import { OrderSummaryCard } from "@/src/components/molecules/OrderSummaryCard";
-import { ShippingAddressCard } from "@/src/components/molecules/ShippingAddressCard";
 import { OrderStatusStepper } from "@/src/components/molecules/OrderStatusStepper";
 import { api } from "@/src/lib/api";
-import { formatDate, cn } from "@/src/lib/utils";
+import { encodeOrderIdBase256 } from "@/src/lib/security";
+import { cn } from "@/src/lib/utils";
 import {
   HiShoppingBag,
   HiMagnifyingGlass,
@@ -20,68 +18,8 @@ import {
 } from "react-icons/hi2";
 import type { Order } from "@/src/types";
 
-const statusVariant: Record<string, "warning" | "primary" | "success" | "default" | "error"> = {
-  pending: "warning",
-  confirmed: "primary",
-  shipped: "primary",
-  delivered: "success",
-  cancelled: "error",
-};
-
 const STATUS_FILTERS = ["All", "Processing", "Shipped", "Delivered", "Returned"] as const;
 const PAGE_SIZE = 10;
-
-function OrderDetailModal({
-  order,
-  onClose,
-}: {
-  order: Order;
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-ink">Order #{order.id.toUpperCase()}</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-ink">
-            <HiXMark className="h-5 w-5" />
-          </button>
-        </div>
-
-        <div className="mb-4 flex items-center justify-between text-sm">
-          <span className="text-gray-500">{formatDate(order.createdAt)}</span>
-          <Badge variant={statusVariant[order.status] || "default"}>
-            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-          </Badge>
-        </div>
-
-        <div className="mb-4 space-y-3">
-          <h4 className="text-sm font-semibold text-ink">Items</h4>
-          {order.items.map((item, i) => (
-            <OrderItemRow key={i} item={item} currency={order.currency} />
-          ))}
-        </div>
-
-        <OrderSummaryCard
-          subtotal={order.total}
-          total={order.total}
-          currency={order.currency}
-          className="mb-4 border-0 p-0 shadow-none"
-        />
-
-        <div className="mt-4 border-t border-gray-200 pt-4">
-          <ShippingAddressCard
-            address={order.shippingAddress}
-            className="border-0 p-0 shadow-none"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function TrackingModal({
   order,
@@ -114,6 +52,7 @@ function TrackingModal({
 }
 
 export default function OrdersPage() {
+  const router = useRouter();
   const { user } = useAuthStore();
   const { addItem } = useCartStore();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -121,7 +60,6 @@ export default function OrdersPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All");
-  const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [trackingOrder, setTrackingOrder] = useState<Order | null>(null);
 
   useEffect(() => {
@@ -154,6 +92,11 @@ export default function OrdersPage() {
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginatedOrders = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleViewOrderDetails = (order: Order) => {
+    const token = encodeOrderIdBase256(order.id);
+    router.push(`/account/orders/${token}`);
+  };
 
   return (
     <>
@@ -208,7 +151,7 @@ export default function OrdersPage() {
               <OrderCard
                 key={order.id}
                 order={order}
-                onViewDetails={() => setDetailOrder(order)}
+                onViewDetails={() => handleViewOrderDetails(order)}
                 onReorder={() => {
                   order.items.forEach((item) =>
                     addItem({
@@ -229,7 +172,6 @@ export default function OrdersPage() {
         </>
       )}
 
-      {detailOrder && <OrderDetailModal order={detailOrder} onClose={() => setDetailOrder(null)} />}
       {trackingOrder && <TrackingModal order={trackingOrder} onClose={() => setTrackingOrder(null)} />}
     </>
   );

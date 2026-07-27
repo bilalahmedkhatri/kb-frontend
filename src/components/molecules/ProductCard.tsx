@@ -15,7 +15,7 @@ interface ProductCardProps {
   product: Product;
   onAddToCart?: (id: string) => void;
   className?: string;
-  /** next/image sizes hint — defaults to grid context; pass a narrow value for rail context */
+  /** next/image sizes hint - defaults to grid context; pass a narrow value for rail context */
   sizes?: string;
 }
 
