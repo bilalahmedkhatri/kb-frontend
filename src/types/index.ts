@@ -142,6 +142,7 @@ export interface Category {
   name: string;
   slug: string;
   icon?: string;
+  count?: number;
   itemCount?: number;
 }
 
