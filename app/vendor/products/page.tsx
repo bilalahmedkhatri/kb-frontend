@@ -1,210 +1,282 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
-import { useAuthStore } from "@/src/store/authStore";
-import { Button } from "@/src/components/atoms/Button";
+import { VendorLayout } from "@/src/components/templates/VendorLayout";
 import { Badge } from "@/src/components/atoms/Badge";
-import { Input } from "@/src/components/atoms/Input";
-import { Pagination } from "@/src/components/atoms/Pagination";
+import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
 import { api } from "@/src/lib/api";
-import { formatCurrency, generateId } from "@/src/lib/utils";
+import { formatCurrency } from "@/src/lib/utils";
 import {
   HiPlus,
-  HiPencilSquare,
-  HiTrash,
-  HiXMark,
-  HiCheck,
+  HiMagnifyingGlass,
   HiCube,
+  HiXMark,
+  HiCheckCircle,
 } from "react-icons/hi2";
 import type { Product } from "@/src/types";
 
-const statusVariant: Record<string, "success" | "warning" | "error"> = {
-  active: "success",
-  pending: "warning",
-  rejected: "error",
-};
-
-const PAGE_SIZE = 10;
-
-interface ProductForm {
-  name: string;
-  price: string;
-  stock: string;
-  category: string;
-  description: string;
-  images: string[];
-}
-
-const emptyForm: ProductForm = {
-  name: "",
-  price: "",
-  stock: "",
-  category: "",
-  description: "",
-  images: [],
-};
-
 export default function VendorProductsPage() {
-  const { user } = useAuthStore();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState<ProductForm>(emptyForm);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Form State
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("10");
+  const [category, setCategory] = useState("Handicrafts");
+  const [origin, setOrigin] = useState("Tarawa");
+  const [description, setDescription] = useState("");
+
+  const triggerToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3000);
+  };
 
   useEffect(() => {
-    if (!user) return;
-
-    api.getVendorProducts(user.id).then((data) => {
-      setProducts(data);
+    api.getProducts({ pageSize: 50 }).then((res) => {
+      setProducts(res.data);
       setLoading(false);
     });
-  }, [user]);
+  }, []);
 
-  const handleAdd = () => {
-    if (!form.name || !form.price || !form.stock) return;
-    const newProduct: Product = {
-      id: generateId(),
-      name: form.name,
-      price: parseFloat(form.price),
+  const handleCreateProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !price) return;
+
+    const newProd: Product = {
+      id: `p-${Date.now()}`,
+      name,
+      price: parseFloat(price),
       currency: "AUD",
-      images: form.images.length > 0 ? form.images : ["https://picsum.photos/seed/placeholder/400/400"],
-      category: form.category || "General",
-      vendorId: user?.id || "",
-      vendorName: user?.name || "",
-      rating: 0,
+      images: ["/favicon.png"],
+      category,
+      vendorId: "v-1",
+      vendorName: "Tebwa Artisans",
+      rating: 5.0,
       reviewCount: 0,
-      stock: parseInt(form.stock),
-      status: "pending",
-      description: form.description,
-      origin: "",
-      material: "",
-      createdAt: new Date().toISOString().split("T")[0],
+      stock: parseInt(stock) || 1,
+      status: "pending", // New listings submit for admin approval
+      description: description || "Authentic handmade Kiribati handicraft.",
+      origin: origin || "Tarawa",
+      material: "Natural Fiber",
+      createdAt: new Date().toISOString(),
     };
-    setProducts((prev) => [newProduct, ...prev]);
-    setForm(emptyForm);
-    setShowForm(false);
+
+    setProducts([newProd, ...products]);
+    setShowAddModal(false);
+    setName("");
+    setPrice("");
+    setDescription("");
+    triggerToast("Product submitted! Sent to Admin queue for moderation.");
   };
 
-  const handleDelete = (id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
-  };
-
-  if (!user) return null;
-
-  const totalPages = Math.ceil(products.length / PAGE_SIZE);
-  const paginated = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const filteredProducts = products.filter((p) => {
+    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === "all" || p.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-[#222222]">Products</h2>
-          <Button
-            size="sm"
-            leftIcon={showForm ? <HiXMark className="h-4 w-4" /> : <HiPlus className="h-4 w-4" />}
-            onClick={() => { setShowForm(!showForm); setForm(emptyForm); }}
-          >
-            {showForm ? "Cancel" : "Add Product"}
+    <VendorLayout activeTab="products">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-bold text-ink">My Products & Inventory</h2>
+            <p className="text-xs text-gray-500">Manage your product listings, inventory levels, and submission status.</p>
+          </div>
+          <Button onClick={() => setShowAddModal(true)} leftIcon={<HiPlus className="h-4 w-4" />}>
+            Add New Product
           </Button>
         </div>
 
-        {showForm && (
-          <div className="rounded-xl border border-[#DDDDDD] p-4">
-            <div className="mb-3 grid gap-3 md:grid-cols-2">
-              <Input label="Product Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-              <Input label="Price (AUD)" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-              <Input label="Stock" type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
-              <Input label="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
-            </div>
-            <Input label="Image URL" value={form.images[0] || ""} onChange={(e) => setForm({ ...form, images: [e.target.value] })} />
-            <div className="mt-2">
-              <label className="mb-1.5 block text-sm font-medium text-[#222222]">Description</label>
-              <textarea
-                className="w-full rounded-lg border border-[#DDDDDD] bg-white px-4 py-2.5 text-sm text-[#222222] placeholder:text-[#717171] transition-colors focus:border-[#222222] focus:outline-none focus:ring-1 focus:ring-[#222222]"
-                rows={3}
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-              />
-            </div>
-            <Button size="sm" className="mt-3" leftIcon={<HiCheck className="h-4 w-4" />} onClick={handleAdd}>
-              Save Product
-            </Button>
+        {/* Filters & Search */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between">
+          <div className="relative flex-1">
+            <HiMagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search product name or category..."
+              className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-ink placeholder:text-gray-400 focus:border-ink focus:outline-none"
+            />
           </div>
-        )}
+          <div className="flex gap-2">
+            {["all", "active", "pending", "rejected"].map((st) => (
+              <button
+                key={st}
+                onClick={() => setStatusFilter(st)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${
+                  statusFilter === st ? "bg-ink text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {st}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <Spinner size="lg" />
-          </div>
-        ) : products.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#DDDDDD] py-16">
-            <HiCube className="mb-3 h-12 w-12 text-[#DDDDDD]" />
-            <p className="text-base font-medium text-[#717171]">No products yet</p>
-            <p className="text-sm text-[#717171]">Add your first product to start selling.</p>
-          </div>
-        ) : (
-          <>
+        {/* Product Table */}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <Spinner />
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="py-12 text-center text-gray-500">
+              <HiCube className="mx-auto mb-2 h-10 w-10 text-gray-300" />
+              <p className="text-sm">No products found matching filters.</p>
+            </div>
+          ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#DDDDDD] text-[#717171]">
-                    <th className="pb-3 font-medium">Product</th>
-                    <th className="pb-3 font-medium">Price</th>
-                    <th className="pb-3 font-medium">Stock</th>
-                    <th className="pb-3 font-medium">Status</th>
-                    <th className="pb-3 font-medium">Actions</th>
+                  <tr className="border-b border-gray-200 bg-gray-50 text-gray-600">
+                    <th className="p-3 font-semibold">Product Name</th>
+                    <th className="p-3 font-semibold">Category</th>
+                    <th className="p-3 font-semibold">Price</th>
+                    <th className="p-3 font-semibold">Stock</th>
+                    <th className="p-3 font-semibold">Status</th>
+                    <th className="p-3 font-semibold">Origin</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {paginated.map((product) => (
-                    <tr key={product.id} className="border-b border-[#DDDDDD]">
-                      <td className="py-3">
-                        <div className="flex items-center gap-3">
-                          <Image
-                            src={product.images[0]}
-                            alt={product.name}
-                            width={40}
-                            height={40}
-                            className="h-10 w-10 flex-shrink-0 rounded-lg object-cover"
-                          />
-                          <span className="font-medium text-[#222222]">{product.name}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 text-[#222222]">{formatCurrency(product.price, product.currency)}</td>
-                      <td className="py-3 text-[#717171]">{product.stock}</td>
-                      <td className="py-3">
-                        <Badge variant={statusVariant[product.status]}>
-                          {product.status.charAt(0).toUpperCase() + product.status.slice(1)}
+                <tbody className="divide-y divide-gray-100">
+                  {filteredProducts.map((product) => (
+                    <tr key={product.id} className="hover:bg-gray-50/50">
+                      <td className="p-3 font-semibold text-ink">{product.name}</td>
+                      <td className="p-3 text-gray-600">{product.category}</td>
+                      <td className="p-3 font-semibold text-ink">{formatCurrency(product.price, product.currency)}</td>
+                      <td className="p-3 text-gray-600">{product.stock} units</td>
+                      <td className="p-3">
+                        <Badge
+                          variant={
+                            product.status === "active"
+                              ? "success"
+                              : product.status === "pending"
+                              ? "warning"
+                              : "error"
+                          }
+                          className="capitalize"
+                        >
+                          {product.status === "pending" ? "Pending Approval" : product.status}
                         </Badge>
                       </td>
-                      <td className="py-3">
-                        <div className="flex items-center gap-2">
-                          <button className="rounded-lg p-1.5 text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]">
-                            <HiPencilSquare className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(product.id)}
-                            className="rounded-lg p-1.5 text-[#717171] hover:bg-[#F7F7F7] hover:text-red-500"
-                          >
-                            <HiTrash className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
+                      <td className="p-3 text-gray-500">{product.origin}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+          )}
+        </div>
 
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
-            />
-          </>
+        {/* Add Product Modal */}
+        {showAddModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowAddModal(false)}>
+            <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+              <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-3">
+                <h3 className="text-lg font-bold text-ink">Add New Product</h3>
+                <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-ink">
+                  <HiXMark className="h-5 w-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateProduct} className="flex flex-col gap-4">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-gray-700">Product Name</label>
+                  <input
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Hand-woven Kiribati Mat"
+                    className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-gray-700">Price (AUD)</label>
+                    <input
+                      required
+                      type="number"
+                      step="0.01"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="45.00"
+                      className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-gray-700">Stock Units</label>
+                    <input
+                      type="number"
+                      value={stock}
+                      onChange={(e) => setStock(e.target.value)}
+                      placeholder="10"
+                      className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-gray-700">Category</label>
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none bg-white"
+                    >
+                      <option value="Handicrafts">Handicrafts</option>
+                      <option value="Jewelry">Jewelry</option>
+                      <option value="Woodwork">Woodwork</option>
+                      <option value="Apparel">Apparel</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-gray-700">Island Origin</label>
+                    <input
+                      value={origin}
+                      onChange={(e) => setOrigin(e.target.value)}
+                      placeholder="Tarawa"
+                      className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-gray-700">Description</label>
+                  <textarea
+                    rows={3}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Craft story, materials, and island traditions..."
+                    className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
+                  />
+                </div>
+
+                <div className="mt-2 flex justify-end gap-3 border-t border-gray-200 pt-3">
+                  <Button type="button" variant="outline" onClick={() => setShowAddModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit">Submit Product</Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Toast */}
+        {toastMsg && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-[#222222] px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
+            <HiCheckCircle className="h-5 w-5 text-green-400" />
+            <span>{toastMsg}</span>
+          </div>
         )}
       </div>
+    </VendorLayout>
   );
 }

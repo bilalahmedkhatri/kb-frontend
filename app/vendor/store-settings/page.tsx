@@ -1,83 +1,101 @@
 "use client";
 
 import { useState } from "react";
-import { useAuthStore } from "@/src/store/authStore";
+import { VendorLayout } from "@/src/components/templates/VendorLayout";
 import { Button } from "@/src/components/atoms/Button";
-import { Input } from "@/src/components/atoms/Input";
-import { Checkbox } from "@/src/components/atoms/Checkbox";
-import { HiCheckCircle } from "react-icons/hi2";
+import { useAuthStore } from "@/src/store/authStore";
+import { HiCheckCircle, HiBuildingStorefront, HiBanknotes } from "react-icons/hi2";
 
-export default function StoreSettingsPage() {
-  const { user, updateProfile } = useAuthStore();
-  const [storeName, setStoreName] = useState(user?.name || "");
-  const [bio, setBio] = useState(user?.bio || "");
-  const [location, setLocation] = useState(user?.location || "");
-  const [verified, setVerified] = useState(false);
+export default function VendorStoreSettingsPage() {
+  const { user } = useAuthStore();
+  const [storeName, setStoreName] = useState("Tebwa Artisans & Weavers");
+  const [island, setIsland] = useState("Tarawa");
+  const [bio, setBio] = useState("Traditional I-Kiribati handicraft weaving cooperative empowering local women artisans.");
+  const [bankAccount, setBankAccount] = useState("ANZ Kiribati: 1029384756");
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 800));
-    updateProfile({ name: storeName, bio, location });
+    await new Promise((r) => setTimeout(r, 600));
     setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    setToastMsg("Storefront settings updated successfully!");
+    setTimeout(() => setToastMsg(null), 3000);
   };
 
   return (
-      <div className="flex flex-col gap-6">
-        <h2 className="text-lg font-bold text-[#222222]">Store Settings</h2>
+    <VendorLayout activeTab="store-settings">
+      <div className="flex flex-col gap-6 max-w-2xl">
+        <div>
+          <h2 className="text-lg font-bold text-ink">Storefront Customization & Payouts</h2>
+          <p className="text-xs text-gray-500">Update public store details, artisan story, and bank transfer payout info.</p>
+        </div>
 
-        <div className="flex flex-col gap-4 rounded-xl border border-[#DDDDDD] p-6">
-          <Input
-            label="Store Name"
-            value={storeName}
-            onChange={(e) => setStoreName(e.target.value)}
-          />
+        <form onSubmit={handleSave} className="flex flex-col gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
+            <HiBuildingStorefront className="h-6 w-6 text-[#FF385C]" />
+            <h3 className="text-base font-bold text-ink">Store Branding</h3>
+          </div>
+
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#222222]">Store Bio</label>
+            <label className="mb-1 block text-xs font-semibold text-gray-700">Store / Artisan Name</label>
+            <input
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+              className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-gray-700">Island Location</label>
+            <input
+              value={island}
+              onChange={(e) => setIsland(e.target.value)}
+              className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-gray-700">Artisan Story & Bio</label>
             <textarea
-              className="w-full rounded-lg border border-[#DDDDDD] bg-white px-4 py-2.5 text-sm text-[#222222] placeholder:text-[#717171] transition-colors focus:border-[#222222] focus:outline-none focus:ring-1 focus:ring-[#222222]"
               rows={4}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Tell customers about your store..."
+              className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
             />
           </div>
-          <Input
-            label="Location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="e.g. Tarawa, Kiribati"
-          />
+
+          <div className="flex items-center gap-3 border-b border-gray-200 pb-4 pt-2">
+            <HiBanknotes className="h-6 w-6 text-green-600" />
+            <h3 className="text-base font-bold text-ink">Payout Method</h3>
+          </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#222222]">Banner Image</label>
-            <div className="flex h-40 items-center justify-center rounded-lg border-2 border-dashed border-[#DDDDDD] bg-[#F7F7F7]">
-              <span className="text-sm text-[#717171]">Upload Banner</span>
-            </div>
+            <label className="mb-1 block text-xs font-semibold text-gray-700">Bank Account / ANZ Details</label>
+            <input
+              value={bankAccount}
+              onChange={(e) => setBankAccount(e.target.value)}
+              className="w-full rounded-lg border border-gray-200 p-2.5 text-sm text-ink focus:border-ink focus:outline-none"
+            />
+            <p className="mt-1 text-xs text-gray-400">Direct AUD bank transfer details for weekly payout settlements.</p>
           </div>
 
-          <Checkbox
-            id="verified"
-            label="Request verification badge"
-            checked={verified}
-            onChange={setVerified}
-          />
-
-          <div className="flex items-center gap-3">
-            <Button onClick={handleSave} isLoading={saving}>
-              Save Settings
+          <div className="pt-2">
+            <Button type="submit" isLoading={saving}>
+              {saving ? "Saving Changes..." : "Save Store Settings"}
             </Button>
-            {saved && (
-              <span className="flex items-center gap-1 text-sm text-green-600">
-                <HiCheckCircle className="h-4 w-4" />
-                Settings saved
-              </span>
-            )}
           </div>
-        </div>
+        </form>
+
+        {/* Toast */}
+        {toastMsg && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-[#222222] px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
+            <HiCheckCircle className="h-5 w-5 text-green-400" />
+            <span>{toastMsg}</span>
+          </div>
+        )}
       </div>
+    </VendorLayout>
   );
 }

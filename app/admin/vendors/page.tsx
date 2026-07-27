@@ -1,138 +1,105 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useState } from "react";
+import { AdminLayout } from "@/src/components/templates/AdminLayout";
 import { Badge } from "@/src/components/atoms/Badge";
-import { Spinner } from "@/src/components/atoms/Spinner";
-import { api } from "@/src/lib/api";
-import { cn } from "@/src/lib/utils";
-import { HiBuildingStorefront, HiEye, HiNoSymbol } from "react-icons/hi2";
-import type { User } from "@/src/types";
+import { Button } from "@/src/components/atoms/Button";
+import { HiBuildingStorefront, HiCheckBadge, HiCheckCircle } from "react-icons/hi2";
 
-interface VendorWithCount extends User {
-  productCount: number;
-  suspended: boolean;
+interface VendorEntry {
+  id: string;
+  name: string;
+  email: string;
+  island: string;
+  verified: boolean;
+  productsCount: number;
+  joinedDate: string;
 }
 
+const mockVendors: VendorEntry[] = [
+  { id: "v-1", name: "Maria Tebwa Artisans", email: "maria@tebwa.shop", island: "Tarawa", verified: true, productsCount: 12, joinedDate: "2024-01-15" },
+  { id: "v-2", name: "Tione Karanga Carvings", email: "tione@karanga.art", island: "Kiritimati", verified: true, productsCount: 8, joinedDate: "2024-02-20" },
+  { id: "v-3", name: "Nei Rera Weavers", email: "nei@reraweaves.fi", island: "Abaiang", verified: false, productsCount: 5, joinedDate: "2024-03-10" },
+  { id: "v-4", name: "Tabwai Shell Pottery", email: "tabwai@pottery.ki", island: "Beru", verified: false, productsCount: 3, joinedDate: "2024-04-05" },
+];
+
 export default function AdminVendorsPage() {
-  const [vendors, setVendors] = useState<VendorWithCount[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [vendors, setVendors] = useState<VendorEntry[]>(mockVendors);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    Promise.all([
-      api.getVendor("v-1"),
-      api.getVendorProducts("v-1"),
-    ]).then(() => {
-      const vendorList: User[] = [
-        { id: "v-1", email: "maria@tebwa.shop", name: "Maria Tebwa", avatar: "", role: "vendor", bio: "Traditional jewelry artisan from Tarawa", location: "Tarawa", createdAt: "2024-01-15" },
-        { id: "v-2", email: "tione@karanga.art", name: "Tione Karanga", avatar: "", role: "vendor", bio: "Wood carving master with 20 years experience", location: "Kiritimati", createdAt: "2024-02-20" },
-        { id: "v-3", email: "nei@reraweaves.fi", name: "Nei Reraweaves", avatar: "", role: "vendor", bio: "Specializing in traditional Kiribati textiles", location: "Abaiang", createdAt: "2024-03-10" },
-        { id: "v-4", email: "tabwai@pottery.ki", name: "Tabwai Pottery", avatar: "", role: "vendor", bio: "Handcrafted pottery using traditional techniques", location: "Beru", createdAt: "2024-04-05" },
-        { id: "v-5", email: "anere@homestay.ki", name: "Anere Homestays", avatar: "", role: "vendor", bio: "Family-run homestays across the islands", location: "Tarawa", createdAt: "2023-11-01" },
-        { id: "v-6", email: "bwere@ecolodge.ki", name: "Bwere Eco Retreats", avatar: "", role: "vendor", bio: "Sustainable eco-lodges with ocean views", location: "Kiritimati", createdAt: "2023-10-15" },
-        { id: "v-7", email: "riki@shellcraft.ki", name: "Riki Shellcraft", avatar: "", role: "vendor", bio: "Beautiful shell jewelry and ornaments", location: "Abemama", createdAt: "2024-05-01" },
-        { id: "v-8", email: "teuro@weaves.ki", name: "Teuro Weaves", avatar: "", role: "vendor", bio: "Pandanus weaving artisan collective", location: "Makin", createdAt: "2024-06-01" },
-      ];
-
-      Promise.all(
-        vendorList.map((v) => api.getVendorProducts(v.id))
-      ).then((productArrays) => {
-        setVendors(
-          vendorList.map((v, i) => ({
-            ...v,
-            productCount: productArrays[i].length,
-            suspended: false,
-          }))
-        );
-        setLoading(false);
-      });
-    });
-  }, []);
-
-  const toggleSuspend = (id: string) => {
+  const toggleVerification = (id: string, currentStatus: boolean, name: string) => {
     setVendors((prev) =>
-      prev.map((v) => (v.id === id ? { ...v, suspended: !v.suspended } : v))
+      prev.map((v) => (v.id === id ? { ...v, verified: !currentStatus } : v))
     );
+    const newStatus = !currentStatus ? "Verified Badge Granted" : "Verification Badge Revoked";
+    setToastMsg(`${name}: ${newStatus}`);
+    setTimeout(() => setToastMsg(null), 3000);
   };
 
-  if (loading) {
-    return (
-      <div className="container-app py-8">
-        <div className="flex items-center justify-center py-16">
-          <Spinner size="lg" />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container-app py-8">
-      <h1 className="mb-6 text-2xl font-bold text-[#222222]">Vendor Management</h1>
-
-      {vendors.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#DDDDDD] py-16">
-          <HiBuildingStorefront className="mb-3 h-12 w-12 text-[#DDDDDD]" />
-          <p className="text-base font-medium text-[#717171]">No vendors found</p>
+    <AdminLayout activeTab="vendors">
+      <div className="flex flex-col gap-6">
+        <div>
+          <h2 className="text-lg font-bold text-ink flex items-center gap-2">
+            <HiBuildingStorefront className="h-5 w-5 text-red-600" />
+            Vendor Accounts & Verification Badges
+          </h2>
+          <p className="text-xs text-gray-500">Manage merchant store registrations, locations, and artisan verification status.</p>
         </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {vendors.map((vendor) => (
-            <div
-              key={vendor.id}
-              className={cn(
-                "rounded-xl border p-4 transition-colors",
-                vendor.suspended
-                  ? "border-red-200 bg-red-50"
-                  : "border-[#DDDDDD]"
-              )}
-            >
-              <div className="mb-3 flex items-start justify-between">
-                <div>
-                  <h3 className="text-sm font-semibold text-[#222222]">{vendor.name}</h3>
-                  <p className="text-xs text-[#717171]">{vendor.email}</p>
-                  {vendor.location && (
-                    <p className="text-xs text-[#717171]">{vendor.location}</p>
-                  )}
-                </div>
-                <div className="flex gap-1">
-                  <Badge variant="outline">{vendor.productCount} products</Badge>
-                  {vendor.suspended && <Badge variant="error">Suspended</Badge>}
-                </div>
-              </div>
 
-              {vendor.bio && (
-                <p className="mb-3 text-xs text-[#717171]">{vendor.bio}</p>
-              )}
-
-              <p className="mb-3 text-xs text-[#717171]">
-                Since {vendor.createdAt}
-              </p>
-
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/vendor/${vendor.id}`}
-                  className="flex items-center gap-1 rounded-lg bg-[#F7F7F7] px-3 py-1.5 text-xs font-medium text-[#222222] transition-colors hover:bg-[#DDDDDD]"
-                >
-                  <HiEye className="h-3.5 w-3.5" />
-                  View Store
-                </Link>
-                <button
-                  onClick={() => toggleSuspend(vendor.id)}
-                  className={cn(
-                    "flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
-                    vendor.suspended
-                      ? "bg-green-50 text-green-700 hover:bg-green-100"
-                      : "bg-red-50 text-red-700 hover:bg-red-100"
-                  )}
-                >
-                  <HiNoSymbol className="h-3.5 w-3.5" />
-                  {vendor.suspended ? "Unsuspend" : "Suspend"}
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50 text-gray-600">
+                  <th className="p-3 font-semibold">Vendor Name</th>
+                  <th className="p-3 font-semibold">Contact Email</th>
+                  <th className="p-3 font-semibold">Island Location</th>
+                  <th className="p-3 font-semibold">Catalog</th>
+                  <th className="p-3 font-semibold">Verification Badge</th>
+                  <th className="p-3 font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {vendors.map((vendor) => (
+                  <tr key={vendor.id} className="hover:bg-gray-50/50">
+                    <td className="p-3 font-semibold text-ink flex items-center gap-2">
+                      {vendor.name}
+                      {vendor.verified && <HiCheckBadge className="h-4 w-4 text-blue-500" title="Verified Artisan Store" />}
+                    </td>
+                    <td className="p-3 text-gray-600">{vendor.email}</td>
+                    <td className="p-3 text-gray-600 font-medium">{vendor.island}</td>
+                    <td className="p-3 text-gray-600">{vendor.productsCount} items</td>
+                    <td className="p-3">
+                      <Badge variant={vendor.verified ? "success" : "default"}>
+                        {vendor.verified ? "Verified Artisan" : "Standard Store"}
+                      </Badge>
+                    </td>
+                    <td className="p-3">
+                      <Button
+                        size="sm"
+                        variant={vendor.verified ? "outline" : "primary"}
+                        className="text-xs py-1 px-3"
+                        onClick={() => toggleVerification(vendor.id, vendor.verified, vendor.name)}
+                      >
+                        {vendor.verified ? "Revoke Verification" : "Grant Verified Badge"}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      )}
-    </div>
+
+        {/* Toast */}
+        {toastMsg && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-[#222222] px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
+            <HiCheckCircle className="h-5 w-5 text-green-400" />
+            <span>{toastMsg}</span>
+          </div>
+        )}
+      </div>
+    </AdminLayout>
   );
 }

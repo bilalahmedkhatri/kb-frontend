@@ -10,6 +10,11 @@ import {
   HiChevronDown,
   HiArrowRightOnRectangle,
   HiXMark,
+  HiBuildingStorefront,
+  HiShieldCheck,
+  HiCube,
+  HiClipboardDocumentList,
+  HiCog6Tooth,
 } from "react-icons/hi2";
 import { cn } from "@/src/lib/utils";
 import { Avatar } from "@/src/components/atoms/Avatar";
@@ -104,23 +109,111 @@ export function Header() {
                     className="fixed inset-0 z-40"
                     onClick={() => setShowUserMenu(false)}
                   />
-                  <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-[#DDDDDD] bg-white py-2 shadow-lg">
+                  <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-[#DDDDDD] bg-white py-2 shadow-lg">
                     <div className="border-b border-[#DDDDDD] px-4 py-2">
-                      <p className="text-sm font-semibold text-[#222222]">{user.name}</p>
-                      <p className="text-xs text-[#717171]">{user.email}</p>
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-[#222222] truncate">{user.name}</p>
+                        <Badge
+                          variant={user.role === "admin" ? "error" : user.role === "vendor" ? "primary" : "default"}
+                          className="capitalize text-[10px] px-2 py-0.5"
+                        >
+                          {user.role}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-[#717171] truncate">{user.email}</p>
                     </div>
+
+                    {/* Customer Account Links */}
                     <Link
                       href="/account"
                       onClick={() => setShowUserMenu(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
+                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
                     >
-                      <HiUser className="h-4 w-4" />
-                      My Account
+                      <HiUser className="h-4 w-4 text-gray-500" />
+                      My Profile
                     </Link>
+
+                    {/* Vendor Role Links */}
+                    {(user.role === "vendor" || user.role === "admin") && (
+                      <>
+                        <div className="my-1 border-t border-[#DDDDDD]" />
+                        <div className="px-4 py-1 text-[10px] font-bold text-[#717171] uppercase tracking-wider">
+                          Vendor Workspace
+                        </div>
+                        <Link
+                          href="/vendor/dashboard"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#FFF0F3] hover:text-[#FF385C]"
+                        >
+                          <HiBuildingStorefront className="h-4 w-4 text-[#FF385C]" />
+                          Vendor Dashboard
+                        </Link>
+                        <Link
+                          href="/vendor/products"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
+                        >
+                          <HiCube className="h-4 w-4 text-gray-500" />
+                          My Products
+                        </Link>
+                        <Link
+                          href="/vendor/orders"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
+                        >
+                          <HiClipboardDocumentList className="h-4 w-4 text-gray-500" />
+                          Vendor Orders
+                        </Link>
+                      </>
+                    )}
+
+                    {/* Admin Role Links */}
+                    {user.role === "admin" && (
+                      <>
+                        <div className="my-1 border-t border-[#DDDDDD]" />
+                        <div className="px-4 py-1 text-[10px] font-bold text-red-600 uppercase tracking-wider">
+                          Admin Portal
+                        </div>
+                        <Link
+                          href="/admin/dashboard"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-red-700 font-semibold hover:bg-red-50"
+                        >
+                          <HiShieldCheck className="h-4 w-4 text-red-600" />
+                          Admin Dashboard
+                        </Link>
+                        <Link
+                          href="/admin/products"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
+                        >
+                          <HiCube className="h-4 w-4 text-gray-500" />
+                          Moderate Listings
+                        </Link>
+                        <Link
+                          href="/admin/vendors"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
+                        >
+                          <HiBuildingStorefront className="h-4 w-4 text-gray-500" />
+                          Manage Vendors
+                        </Link>
+                        <Link
+                          href="/admin/settings"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
+                        >
+                          <HiCog6Tooth className="h-4 w-4 text-gray-500" />
+                          Platform Settings
+                        </Link>
+                      </>
+                    )}
+
+                    <div className="my-1 border-t border-[#DDDDDD]" />
                     <button
                       type="button"
                       onClick={() => { logout(); setShowUserMenu(false); }}
-                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
+                      className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                     >
                       <HiArrowRightOnRectangle className="h-4 w-4" />
                       Sign Out
@@ -192,10 +285,30 @@ export function Header() {
                   <HiUser className="h-5 w-5" />
                   My Account
                 </Link>
+                {(user.role === "vendor" || user.role === "admin") && (
+                  <Link
+                    href="/vendor/dashboard"
+                    onClick={closeMobileNav}
+                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-base text-[#FF385C] font-semibold hover:bg-[#FFF0F3]"
+                  >
+                    <HiBuildingStorefront className="h-5 w-5" />
+                    Vendor Dashboard
+                  </Link>
+                )}
+                {user.role === "admin" && (
+                  <Link
+                    href="/admin/dashboard"
+                    onClick={closeMobileNav}
+                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-base text-red-700 font-semibold hover:bg-red-50"
+                  >
+                    <HiShieldCheck className="h-5 w-5" />
+                    Admin Dashboard
+                  </Link>
+                )}
                 <button
                   type="button"
                   onClick={() => { logout(); closeMobileNav(); }}
-                  className="flex items-center gap-3 w-full text-left rounded-lg px-4 py-3 text-base text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]"
+                  className="flex items-center gap-3 w-full text-left rounded-lg px-4 py-3 text-base text-red-600 hover:bg-red-50"
                 >
                   <HiArrowRightOnRectangle className="h-5 w-5" />
                   Sign Out
