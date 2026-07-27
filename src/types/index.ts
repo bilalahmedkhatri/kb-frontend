@@ -142,7 +142,7 @@ export interface Category {
   name: string;
   slug: string;
   icon?: string;
-  type?: "product" | "stay";
+  type?: "product" | "stay" | "experience" | "guide";
   count?: number;
   itemCount?: number;
   image?: string;
