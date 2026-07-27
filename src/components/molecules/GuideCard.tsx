@@ -13,9 +13,9 @@ interface GuideCardProps {
 export function GuideCard({ guide, variant = "default", className }: GuideCardProps) {
   return (
     <Link
-      href={`/guide/${guide.slug}`}
+      href={`/guides/${guide.slug}`}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-xl bg-[#F7F7F7]",
+        "group relative flex flex-col overflow-hidden rounded-xl bg-gray-100",
         variant === "featured" ? "min-h-[240px]" : "min-h-[170px]",
         className
       )}
@@ -28,7 +28,7 @@ export function GuideCard({ guide, variant = "default", className }: GuideCardPr
         className="object-cover transition-transform duration-300 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-      <span className="absolute left-2 top-2 z-10 inline-flex items-center rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-[#222222] backdrop-blur-sm">
+      <span className="absolute left-2 top-2 z-10 inline-flex items-center rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-ink backdrop-blur-sm">
         {guide.topic}
       </span>
       <div className="relative z-10 mt-auto flex flex-col gap-1 p-3 text-white">
