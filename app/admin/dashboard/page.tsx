@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { AdminLayout } from "@/src/components/templates/AdminLayout";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Spinner } from "@/src/components/atoms/Spinner";
-import { api } from "@/src/lib/api";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
+import { useOrders, useProducts } from "@/src/hooks";
 import { formatCurrency, formatDate } from "@/src/lib/utils";
 import {
   HiUserGroup,
@@ -15,7 +16,7 @@ import {
   HiBuildingStorefront,
   HiShieldCheck,
 } from "react-icons/hi2";
-import type { Order, User, Product } from "@/src/types";
+import type { User } from "@/src/types";
 
 const statusVariant: Record<string, "warning" | "primary" | "success" | "default" | "error"> = {
   pending: "warning",
@@ -26,20 +27,12 @@ const statusVariant: Record<string, "warning" | "primary" | "success" | "default
 };
 
 export default function AdminDashboardPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const ordersQuery = useOrders();
+  const productsQuery = useProducts({ pageSize: 100 });
 
-  useEffect(() => {
-    Promise.all([
-      api.getOrders(),
-      api.getProducts({ pageSize: 100 }),
-    ]).then(([orderData, productData]) => {
-      setOrders(orderData);
-      setAllProducts(productData.data);
-      setLoading(false);
-    });
-  }, []);
+  const orders = ordersQuery.data ?? [];
+  const allProducts = productsQuery.data?.data ?? [];
+  const loading = ordersQuery.isLoading || productsQuery.isLoading;
 
   const totalStays = 16;
   const totalUsers = 9;
@@ -80,6 +73,15 @@ export default function AdminDashboardPage() {
           <div className="flex justify-center py-12">
             <Spinner size="lg" />
           </div>
+        ) : ordersQuery.isError || productsQuery.isError ? (
+          <ErrorState
+            title="Could not load platform summary"
+            description="We ran into a problem fetching the platform overview statistics. Please try again."
+            onRetry={() => {
+              void ordersQuery.refetch();
+              void productsQuery.refetch();
+            }}
+          />
         ) : (
           <>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

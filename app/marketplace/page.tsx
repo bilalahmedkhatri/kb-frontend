@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { MarketplaceLayout } from "@/src/components/templates/MarketplaceLayout";
 import { FilterSidebar } from "@/src/components/organisms/FilterSidebar";
 import { ProductGrid } from "@/src/components/organisms/ProductGrid";
 import { SortSelect } from "@/src/components/molecules/SortSelect";
-import { api } from "@/src/lib/api";
 import { JsonLd } from "@/src/components/atoms/JsonLd";
-import type { Product, PaginatedResponse } from "@/src/types";
+import { Button } from "@/src/components/atoms/Button";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
+import { useProducts, useCategories } from "@/src/hooks";
 
 const sortOptions = [
   { label: "Newest", value: "newest" },
@@ -17,42 +18,21 @@ const sortOptions = [
 ];
 
 export default function MarketplacePage() {
-  const [products, setProducts] = useState<PaginatedResponse<Product>>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("newest");
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [retryKey, setRetryKey] = useState(0);
 
-  useEffect(() => {
-    let cancelled = false;
-    api.getProducts({
-      page,
-      pageSize: 12,
-      filters: { categories: activeCategories, sort, priceRange },
-    })
-      .then((res) => {
-        if (!cancelled) {
-          setProducts(res);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setError("Could not load products. Please try again.");
-          setLoading(false);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [page, sort, activeCategories, priceRange, retryKey]);
+  const categoriesQuery = useCategories("product");
+  const productsQuery = useProducts({
+    page,
+    pageSize: 12,
+    filters: { categories: activeCategories, sort, priceRange },
+  });
 
   const sidebar = (
     <FilterSidebar
-      categories={[]}
+      categories={categoriesQuery.data ?? []}
       activeCategories={activeCategories}
       priceRange={priceRange}
       sort={sort}
@@ -67,12 +47,12 @@ export default function MarketplacePage() {
     />
   );
 
-  const itemListSchema = products?.data
+  const itemListSchema = productsQuery.data
     ? {
         "@context": "https://schema.org",
         "@type": "ItemList",
         "name": "Kiribati Handicrafts Marketplace",
-        "itemListElement": products.data.map((product, index) => ({
+        "itemListElement": productsQuery.data.data.map((product, index) => ({
           "@type": "ListItem",
           "position": index + 1,
           "item": {
@@ -91,14 +71,15 @@ export default function MarketplacePage() {
     : null;
 
   return (
-    // <div className="container-app flex flex-col px-0 pt-8 pb-12">
     <>
       {itemListSchema && <JsonLd data={itemListSchema} />}
       <MarketplaceLayout sidebar={sidebar}>
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-[#717171]">
-              {products ? `${products.total} product${products.total !== 1 ? "s" : ""} found` : ""}
+            <p className="text-sm text-gray-500">
+              {productsQuery.data
+                ? `${productsQuery.data.total} product${productsQuery.data.total !== 1 ? "s" : ""} found`
+                : ""}
             </p>
             <SortSelect
               value={sort}
@@ -106,23 +87,18 @@ export default function MarketplacePage() {
               options={sortOptions}
             />
           </div>
-          {error ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <p className="mb-2 text-base font-medium text-[#222222]">{error}</p>
-              <button
-                type="button"
-                onClick={() => { setError(null); setLoading(true); setRetryKey((k) => k + 1); }}
-                className="mt-2 rounded-lg bg-[#222222] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#222222]/80"
-              >
-                Try again
-              </button>
-            </div>
+          {productsQuery.isError ? (
+            <ErrorState
+              title="Could not load marketplace products"
+              description="We ran into a problem loading the listing catalog. Please try again."
+              onRetry={() => void productsQuery.refetch()}
+            />
           ) : (
             <ProductGrid
-              products={products?.data || []}
-              isLoading={loading}
-              totalPages={products?.totalPages}
-              currentPage={products?.page}
+              products={productsQuery.data?.data ?? []}
+              isLoading={productsQuery.isLoading}
+              totalPages={productsQuery.data?.totalPages}
+              currentPage={productsQuery.data?.page}
               onPageChange={setPage}
               emptyMessage="No products found. Try adjusting your filters."
             />

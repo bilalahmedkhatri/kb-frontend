@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { decodeOrderIdBase256 } from "@/src/lib/security";
 import { generateOrderInvoicePDF } from "@/src/lib/pdfGenerator";
-import { api } from "@/src/lib/api";
+import { useOrder } from "@/src/hooks";
 import { formatCurrency, formatDate } from "@/src/lib/utils";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Button } from "@/src/components/atoms/Button";
@@ -40,9 +40,9 @@ export default function VendorOrderDetailsPage() {
   const rawId = params?.id as string;
   const decodedId = decodeOrderIdBase256(rawId) || rawId;
 
-  const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState<Order["status"]>("pending");
+  const orderQuery = useOrder(decodedId, Boolean(decodedId));
+  const order = orderQuery.data;
+  const [status, setStatus] = useState<Order["status"]>(order?.status ?? "pending");
   const [trackingNumber, setTrackingNumber] = useState("KIR-SHIP-9042");
   const [savingTracking, setSavingTracking] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -52,20 +52,26 @@ export default function VendorOrderDetailsPage() {
     setTimeout(() => setToastMsg(null), 3500);
   };
 
-  useEffect(() => {
-    api.getOrder(decodedId).then((data) => {
-      if (data) {
-        setOrder(data);
-        setStatus(data.status);
-      }
-      setLoading(false);
-    });
-  }, [decodedId]);
-
-  if (loading) {
+  if (orderQuery.isLoading) {
     return (
       <div className="flex justify-center py-20">
         <Spinner />
+      </div>
+    );
+  }
+
+  if (orderQuery.isError) {
+    return (
+      <div className="container-app py-16 text-center">
+        <h2 className="text-xl font-bold text-ink">Could not load order</h2>
+        <p className="mt-2 text-sm text-gray-500">The requested order payload could not be loaded.</p>
+        <Button
+          variant="outline"
+          className="mt-4"
+          onClick={() => void orderQuery.refetch()}
+        >
+          Try again
+        </Button>
       </div>
     );
   }
@@ -84,7 +90,6 @@ export default function VendorOrderDetailsPage() {
 
   const handleStatusChange = (newStatus: Order["status"]) => {
     setStatus(newStatus);
-    setOrder({ ...order, status: newStatus });
     triggerToast(`Fulfillment status updated to ${newStatus.toUpperCase()}`);
   };
 
@@ -122,7 +127,7 @@ export default function VendorOrderDetailsPage() {
           onClick={handleDownloadInvoice}
           variant="outline"
           size="sm"
-          leftIcon={<HiArrowDownTray className="h-4 w-4 text-[#FF385C]" />}
+          leftIcon={<HiArrowDownTray className="h-4 w-4 text-rausch" />}
         >
           Download Invoice PDF
         </Button>
@@ -132,7 +137,7 @@ export default function VendorOrderDetailsPage() {
       {status !== "cancelled" && (
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
           <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-2">
-            <HiSparkles className="h-4 w-4 text-[#FF385C]" />
+            <HiSparkles className="h-4 w-4 text-rausch" />
             Fulfillment Progress Stepper
           </h3>
           <OrderStatusStepper currentStatus={status} />
@@ -179,14 +184,14 @@ export default function VendorOrderDetailsPage() {
         {/* Island Shipping Address & Freight Notes */}
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex flex-col gap-3">
           <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
-            <HiMapPin className="h-5 w-5 text-[#FF385C]" />
+            <HiMapPin className="h-5 w-5 text-rausch" />
             <h3 className="text-sm font-bold text-ink">Island Delivery Address</h3>
           </div>
 
           <div className="flex flex-col gap-1 text-xs">
-            <span className="font-bold text-ink">{order.shippingAddress.streetAddress}</span>
+            <span className="font-bold text-ink">{order.shippingAddress.street}</span>
             <span className="text-gray-600">{order.shippingAddress.city}, {order.shippingAddress.state}</span>
-            <span className="text-gray-500">{order.shippingAddress.country} • {order.shippingAddress.postalCode}</span>
+            <span className="text-gray-500">{order.shippingAddress.country} • {order.shippingAddress.zip}</span>
 
             <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-2.5 text-[11px] text-amber-900">
               <strong className="block text-amber-950 font-bold mb-0.5">Cargo Dock Delivery Note:</strong>
@@ -255,9 +260,9 @@ export default function VendorOrderDetailsPage() {
                 <tr key={idx} className="hover:bg-gray-50/50">
                   <td className="p-3">
                     <div className="flex items-center gap-3">
-                      <img src={item.image || "/favicon.png"} alt={item.name} className="h-12 w-12 rounded-lg object-cover border border-gray-200" />
+                      <img src={item.productImage || "/favicon.png"} alt={item.productName} className="h-12 w-12 rounded-lg object-cover border border-gray-200" />
                       <div>
-                        <span className="font-bold text-ink block">{item.name}</span>
+                        <span className="font-bold text-ink block">{item.productName}</span>
                         <span className="text-xs text-gray-400">Handcrafted Kiribati Artisan Product</span>
                       </div>
                     </div>
@@ -272,30 +277,30 @@ export default function VendorOrderDetailsPage() {
           </table>
         </div>
 
-        {/* Financial Summary & Payout */}
-        <div className="mt-6 flex flex-col items-end border-t border-gray-200 pt-4 text-sm">
-          <div className="flex w-full max-w-xs justify-between py-1 text-gray-600">
-            <span>Subtotal:</span>
-            <span>{formatCurrency(order.subtotal, order.currency)}</span>
-          </div>
-          <div className="flex w-full max-w-xs justify-between py-1 text-gray-600">
-            <span>Inter-Island Delivery Fee:</span>
-            <span>{formatCurrency(order.deliveryFee || 15.0, order.currency)}</span>
-          </div>
-          <div className="flex w-full max-w-xs justify-between py-1 text-gray-600">
-            <span>Platform Tax:</span>
-            <span>{formatCurrency(order.tax, order.currency)}</span>
-          </div>
+          {/* Financial Summary & Payout */}
+          <div className="mt-6 flex flex-col items-end border-t border-gray-200 pt-4 text-sm">
+            <div className="flex w-full max-w-xs justify-between py-1 text-gray-600">
+              <span>Subtotal:</span>
+              <span>{formatCurrency(order.items.reduce((sum, i) => sum + i.price * i.quantity, 0), order.currency)}</span>
+            </div>
+            <div className="flex w-full max-w-xs justify-between py-1 text-gray-600">
+              <span>Inter-Island Delivery Fee:</span>
+              <span>{formatCurrency(order.deliveryFee ?? 0, order.currency)}</span>
+            </div>
+            <div className="flex w-full max-w-xs justify-between py-1 text-gray-600">
+              <span>Inter-Island Shipping Fee:</span>
+              <span>{formatCurrency(order.shippingFee ?? 0, order.currency)}</span>
+            </div>
           <div className="flex w-full max-w-xs justify-between border-t border-gray-200 pt-2 text-base font-extrabold text-ink">
             <span>Vendor Payout Total:</span>
-            <span className="text-[#FF385C]">{formatCurrency(order.total, order.currency)}</span>
+            <span className="text-rausch">{formatCurrency(order.total, order.currency)}</span>
           </div>
         </div>
       </div>
 
       {/* Toast Notification */}
       {toastMsg && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-[#222222] px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-ink px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
           <HiCheckCircle className="h-5 w-5 text-green-400" />
           <span>{toastMsg}</span>
         </div>

@@ -42,16 +42,30 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
 
-  const [reviews, relatedRes] = await Promise.all([
-    api.getReviews(product.id, "product"),
+  let reviewsError = false;
+  let relatedError = false;
+
+  const [reviews, relatedRes, vendor] = await Promise.all([
+    api.getReviews(product.id, "product").catch((err) => {
+      console.error(`Failed to load reviews for product ${product.id}:`, err);
+      reviewsError = true;
+      return [];
+    }),
     api.getProducts({
       pageSize: 8,
       filters: { categories: [product.category] },
+    }).catch((err) => {
+      console.error(`Failed to load related products for category ${product.category}:`, err);
+      relatedError = true;
+      return { data: [], total: 0, page: 1, totalPages: 1, hasMore: false };
+    }),
+    api.getVendor(product.vendorId).catch((err) => {
+      console.error(`Failed to load vendor ${product.vendorId}:`, err);
+      return null;
     }),
   ]);
 
   const relatedProducts = relatedRes.data.filter((p) => p.id !== product.id);
-  const vendor = await api.getVendor(product.vendorId).catch(() => null) || null;
 
   const productSchema = {
     "@context": "https://schema.org",
@@ -85,9 +99,12 @@ export default async function ProductDetailPage({ params }: Props) {
       <ProductDetailClient
         product={product}
         reviews={reviews}
+        reviewsError={reviewsError}
         relatedProducts={relatedProducts}
+        relatedError={relatedError}
         vendor={vendor}
       />
     </>
   );
 }
+

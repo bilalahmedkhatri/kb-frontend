@@ -27,14 +27,18 @@ import type { Product, Review, User } from "@/src/types";
 interface ProductDetailClientProps {
   product: Product;
   reviews: Review[];
+  reviewsError?: boolean;
   relatedProducts: Product[];
+  relatedError?: boolean;
   vendor: User | null;
 }
 
 export default function ProductDetailClient({
   product,
   reviews,
+  reviewsError = false,
   relatedProducts,
+  relatedError = false,
   vendor,
 }: ProductDetailClientProps) {
   const { addItem } = useCartStore();
@@ -231,16 +235,17 @@ export default function ProductDetailClient({
 
       {/* Reviews */}
       <div className="mt-16 border-t border-[var(--gray-200)] pt-12">
-        <ReviewList reviews={reviews} />
+        <ReviewList reviews={reviews} isError={reviewsError} />
       </div>
 
       {/* Related Products Rail */}
-      {relatedProducts.length > 0 && (
+      {(relatedProducts.length > 0 || relatedError) && (
         <div className="mt-16">
           <FeaturedRail
             items={relatedProducts}
             type="product"
             title="Related Authentic Handicrafts"
+            isError={relatedError}
             viewAllHref={`/category/${product.category.toLowerCase()}`}
           />
         </div>
@@ -248,3 +253,4 @@ export default function ProductDetailClient({
     </div>
   );
 }
+

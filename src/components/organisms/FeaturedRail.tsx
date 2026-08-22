@@ -6,6 +6,7 @@ import { cn } from "@/src/lib/utils";
 import { ProductCard } from "@/src/components/molecules/ProductCard";
 import { StayCard } from "@/src/components/molecules/StayCard";
 import { HiChevronLeft, HiChevronRight, HiArrowRight } from "react-icons/hi2";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
 import type { Product, Stay } from "@/src/types";
 
 interface FeaturedRailProps {
@@ -14,9 +15,19 @@ interface FeaturedRailProps {
   title: string;
   viewAllHref?: string;
   className?: string;
+  isError?: boolean;
+  onRetry?: () => void;
 }
 
-export function FeaturedRail({ items, type, title, viewAllHref, className }: FeaturedRailProps) {
+export function FeaturedRail({
+  items,
+  type,
+  title,
+  viewAllHref,
+  className,
+  isError = false,
+  onRetry,
+}: FeaturedRailProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -42,6 +53,19 @@ export function FeaturedRail({ items, type, title, viewAllHref, className }: Fea
     const amount = direction === "left" ? -400 : 400;
     scrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
   };
+
+  if (isError) {
+    return (
+      <div className={cn("flex flex-col gap-2", className)}>
+        <h2 className="text-xl font-bold text-[#222222]">{title}</h2>
+        <ErrorState
+          variant="compact"
+          title={`Unable to load ${title.toLowerCase()}`}
+          onRetry={onRetry}
+        />
+      </div>
+    );
+  }
 
   if (items.length === 0) return null;
 

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { AdminLayout } from "@/src/components/templates/AdminLayout";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Button } from "@/src/components/atoms/Button";
+import { Spinner } from "@/src/components/atoms/Spinner";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
 import { HiBuildingStorefront, HiCheckBadge, HiCheckCircle } from "react-icons/hi2";
 
 interface VendorEntry {
@@ -25,6 +27,8 @@ const mockVendors: VendorEntry[] = [
 
 export default function AdminVendorsPage() {
   const [vendors, setVendors] = useState<VendorEntry[]>(mockVendors);
+  const [isLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const toggleVerification = (id: string, currentStatus: boolean, name: string) => {
@@ -48,48 +52,61 @@ export default function AdminVendorsPage() {
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-50 text-gray-600">
-                  <th className="p-3 font-semibold">Vendor Name</th>
-                  <th className="p-3 font-semibold">Contact Email</th>
-                  <th className="p-3 font-semibold">Island Location</th>
-                  <th className="p-3 font-semibold">Catalog</th>
-                  <th className="p-3 font-semibold">Verification Badge</th>
-                  <th className="p-3 font-semibold">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {vendors.map((vendor) => (
-                  <tr key={vendor.id} className="hover:bg-gray-50/50">
-                    <td className="p-3 font-semibold text-ink flex items-center gap-2">
-                      {vendor.name}
-                      {vendor.verified && <HiCheckBadge className="h-4 w-4 text-blue-500" title="Verified Artisan Store" />}
-                    </td>
-                    <td className="p-3 text-gray-600">{vendor.email}</td>
-                    <td className="p-3 text-gray-600 font-medium">{vendor.island}</td>
-                    <td className="p-3 text-gray-600">{vendor.productsCount} items</td>
-                    <td className="p-3">
-                      <Badge variant={vendor.verified ? "success" : "default"}>
-                        {vendor.verified ? "Verified Artisan" : "Standard Store"}
-                      </Badge>
-                    </td>
-                    <td className="p-3">
-                      <Button
-                        size="sm"
-                        variant={vendor.verified ? "outline" : "primary"}
-                        className="text-xs py-1 px-3"
-                        onClick={() => toggleVerification(vendor.id, vendor.verified, vendor.name)}
-                      >
-                        {vendor.verified ? "Revoke Verification" : "Grant Verified Badge"}
-                      </Button>
-                    </td>
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Spinner />
+            </div>
+          ) : isError ? (
+            <ErrorState
+              variant="compact"
+              title="Could not load vendor accounts"
+              description="We encountered an issue retrieving the list of registered artisan vendors."
+              onRetry={() => setIsError(false)}
+            />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50 text-gray-600">
+                    <th className="p-3 font-semibold">Vendor Name</th>
+                    <th className="p-3 font-semibold">Contact Email</th>
+                    <th className="p-3 font-semibold">Island Location</th>
+                    <th className="p-3 font-semibold">Catalog</th>
+                    <th className="p-3 font-semibold">Verification Badge</th>
+                    <th className="p-3 font-semibold">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {vendors.map((vendor) => (
+                    <tr key={vendor.id} className="hover:bg-gray-50/50">
+                      <td className="p-3 font-semibold text-ink flex items-center gap-2">
+                        {vendor.name}
+                        {vendor.verified && <HiCheckBadge className="h-4 w-4 text-blue-500" title="Verified Artisan Store" />}
+                      </td>
+                      <td className="p-3 text-gray-600">{vendor.email}</td>
+                      <td className="p-3 text-gray-600 font-medium">{vendor.island}</td>
+                      <td className="p-3 text-gray-600">{vendor.productsCount} items</td>
+                      <td className="p-3">
+                        <Badge variant={vendor.verified ? "success" : "default"}>
+                          {vendor.verified ? "Verified Artisan" : "Standard Store"}
+                        </Badge>
+                      </td>
+                      <td className="p-3">
+                        <Button
+                          size="sm"
+                          variant={vendor.verified ? "outline" : "primary"}
+                          className="text-xs py-1 px-3"
+                          onClick={() => toggleVerification(vendor.id, vendor.verified, vendor.name)}
+                        >
+                          {vendor.verified ? "Revoke Verification" : "Grant Verified Badge"}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Toast */}
@@ -103,3 +120,4 @@ export default function AdminVendorsPage() {
     </AdminLayout>
   );
 }
+

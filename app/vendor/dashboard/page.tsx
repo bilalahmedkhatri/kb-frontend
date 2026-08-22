@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useAuthStore } from "@/src/store/authStore";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
-import { api } from "@/src/lib/api";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
+import { useOrders } from "@/src/hooks";
 import { formatCurrency, formatDate } from "@/src/lib/utils";
 import {
   HiBuildingStorefront,
@@ -18,7 +19,6 @@ import {
   HiUser,
   HiMapPin,
 } from "react-icons/hi2";
-import type { Order } from "@/src/types";
 
 type TimeRange = "7d" | "30d" | "quarter";
 
@@ -116,17 +116,11 @@ const statusVariant: Record<string, "warning" | "primary" | "success" | "default
 
 export default function VendorDashboardPage() {
   const { user } = useAuthStore();
-  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>("7d");
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  useEffect(() => {
-    api.getOrders().then((data) => {
-      setRecentOrders(data.slice(0, 5));
-      setLoading(false);
-    });
-  }, []);
+  const ordersQuery = useOrders();
+  const recentOrders = ordersQuery.data?.slice(0, 5) ?? [];
 
   const activeRangeData = timeRangeData[timeRange];
   const chartPoints = activeRangeData.chart;
@@ -234,7 +228,7 @@ export default function VendorDashboardPage() {
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-sm font-bold text-ink flex items-center gap-2">
-              <HiCalendar className="h-4 w-4 text-[#FF385C]" />
+              <HiCalendar className="h-4 w-4 text-rausch" />
               Daily Sales Performance Area Chart
             </h3>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -254,7 +248,7 @@ export default function VendorDashboardPage() {
                 onClick={() => { setTimeRange(tag.id as TimeRange); setHoveredIndex(null); }}
                 className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                   timeRange === tag.id
-                    ? "bg-[#FF385C] text-white shadow-xs"
+                    ? "bg-rausch text-white shadow-xs"
                     : "text-gray-600 hover:bg-gray-200/70 hover:text-ink"
                 }`}
               >
@@ -273,9 +267,9 @@ export default function VendorDashboardPage() {
             <defs>
               {/* Area Fill Gradient */}
               <linearGradient id="salesAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#FF385C" stopOpacity="0.35" />
-                <stop offset="60%" stopColor="#FF385C" stopOpacity="0.08" />
-                <stop offset="100%" stopColor="#FF385C" stopOpacity="0.0" />
+                <stop offset="0%" stopColor="var(--rausch)" stopOpacity="0.35" />
+                <stop offset="60%" stopColor="var(--rausch)" stopOpacity="0.08" />
+                <stop offset="100%" stopColor="var(--rausch)" stopOpacity="0.0" />
               </linearGradient>
             </defs>
 
@@ -289,7 +283,7 @@ export default function VendorDashboardPage() {
                   y1={gridY}
                   x2={svgWidth - paddingX}
                   y2={gridY}
-                  stroke="#F3F4F6"
+                  stroke="var(--gray-100)"
                   strokeWidth="1"
                   strokeDasharray="4 4"
                 />
@@ -303,7 +297,7 @@ export default function VendorDashboardPage() {
             <path
               d={strokePath}
               fill="none"
-              stroke="#FF385C"
+              stroke="var(--rausch)"
               strokeWidth={chartPoints.length > 50 ? "2.5" : "3.5"}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -321,7 +315,7 @@ export default function VendorDashboardPage() {
                       y1={paddingTop}
                       x2={p.x}
                       y2={svgHeight - paddingBottom}
-                      stroke="#FF385C"
+                      stroke="var(--rausch)"
                       strokeWidth="1.5"
                       strokeDasharray="3 3"
                     />
@@ -342,8 +336,8 @@ export default function VendorDashboardPage() {
                     cx={p.x}
                     cy={p.y}
                     r={isHovered ? "5" : chartPoints.length > 50 ? "1.8" : chartPoints.length > 20 ? "2.5" : "4"}
-                    fill="#FF385C"
-                    stroke="#FFFFFF"
+                    fill="var(--rausch)"
+                    stroke="var(--white)"
                     strokeWidth={isHovered ? "2" : "1"}
                     onMouseEnter={() => setHoveredIndex(idx)}
                     onMouseLeave={() => setHoveredIndex(null)}
@@ -359,7 +353,7 @@ export default function VendorDashboardPage() {
                         width="70"
                         height="22"
                         rx="4"
-                        fill="#222222"
+                        fill="var(--ink)"
                       />
                       <text
                         x={p.x}
@@ -407,15 +401,21 @@ export default function VendorDashboardPage() {
             <h3 className="text-sm font-bold text-ink">Recent Incoming Orders</h3>
             <p className="text-xs text-gray-500">Orders requiring fulfillment or shipment tracking.</p>
           </div>
-          <Link href="/vendor/orders" className="text-xs font-semibold text-[#FF385C] hover:underline">
+          <Link href="/vendor/orders" className="text-xs font-semibold text-rausch hover:underline">
             View All Orders →
           </Link>
         </div>
 
-        {loading ? (
+        {ordersQuery.isLoading ? (
           <div className="flex items-center justify-center py-10">
             <Spinner />
           </div>
+        ) : ordersQuery.isError ? (
+          <ErrorState
+            variant="compact"
+            title="Could not load recent incoming orders"
+            onRetry={() => void ordersQuery.refetch()}
+          />
         ) : recentOrders.length === 0 ? (
           <p className="text-sm text-gray-500 py-6 text-center">No orders received yet.</p>
         ) : (
@@ -444,7 +444,7 @@ export default function VendorDashboardPage() {
                     </td>
                     <td className="p-3">
                       <span className="flex items-center gap-1 text-xs text-gray-600">
-                        <HiMapPin className="h-3.5 w-3.5 text-[#FF385C]" />
+                        <HiMapPin className="h-3.5 w-3.5 text-rausch" />
                         {order.shippingAddress?.city || "Tarawa"}, {order.shippingAddress?.country || "Kiribati"}
                       </span>
                     </td>

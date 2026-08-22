@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AdminLayout } from "@/src/components/templates/AdminLayout";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
-import { api } from "@/src/lib/api";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
+import { useProducts } from "@/src/hooks";
 import { formatCurrency } from "@/src/lib/utils";
 import {
   HiShieldCheck,
@@ -17,34 +18,30 @@ import {
 import type { Product } from "@/src/types";
 
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [localProducts, setLocalProducts] = useState<Product[] | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  const productsQuery = useProducts({ pageSize: 100 });
+  const fetchedProducts = productsQuery.data?.data ?? [];
+  const products = localProducts ?? fetchedProducts;
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 3000);
   };
 
-  useEffect(() => {
-    api.getProducts({ pageSize: 100 }).then((res) => {
-      setProducts(res.data);
-      setLoading(false);
-    });
-  }, []);
-
   const handleApprove = (id: string, name: string) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, status: "active" } : p))
+    setLocalProducts((prev) =>
+      (prev ?? fetchedProducts).map((p) => (p.id === id ? { ...p, status: "active" } : p))
     );
     showToast(`Approved "${name}" — Listing is now Live on Marketplace!`);
   };
 
   const handleReject = (id: string, name: string) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, status: "rejected" } : p))
+    setLocalProducts((prev) =>
+      (prev ?? fetchedProducts).map((p) => (p.id === id ? { ...p, status: "rejected" } : p))
     );
     showToast(`Rejected "${name}" — Listing returned to vendor.`);
   };
@@ -97,10 +94,17 @@ export default function AdminProductsPage() {
 
         {/* Moderation Table */}
         <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          {loading ? (
+          {productsQuery.isLoading ? (
             <div className="flex justify-center py-12">
               <Spinner />
             </div>
+          ) : productsQuery.isError ? (
+            <ErrorState
+              variant="compact"
+              title="Could not load product moderation queue"
+              description="We couldn't retrieve products submitted for admin moderation. Please try again."
+              onRetry={() => void productsQuery.refetch()}
+            />
           ) : filteredProducts.length === 0 ? (
             <div className="py-12 text-center text-gray-500">
               <HiCube className="mx-auto mb-2 h-10 w-10 text-gray-300" />
@@ -174,7 +178,7 @@ export default function AdminProductsPage() {
 
         {/* Toast */}
         {toastMsg && (
-          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-[#222222] px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-ink px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
             <HiCheckCircle className="h-5 w-5 text-green-400" />
             <span>{toastMsg}</span>
           </div>

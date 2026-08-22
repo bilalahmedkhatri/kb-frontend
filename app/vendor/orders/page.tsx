@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
-import { api } from "@/src/lib/api";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
+import { useOrders } from "@/src/hooks";
 import { formatCurrency, formatDate } from "@/src/lib/utils";
 import { encodeOrderIdBase256 } from "@/src/lib/security";
 import {
@@ -28,29 +29,25 @@ const statusVariants: Record<Order["status"], "default" | "primary" | "success" 
 };
 
 export default function VendorOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [localOrders, setLocalOrders] = useState<Order[] | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
+  const ordersQuery = useOrders();
+  const fetchedOrders = ordersQuery.data ?? [];
+  const orders = localOrders ?? fetchedOrders;
+
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 3000);
   };
 
-  useEffect(() => {
-    api.getOrders().then((data) => {
-      setOrders(data);
-      setLoading(false);
-    });
-  }, []);
-
   const handleStatusChange = (orderId: string, newStatus: Order["status"]) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+    setLocalOrders((prev) =>
+      (prev ?? fetchedOrders).map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
     showToast(`Order #${orderId.toUpperCase()} status updated to ${newStatus.toUpperCase()}`);
   };
@@ -76,10 +73,17 @@ export default function VendorOrdersPage() {
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col">
-        {loading ? (
+        {ordersQuery.isLoading ? (
           <div className="flex justify-center py-12">
             <Spinner />
           </div>
+        ) : ordersQuery.isError ? (
+          <ErrorState
+            variant="compact"
+            title="Could not load incoming vendor orders"
+            description="We ran into a problem retrieving customer orders. Please try again."
+            onRetry={() => void ordersQuery.refetch()}
+          />
         ) : orders.length === 0 ? (
           <div className="py-12 text-center text-gray-500">
             <HiClipboardDocumentList className="mx-auto mb-2 h-10 w-10 text-gray-300" />
@@ -109,7 +113,7 @@ export default function VendorOrdersPage() {
                         <td className="p-3">
                           <Link
                             href={`/vendor/orders/${token}`}
-                            className="font-bold text-[#FF385C] hover:underline"
+                            className="font-bold text-rausch hover:underline"
                           >
                             {order.id.toUpperCase()}
                           </Link>
@@ -122,7 +126,7 @@ export default function VendorOrdersPage() {
                         </td>
                         <td className="p-3">
                           <span className="flex items-center gap-1 text-xs text-gray-600">
-                            <HiMapPin className="h-3.5 w-3.5 text-[#FF385C]" />
+                            <HiMapPin className="h-3.5 w-3.5 text-rausch" />
                             {order.shippingAddress?.city || "Tarawa"}, {order.shippingAddress?.country || "Kiribati"}
                           </span>
                         </td>
@@ -205,7 +209,7 @@ export default function VendorOrdersPage() {
                     onClick={() => handlePageChange(pageNum)}
                     className={`h-7 w-7 rounded-lg text-xs font-bold transition-all ${
                       currentPage === pageNum
-                        ? "bg-[#FF385C] text-white shadow-xs"
+                        ? "bg-rausch text-white shadow-xs"
                         : "bg-white text-gray-700 hover:bg-gray-200/60 border border-gray-200"
                     }`}
                   >
@@ -230,7 +234,7 @@ export default function VendorOrdersPage() {
 
       {/* Toast Notification */}
       {toastMsg && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-[#222222] px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-ink px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
           <HiCheckCircle className="h-5 w-5 text-green-400" />
           <span>{toastMsg}</span>
         </div>

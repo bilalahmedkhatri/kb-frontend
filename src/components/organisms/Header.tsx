@@ -16,6 +16,7 @@ import {
   HiClipboardDocumentList,
   HiCog6Tooth,
 } from "react-icons/hi2";
+import type { IconType } from "react-icons";
 import { cn } from "@/src/lib/utils";
 import { Avatar } from "@/src/components/atoms/Avatar";
 import { Badge } from "@/src/components/atoms/Badge";
@@ -24,15 +25,28 @@ import { Logo } from "@/src/components/atoms/Logo";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartStore } from "@/src/store/cartStore";
 import { useUIStore } from "@/src/store/uiStore";
+import {
+  publicNavItems,
+  navItemsForRole,
+  workspaceNavItemsForRole,
+  roleForUser,
+} from "@/src/lib/permissions";
 import { useState, useSyncExternalStore } from "react";
 
-const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "Stays", href: "/stays" },
-  { label: "Marketplace", href: "/marketplace" },
-  { label: "Experiences", href: "/experiences" },
-  { label: "Guides", href: "/guides" },
-];
+const workspaceIcons: Record<string, IconType> = {
+  "/vendor/dashboard": HiBuildingStorefront,
+  "/vendor/products": HiCube,
+  "/vendor/orders": HiClipboardDocumentList,
+  "/admin/dashboard": HiShieldCheck,
+  "/admin/products": HiCube,
+  "/admin/vendors": HiBuildingStorefront,
+  "/admin/settings": HiCog6Tooth,
+};
+
+const groupLabels: Record<"vendor" | "admin", string> = {
+  vendor: "Vendor Workspace",
+  admin: "Admin Portal",
+};
 
 export function Header() {
   const pathname = usePathname();
@@ -46,23 +60,26 @@ export function Header() {
     () => false
   );
   const count = mounted ? itemCount() : 0;
+  const role = mounted ? roleForUser(user) : "guest";
+  const mobileNavItems = navItemsForRole(role);
+  const workspaceItems = workspaceNavItemsForRole(role);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--gray-300)] bg-white shadow-xs">
+    <header className="sticky top-0 z-50 border-b border-gray-300 bg-white shadow-xs">
       <div className="container-app flex items-center justify-between py-3">
         <div className="flex items-center">
           <Logo className="hover:opacity-95 transition-opacity" />
         </div>
-        <nav className="hidden flex-1 items-center justify-center gap-1 md:flex">
-          {navLinks.map((link) => (
+        <nav className="hidden flex-1 items-center justify-center gap-1 md:flex" aria-label="Main navigation">
+          {publicNavItems.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
                 "rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors",
                 pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
-                  ? "text-[var(--ink)] underline underline-offset-8 decoration-[var(--rausch)] decoration-2 font-bold"
-                  : "text-[var(--gray-500)] hover:bg-[var(--gray-100)] hover:text-[var(--ink)]"
+                  ? "text-ink underline underline-offset-8 decoration-rausch decoration-2 font-bold"
+                  : "text-gray-500 hover:bg-gray-100 hover:text-ink"
               )}
             >
               {link.label}
@@ -74,7 +91,7 @@ export function Header() {
           <button
             type="button"
             onClick={openCart}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#222222] transition-colors hover:bg-[#F7F7F7] hover:text-[#FF385C]"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-gray-100 hover:text-rausch"
             aria-label="Open cart"
           >
             <HiShoppingCart className="h-5 w-5" />
@@ -85,7 +102,7 @@ export function Header() {
 
           <Link
             href="/wishlist"
-            className="hidden h-10 w-10 items-center justify-center rounded-full text-[#222222] transition-colors hover:bg-[#F7F7F7] hover:text-[#FF385C] sm:flex"
+            className="hidden h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-gray-100 hover:text-rausch sm:flex"
             aria-label="Wishlist"
           >
             <HiHeart className="h-5 w-5" />
@@ -98,10 +115,10 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2 rounded-full bg-white px-1 py-1.5 transition-colors hover:bg-[#f6d9d9]"
+                className="flex items-center gap-2 rounded-full bg-white px-1 py-1.5 transition-colors hover:bg-rausch/10"
               >
                 <Avatar src={user.avatar} name={user.name} size="sm" />
-                <HiChevronDown className="hidden h-4 w-4 text-[#717171] sm:block" />
+                <HiChevronDown className="hidden h-4 w-4 text-gray-500 sm:block" />
               </button>
               {showUserMenu && (
                 <>
@@ -109,10 +126,10 @@ export function Header() {
                     className="fixed inset-0 z-40"
                     onClick={() => setShowUserMenu(false)}
                   />
-                  <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-[#DDDDDD] bg-white py-2 shadow-lg">
-                    <div className="border-b border-[#DDDDDD] px-4 py-2">
+                  <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-gray-300 bg-white py-2 shadow-lg">
+                    <div className="border-b border-gray-300 px-4 py-2">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-semibold text-[#222222] truncate">{user.name}</p>
+                        <p className="text-sm font-semibold text-ink truncate">{user.name}</p>
                         <Badge
                           variant={user.role === "admin" ? "error" : user.role === "vendor" ? "primary" : "default"}
                           className="capitalize text-[10px] px-2 py-0.5"
@@ -120,96 +137,58 @@ export function Header() {
                           {user.role}
                         </Badge>
                       </div>
-                      <p className="text-xs text-[#717171] truncate">{user.email}</p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
                     </div>
 
                     {/* Customer Account Links */}
                     <Link
                       href="/account"
                       onClick={() => setShowUserMenu(false)}
-                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
+                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-ink hover:bg-gray-100"
                     >
                       <HiUser className="h-4 w-4 text-gray-500" />
                       My Profile
                     </Link>
 
-                    {/* Vendor Role Links */}
-                    {(user.role === "vendor" || user.role === "admin") && (
-                      <>
-                        <div className="my-1 border-t border-[#DDDDDD]" />
-                        <div className="px-4 py-1 text-[10px] font-bold text-[#717171] uppercase tracking-wider">
-                          Vendor Workspace
-                        </div>
-                        <Link
-                          href="/vendor/dashboard"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#FFF0F3] hover:text-[#FF385C]"
-                        >
-                          <HiBuildingStorefront className="h-4 w-4 text-[#FF385C]" />
-                          Vendor Dashboard
-                        </Link>
-                        <Link
-                          href="/vendor/products"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
-                        >
-                          <HiCube className="h-4 w-4 text-gray-500" />
-                          My Products
-                        </Link>
-                        <Link
-                          href="/vendor/orders"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
-                        >
-                          <HiClipboardDocumentList className="h-4 w-4 text-gray-500" />
-                          Vendor Orders
-                        </Link>
-                      </>
-                    )}
+                    {/* Vendor / Admin Workspace Links (single permission source) */}
+                    {workspaceItems.map((item, index) => {
+                      const Icon = workspaceIcons[item.href];
+                      const showGroupHeader =
+                        index === 0 || workspaceItems[index - 1].group !== item.group;
+                      const isAdmin = item.group === "admin";
+                      return (
+                        <span key={item.href}>
+                          {showGroupHeader && (
+                            <>
+                              <div className="my-1 border-t border-gray-300" />
+                              <div className={cn(
+                                "px-4 py-1 text-[10px] font-bold uppercase tracking-wider",
+                                isAdmin ? "text-red-600" : "text-gray-500"
+                              )}>
+                                {groupLabels[item.group]}
+                              </div>
+                            </>
+                          )}
+                          <Link
+                            href={item.href}
+                            onClick={() => setShowUserMenu(false)}
+                            className={cn(
+                              "flex items-center gap-2.5 px-4 py-2 text-sm",
+                              isAdmin
+                                ? "text-red-700 font-semibold hover:bg-red-50"
+                                : item.href === "/vendor/dashboard"
+                                  ? "text-ink hover:bg-rausch/5 hover:text-rausch"
+                                  : "text-ink hover:bg-gray-100"
+                            )}
+                          >
+                            {Icon && <Icon className={cn("h-4 w-4", isAdmin ? "text-red-600" : "text-gray-500")} />}
+                            {item.label}
+                          </Link>
+                        </span>
+                      );
+                    })}
 
-                    {/* Admin Role Links */}
-                    {user.role === "admin" && (
-                      <>
-                        <div className="my-1 border-t border-[#DDDDDD]" />
-                        <div className="px-4 py-1 text-[10px] font-bold text-red-600 uppercase tracking-wider">
-                          Admin Portal
-                        </div>
-                        <Link
-                          href="/admin/dashboard"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-red-700 font-semibold hover:bg-red-50"
-                        >
-                          <HiShieldCheck className="h-4 w-4 text-red-600" />
-                          Admin Dashboard
-                        </Link>
-                        <Link
-                          href="/admin/products"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
-                        >
-                          <HiCube className="h-4 w-4 text-gray-500" />
-                          Moderate Listings
-                        </Link>
-                        <Link
-                          href="/admin/vendors"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
-                        >
-                          <HiBuildingStorefront className="h-4 w-4 text-gray-500" />
-                          Manage Vendors
-                        </Link>
-                        <Link
-                          href="/admin/settings"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#222222] hover:bg-[#F7F7F7]"
-                        >
-                          <HiCog6Tooth className="h-4 w-4 text-gray-500" />
-                          Platform Settings
-                        </Link>
-                      </>
-                    )}
-
-                    <div className="my-1 border-t border-[#DDDDDD]" />
+                    <div className="my-1 border-t border-gray-300" />
                     <button
                       type="button"
                       onClick={() => { logout(); setShowUserMenu(false); }}
@@ -233,7 +212,7 @@ export function Header() {
           <button
             type="button"
             onClick={toggleMobileNav}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-[#222222] transition-colors hover:bg-[#F7F7F7] md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-gray-100 md:hidden"
             aria-label="Toggle navigation menu"
           >
             {isMobileNavOpen ? <HiXMark className="h-5 w-5" /> : <HiBars3 className="h-5 w-5" />}
@@ -251,7 +230,7 @@ export function Header() {
             className="absolute left-0 top-0 flex h-full w-72 max-w-[85vw] flex-col gap-2 bg-gray-100/95 px-6 pb-8 pt-4"
             onClick={(event) => event.stopPropagation()}
           >
-            {navLinks.map((link) => (
+            {mobileNavItems.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -259,52 +238,34 @@ export function Header() {
                 className={cn(
                   "rounded-lg px-4 py-3 text-base font-medium transition-colors",
                   pathname === link.href
-                    ? "bg-red-200/90 text-[#222222]"
-                    : "text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]"
+                    ? "bg-red-200/90 text-ink"
+                    : "text-gray-500 hover:bg-gray-100 hover:text-ink"
                 )}
               >
                 {link.label}
               </Link>
             ))}
-            <hr className="my-2 border-[#DDDDDD]" />
-            <Link
-              href="/wishlist"
-              onClick={closeMobileNav}
-              className="flex items-center gap-3 rounded-lg px-4 py-3 text-base text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]"
-            >
-              <HiHeart className="h-5 w-5" />
-              Wishlist
-            </Link>
+            <hr className="my-2 border-gray-300" />
             {!mounted ? null : isAuthenticated && user ? (
               <>
-                <Link
-                  href="/account"
-                  onClick={closeMobileNav}
-                  className="flex items-center gap-3 rounded-lg px-4 py-3 text-base text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]"
-                >
-                  <HiUser className="h-5 w-5" />
-                  My Account
-                </Link>
-                {(user.role === "vendor" || user.role === "admin") && (
-                  <Link
-                    href="/vendor/dashboard"
-                    onClick={closeMobileNav}
-                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-base text-[#FF385C] font-semibold hover:bg-[#FFF0F3]"
-                  >
-                    <HiBuildingStorefront className="h-5 w-5" />
-                    Vendor Dashboard
-                  </Link>
-                )}
-                {user.role === "admin" && (
-                  <Link
-                    href="/admin/dashboard"
-                    onClick={closeMobileNav}
-                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-base text-red-700 font-semibold hover:bg-red-50"
-                  >
-                    <HiShieldCheck className="h-5 w-5" />
-                    Admin Dashboard
-                  </Link>
-                )}
+                {workspaceItems.map((item) => {
+                  const Icon = workspaceIcons[item.href];
+                  const isAdmin = item.group === "admin";
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={closeMobileNav}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-4 py-3 text-base font-semibold",
+                        isAdmin ? "text-red-700 hover:bg-red-50" : "text-rausch hover:bg-rausch/5"
+                      )}
+                    >
+                      {Icon && <Icon className="h-5 w-5" />}
+                      {item.label}
+                    </Link>
+                  );
+                })}
                 <button
                   type="button"
                   onClick={() => { logout(); closeMobileNav(); }}
@@ -318,7 +279,7 @@ export function Header() {
               <Link
                 href="/login"
                 onClick={closeMobileNav}
-                className="flex items-center gap-3 rounded-lg px-4 py-3 text-base text-[#717171] hover:bg-[#F7F7F7] hover:text-[#222222]"
+                className="flex items-center gap-3 rounded-lg px-4 py-3 text-base text-gray-500 hover:bg-gray-100 hover:text-ink"
               >
                 <HiUser className="h-5 w-5" />
                 Sign In

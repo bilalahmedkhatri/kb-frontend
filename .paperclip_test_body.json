@@ -1,0 +1,9 @@
+{
+    "payload":  {
+                    "title":  "Approve Frontend Developer Plan (AZE-20)",
+                    "description":  "The 30/60/90-day plan for the Frontend Developer role is complete and ready for approval. Please review and approve to kick off implementation.",
+                    "continuationPolicy":  "wake_assignee",
+                    "idempotencyKey":  "confirmation:AZE-20:plan:frontend-developer-v1",
+                    "kind":  "request_confirmation"
+                }
+}

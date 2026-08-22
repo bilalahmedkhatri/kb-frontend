@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { useAuthStore } from "@/src/store/authStore";
 import { ReviewCard } from "@/src/components/molecules/ReviewCard";
 import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
-import { api } from "@/src/lib/api";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
+import { useUserReviews } from "@/src/hooks";
 import { cn } from "@/src/lib/utils";
 import { HiChatBubbleLeftRight, HiShoppingBag, HiStar, HiPencilSquare, HiTrash } from "react-icons/hi2";
-import type { Review, Product, Order, OrderItem } from "@/src/types";
 
 const TABS = [
   { key: "given", label: "Given Reviews" },
@@ -19,46 +19,14 @@ const TABS = [
 export default function ReviewsPage() {
   const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState<"given" | "pending">("given");
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [toReviewItems, setToReviewItems] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) return;
-
-    Promise.all([
-      api.getOrders(user.id),
-      api.getProducts({ pageSize: 50 }),
-    ]).then(([userOrders, allProducts]) => {
-      const reviewedIds = new Set<string>();
-
-      const productIds = Array.from(new Set<string>(allProducts.data.map((p: Product) => p.id)));
-      const fetchedReviews = Promise.all(
-        productIds.map((pid: string) => api.getReviews(pid, "product"))
-      );
-
-      fetchedReviews.then((reviewArrays: Review[][]) => {
-        const flat = reviewArrays.flat();
-        const userReviews = flat.filter((r: Review) => r.userId === user.id);
-        setReviews(userReviews);
-        userReviews.forEach((r: Review) => reviewedIds.add(r.targetId));
-
-        const purchasedProductIds = new Set(
-          userOrders.flatMap((o: Order) => o.items.map((i: OrderItem) => i.productId))
-        );
-
-        const unreviewed = allProducts.data.filter(
-          (p: Product) => purchasedProductIds.has(p.id) && !reviewedIds.has(p.id)
-        );
-        setToReviewItems(unreviewed);
-        setLoading(false);
-      });
-    });
-  }, [user]);
+  const userReviewsQuery = useUserReviews(user?.id, Boolean(user));
+  const reviews = userReviewsQuery.data?.reviews ?? [];
+  const toReviewItems = userReviewsQuery.data?.toReviewItems ?? [];
 
   return (
     <>
-      <h2 className="mb-4 text-lg font-bold text-[#222222]">My Reviews</h2>
+      <h2 className="mb-4 text-lg font-bold text-ink">My Reviews</h2>
 
       <div className="mb-6 flex gap-2">
         {TABS.map((tab) => (
@@ -68,8 +36,8 @@ export default function ReviewsPage() {
             className={cn(
               "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
               activeTab === tab.key
-                ? "bg-[#222222] text-white"
-                : "bg-[#F7F7F7] text-[#717171] hover:text-[#222222]"
+                ? "bg-ink text-white"
+                : "bg-gray-100 text-gray-500 hover:text-ink"
             )}
           >
             {tab.label}
@@ -77,16 +45,22 @@ export default function ReviewsPage() {
         ))}
       </div>
 
-      {loading ? (
+      {userReviewsQuery.isLoading ? (
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
         </div>
+      ) : userReviewsQuery.isError ? (
+        <ErrorState
+          title="Could not load your reviews"
+          description="We couldn't retrieve your review data right now. Please try again."
+          onRetry={() => void userReviewsQuery.refetch()}
+        />
       ) : activeTab === "given" ? (
         reviews.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#DDDDDD] py-16">
-            <HiChatBubbleLeftRight className="mb-3 h-12 w-12 text-[#DDDDDD]" />
-            <p className="text-base font-medium text-[#717171]">No reviews submitted</p>
-            <p className="text-sm text-[#717171]">You haven&apos;t written any reviews yet.</p>
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 py-16">
+            <HiChatBubbleLeftRight className="mb-3 h-12 w-12 text-gray-300" />
+            <p className="text-base font-medium text-gray-500">No reviews submitted</p>
+            <p className="text-sm text-gray-500">You haven&apos;t written any reviews yet.</p>
           </div>
         ) : (
           <div className="flex flex-col gap-4">
@@ -94,10 +68,10 @@ export default function ReviewsPage() {
               <div key={review.id} className="group relative">
                 <ReviewCard review={review} />
                 <div className="absolute right-4 top-4 hidden gap-1 group-hover:flex">
-                  <button className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-[#717171] shadow-sm hover:text-[#222222]">
+                  <button className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-gray-500 shadow-sm hover:text-ink">
                     <HiPencilSquare className="h-3.5 w-3.5" />
                   </button>
-                  <button className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-[#717171] shadow-sm hover:text-red-500">
+                  <button className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-gray-500 shadow-sm hover:text-red-500">
                     <HiTrash className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -106,17 +80,17 @@ export default function ReviewsPage() {
           </div>
         )
       ) : toReviewItems.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#DDDDDD] py-16">
-          <HiShoppingBag className="mb-3 h-12 w-12 text-[#DDDDDD]" />
-          <p className="text-base font-medium text-[#717171]">Nothing to review</p>
-          <p className="text-sm text-[#717171]">All your purchased items have been reviewed.</p>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 py-16">
+          <HiShoppingBag className="mb-3 h-12 w-12 text-gray-300" />
+          <p className="text-base font-medium text-gray-500">Nothing to review</p>
+          <p className="text-sm text-gray-500">All your purchased items have been reviewed.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
           {toReviewItems.map((product) => (
             <div
               key={product.id}
-              className="flex items-center gap-4 rounded-xl border border-[#DDDDDD] p-4"
+              className="flex items-center gap-4 rounded-xl border border-gray-300 p-4"
             >
               <Image
                 src={product.images[0]}
@@ -126,11 +100,11 @@ export default function ReviewsPage() {
                 className="h-16 w-16 flex-shrink-0 rounded-lg object-cover"
               />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-[#222222]">{product.name}</p>
-                <p className="text-xs text-[#717171]">{product.vendorName}</p>
+                <p className="text-sm font-semibold text-ink">{product.name}</p>
+                <p className="text-xs text-gray-500">{product.vendorName}</p>
                 <div className="mt-1 flex items-center gap-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <HiStar key={i} className="h-3.5 w-3.5 text-[#DDDDDD]" />
+                    <HiStar key={i} className="h-3.5 w-3.5 text-gray-300" />
                   ))}
                 </div>
               </div>

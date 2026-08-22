@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/store/authStore";
 import { useCartStore } from "@/src/store/cartStore";
@@ -8,7 +8,7 @@ import { Pagination } from "@/src/components/atoms/Pagination";
 import { Spinner } from "@/src/components/atoms/Spinner";
 import { OrderCard } from "@/src/components/molecules/OrderCard";
 import { OrderStatusStepper } from "@/src/components/molecules/OrderStatusStepper";
-import { api } from "@/src/lib/api";
+import { useOrders } from "@/src/hooks";
 import { encodeOrderIdBase256 } from "@/src/lib/security";
 import { cn } from "@/src/lib/utils";
 import {
@@ -16,6 +16,7 @@ import {
   HiMagnifyingGlass,
   HiXMark,
 } from "react-icons/hi2";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
 import type { Order } from "@/src/types";
 
 const STATUS_FILTERS = ["All", "Processing", "Shipped", "Delivered", "Returned"] as const;
@@ -55,42 +56,32 @@ export default function OrdersPage() {
   const router = useRouter();
   const { user } = useAuthStore();
   const { addItem } = useCartStore();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [trackingOrder, setTrackingOrder] = useState<Order | null>(null);
 
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    api.getOrders(user.id).then((data) => {
-      if (!cancelled) {
-        setOrders(data);
-        setLoading(false);
-      }
+  const ordersQuery = useOrders(user?.id, Boolean(user));
+  const orders = ordersQuery.data ?? [];
+
+  const filtered = useMemo(() => {
+    const result = orders.filter((o) => {
+      const matchesSearch =
+        !search ||
+        o.id.toLowerCase().includes(search.toLowerCase()) ||
+        o.items.some((i) => i.productName.toLowerCase().includes(search.toLowerCase()));
+      const matchesStatus =
+        statusFilter === "All" ||
+        (statusFilter === "Processing" && (o.status === "pending" || o.status === "confirmed")) ||
+        (statusFilter === "Shipped" && o.status === "shipped") ||
+        (statusFilter === "Delivered" && o.status === "delivered") ||
+        (statusFilter === "Returned" && o.status === "cancelled");
+      return matchesSearch && matchesStatus;
     });
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
+    return result;
+  }, [orders, search, statusFilter]);
 
-  const filtered = orders.filter((o) => {
-    const matchesSearch =
-      !search ||
-      o.id.toLowerCase().includes(search.toLowerCase()) ||
-      o.items.some((i) => i.productName.toLowerCase().includes(search.toLowerCase()));
-    const matchesStatus =
-      statusFilter === "All" ||
-      (statusFilter === "Processing" && (o.status === "pending" || o.status === "confirmed")) ||
-      (statusFilter === "Shipped" && o.status === "shipped") ||
-      (statusFilter === "Delivered" && o.status === "delivered") ||
-      (statusFilter === "Returned" && o.status === "cancelled");
-    return matchesSearch && matchesStatus;
-  });
-
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginatedOrders = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleViewOrderDetails = (order: Order) => {
@@ -130,10 +121,16 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {loading ? (
+      {ordersQuery.isLoading ? (
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
         </div>
+      ) : ordersQuery.isError ? (
+        <ErrorState
+          title="Could not load your orders"
+          description="We ran into an issue retrieving your order history. Please try again."
+          onRetry={() => void ordersQuery.refetch()}
+        />
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 py-16">
           <HiShoppingBag className="mb-3 h-12 w-12 text-gray-300" />

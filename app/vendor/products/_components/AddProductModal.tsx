@@ -117,7 +117,7 @@ export function AddProductModal({ isOpen, onClose, onSubmit }: AddProductModalPr
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-bold text-ink flex items-center gap-2">
-                <HiSparkles className="h-5 w-5 text-[#FF385C]" />
+                <HiSparkles className="h-5 w-5 text-rausch" />
                 Add New Island Product
               </h3>
               <p className="text-xs text-gray-500">Step {step} of 5 — Complete details to publish or save as draft.</p>
@@ -244,11 +244,11 @@ export function AddProductModal({ isOpen, onClose, onSubmit }: AddProductModalPr
                       key={idx}
                       type="button"
                       onClick={() => addPresetImage(preset.url, preset.label)}
-                      className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center transition-all ${
-                        selectedPreset === preset.label
-                          ? "border-[#FF385C] bg-red-50/50 text-[#FF385C]"
-                          : "border-gray-200 bg-gray-50 hover:border-gray-300 text-gray-700"
-                      }`}
+                  className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center transition-all ${
+                    selectedPreset === preset.label
+                      ? "border-rausch bg-red-50/50 text-rausch"
+                      : "border-gray-200 bg-gray-50 hover:border-gray-300 text-gray-700"
+                  }`}
                     >
                       <HiPhoto className="h-6 w-6 text-gray-400" />
                       <span className="text-[11px] font-semibold leading-tight">{preset.label}</span>
@@ -272,7 +272,7 @@ export function AddProductModal({ isOpen, onClose, onSubmit }: AddProductModalPr
                     <div key={idx} className="group relative h-20 w-20 rounded-xl border border-gray-200 bg-gray-100 overflow-hidden shadow-xs">
                       <img src={img} alt="preview" className="h-full w-full object-cover" />
                       {idx === 0 && (
-                        <span className="absolute bottom-0 inset-x-0 bg-[#FF385C] py-0.5 text-center text-[9px] font-bold text-white">
+                        <span className="absolute bottom-0 inset-x-0 bg-rausch py-0.5 text-center text-[9px] font-bold text-white">
                           Cover
                         </span>
                       )}
@@ -383,7 +383,7 @@ export function AddProductModal({ isOpen, onClose, onSubmit }: AddProductModalPr
                     type="checkbox"
                     checked={isFragile}
                     onChange={(e) => setIsFragile(e.target.checked)}
-                    className="h-4 w-4 rounded-md text-[#FF385C] focus:ring-[#FF385C]"
+                    className="h-4 w-4 rounded-md text-rausch focus:ring-rausch"
                   />
                   <div>
                     <span className="block text-xs font-bold text-amber-900">Fragile Inter-Island Cargo Handling</span>

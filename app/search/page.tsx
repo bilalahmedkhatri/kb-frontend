@@ -1,15 +1,17 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { SearchBar } from "@/src/components/molecules/SearchBar";
 import { ProductGrid } from "@/src/components/organisms/ProductGrid";
 import { StayGrid } from "@/src/components/organisms/StayGrid";
 import { GuideGrid } from "@/src/components/organisms/GuideGrid";
+import { Button } from "@/src/components/atoms/Button";
 import { cn } from "@/src/lib/utils";
-import { api } from "@/src/lib/api";
+import { useProducts, useStays, useGuides } from "@/src/hooks";
 import { HiMagnifyingGlass } from "react-icons/hi2";
-import type { Product, Stay, Guide, PaginatedResponse } from "@/src/types";
+
+import { ErrorState } from "@/src/components/molecules/ErrorState";
 
 type Tab = "all" | "products" | "stays" | "guides";
 
@@ -29,40 +31,23 @@ function SearchPageContent() {
   const [activeTab, setActiveTab] = useState<Tab>(
     (searchParams.get("tab") as Tab) || "all"
   );
-  const [products, setProducts] = useState<PaginatedResponse<Product>>();
-  const [stays, setStays] = useState<PaginatedResponse<Stay>>();
-  const [guides, setGuides] = useState<PaginatedResponse<Guide>>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [retryKey, setRetryKey] = useState(0);
 
-  useEffect(() => {
-    let cancelled = false;
-    const filters = { search: query };
-    Promise.all([
-      api.getProducts({ page, pageSize: 12, filters }),
-      api.getStays({ page, pageSize: 12, filters }),
-      api.getGuides({ page, pageSize: 12, filters }),
-    ])
-      .then(([prodRes, stayRes, guideRes]) => {
-        if (!cancelled) {
-          setProducts(prodRes);
-          setStays(stayRes);
-          setGuides(guideRes);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setError("Could not load search results. Please try again.");
-          setLoading(false);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [query, page, retryKey]);
+  const sharedFilters = { search: query };
+  const productsQuery = useProducts({ page, pageSize: 12, filters: sharedFilters });
+  const staysQuery = useStays({ page, pageSize: 12, filters: sharedFilters });
+  const guidesQuery = useGuides({ page, pageSize: 12, filters: sharedFilters });
+
+  const loading =
+    productsQuery.isLoading || staysQuery.isLoading || guidesQuery.isLoading;
+  const error =
+    productsQuery.error || staysQuery.error || guidesQuery.error;
+
+  const refetchAll = () => {
+    void productsQuery.refetch();
+    void staysQuery.refetch();
+    void guidesQuery.refetch();
+  };
 
   const handleSearch = (val: string) => {
     setSearchValue(val);
@@ -83,10 +68,14 @@ function SearchPageContent() {
 
   const hasNoResults =
     !loading &&
-    ((activeTab === "all" && (products?.data.length ?? 0) + (stays?.data.length ?? 0) + (guides?.data.length ?? 0) === 0) ||
-      (activeTab === "products" && (products?.data.length ?? 0) === 0) ||
-      (activeTab === "stays" && (stays?.data.length ?? 0) === 0) ||
-      (activeTab === "guides" && (guides?.data.length ?? 0) === 0));
+    ((activeTab === "all" &&
+      (productsQuery.data?.data.length ?? 0) +
+        (staysQuery.data?.data.length ?? 0) +
+        (guidesQuery.data?.data.length ?? 0) ===
+        0) ||
+      (activeTab === "products" && (productsQuery.data?.data.length ?? 0) === 0) ||
+      (activeTab === "stays" && (staysQuery.data?.data.length ?? 0) === 0) ||
+      (activeTab === "guides" && (guidesQuery.data?.data.length ?? 0) === 0));
 
   return (
     <div className="container-app py-8">
@@ -99,7 +88,7 @@ function SearchPageContent() {
         />
       </div>
 
-      <div className="mb-6 flex items-center gap-2 border-b border-[#DDDDDD]">
+      <div className="mb-6 flex items-center gap-2 border-b border-gray-300">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -108,8 +97,8 @@ function SearchPageContent() {
             className={cn(
               "px-4 py-3 text-sm font-medium transition-colors",
               activeTab === tab.key
-                ? "border-b-2 border-[#222222] text-[#222222]"
-                : "text-[#717171] hover:text-[#222222]"
+                ? "border-b-2 border-ink text-ink"
+                : "text-gray-500 hover:text-ink"
             )}
           >
             {tab.label}
@@ -118,20 +107,7 @@ function SearchPageContent() {
       </div>
 
       {error ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
-            <HiMagnifyingGlass className="h-8 w-8 text-red-400" />
-          </div>
-          <h2 className="mb-2 text-xl font-bold text-[#222222]">Something went wrong</h2>
-          <p className="mb-6 text-center text-[#717171]">{error}</p>
-          <button
-            type="button"
-            onClick={() => { setError(null); setLoading(true); setRetryKey((k) => k + 1); }}
-            className="rounded-lg bg-[#222222] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#222222]/80"
-          >
-            Try again
-          </button>
-        </div>
+        <ErrorState onRetry={refetchAll} />
       ) : loading ? (
         <div>
           {activeTab === "stays" ? (
@@ -144,9 +120,9 @@ function SearchPageContent() {
         </div>
       ) : hasNoResults ? (
         <div className="flex flex-col items-center justify-center py-20">
-          <HiMagnifyingGlass className="mb-4 h-16 w-16 text-[#DDDDDD]" />
-          <h2 className="mb-2 text-xl font-bold text-[#222222]">No results found</h2>
-          <p className="text-center text-[#717171]">
+          <HiMagnifyingGlass className="mb-4 h-16 w-16 text-gray-300" />
+          <h2 className="mb-2 text-xl font-bold text-ink">No results found</h2>
+          <p className="text-center text-gray-500">
             {query ? (
               <>We couldn&rsquo;t find anything for &ldquo;{query}&rdquo;. Try a different search term or browse categories.</>
             ) : (
@@ -156,44 +132,50 @@ function SearchPageContent() {
         </div>
       ) : (
         <div className="flex flex-col gap-8">
-          {(activeTab === "all" || activeTab === "products") && products && products.data.length > 0 && (
-            <section>
-              {activeTab === "all" && (
-                <h3 className="mb-4 text-lg font-bold text-[#222222]">Products</h3>
-              )}
-              <ProductGrid
-                products={products.data}
-                isLoading={false}
-                totalPages={products.totalPages}
-                currentPage={products.page}
-                onPageChange={setPage}
-              />
-            </section>
-          )}
+          {(activeTab === "all" || activeTab === "products") &&
+            productsQuery.data &&
+            productsQuery.data.data.length > 0 && (
+              <section>
+                {activeTab === "all" && (
+                  <h3 className="mb-4 text-lg font-bold text-ink">Products</h3>
+                )}
+                <ProductGrid
+                  products={productsQuery.data.data}
+                  isLoading={false}
+                  totalPages={productsQuery.data.totalPages}
+                  currentPage={productsQuery.data.page}
+                  onPageChange={setPage}
+                />
+              </section>
+            )}
 
-          {(activeTab === "all" || activeTab === "stays") && stays && stays.data.length > 0 && (
-            <section>
-              {activeTab === "all" && (
-                <h3 className="mb-4 text-lg font-bold text-[#222222]">Stays</h3>
-              )}
-              <StayGrid
-                stays={stays.data}
-                isLoading={false}
-                totalPages={stays.totalPages}
-                currentPage={stays.page}
-                onPageChange={setPage}
-              />
-            </section>
-          )}
+          {(activeTab === "all" || activeTab === "stays") &&
+            staysQuery.data &&
+            staysQuery.data.data.length > 0 && (
+              <section>
+                {activeTab === "all" && (
+                  <h3 className="mb-4 text-lg font-bold text-ink">Stays</h3>
+                )}
+                <StayGrid
+                  stays={staysQuery.data.data}
+                  isLoading={false}
+                  totalPages={staysQuery.data.totalPages}
+                  currentPage={staysQuery.data.page}
+                  onPageChange={setPage}
+                />
+              </section>
+            )}
 
-          {(activeTab === "all" || activeTab === "guides") && guides && guides.data.length > 0 && (
-            <section>
-              {activeTab === "all" && (
-                <h3 className="mb-4 text-lg font-bold text-[#222222]">Guides</h3>
-              )}
-              <GuideGrid guides={guides.data} isLoading={false} />
-            </section>
-          )}
+          {(activeTab === "all" || activeTab === "guides") &&
+            guidesQuery.data &&
+            guidesQuery.data.data.length > 0 && (
+              <section>
+                {activeTab === "all" && (
+                  <h3 className="mb-4 text-lg font-bold text-ink">Guides</h3>
+                )}
+                <GuideGrid guides={guidesQuery.data.data} isLoading={false} />
+              </section>
+            )}
         </div>
       )}
     </div>

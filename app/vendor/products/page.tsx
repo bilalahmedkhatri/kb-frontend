@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
-import { api } from "@/src/lib/api";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
+import { useProducts } from "@/src/hooks";
 import { formatCurrency } from "@/src/lib/utils";
 import {
   HiPlus,
@@ -19,8 +20,6 @@ import {
 import type { Product } from "@/src/types";
 
 export default function VendorProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -28,12 +27,8 @@ export default function VendorProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  useEffect(() => {
-    api.getProducts({ pageSize: 50 }).then((res) => {
-      setProducts(res.data);
-      setLoading(false);
-    });
-  }, []);
+  const productsQuery = useProducts({ pageSize: 50 });
+  const products = productsQuery.data?.data ?? [];
 
   // Filter products based on search & status
   const filteredProducts = products.filter((p) => {
@@ -111,10 +106,17 @@ export default function VendorProductsPage() {
 
       {/* Product Table Container */}
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col">
-        {loading ? (
+        {productsQuery.isLoading ? (
           <div className="flex justify-center py-12">
             <Spinner />
           </div>
+        ) : productsQuery.isError ? (
+          <ErrorState
+            variant="compact"
+            title="Could not load your product inventory"
+            description="We ran into an issue fetching your vendor listings. Please try again."
+            onRetry={() => void productsQuery.refetch()}
+          />
         ) : filteredProducts.length === 0 ? (
           <div className="py-12 text-center text-gray-500">
             <HiCube className="mx-auto mb-2 h-10 w-10 text-gray-300" />
@@ -172,7 +174,7 @@ export default function VendorProductsPage() {
                           </Link>
                           <Link
                             href={`/vendor/products/new`}
-                            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-[#FF385C] hover:bg-red-50"
+                            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-rausch hover:bg-rausch/10"
                             title="Edit Product"
                           >
                             <HiPencilSquare className="h-3.5 w-3.5" />
@@ -229,7 +231,7 @@ export default function VendorProductsPage() {
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
                     className={`h-7 w-7 rounded-lg text-xs font-bold transition-all ${currentPage === pageNum
-                      ? "bg-[#FF385C] text-white shadow-xs"
+                      ? "bg-rausch text-white shadow-xs"
                       : "bg-white text-gray-700 hover:bg-gray-200/60 border border-gray-200"
                       }`}
                   >

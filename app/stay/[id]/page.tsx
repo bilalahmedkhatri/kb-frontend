@@ -42,9 +42,20 @@ export default async function StayDetailPage({ params }: Props) {
     notFound();
   }
 
+  let reviewsError = false;
+  let relatedError = false;
+
   const [reviews, allStays] = await Promise.all([
-    api.getReviews(stay.id, "stay"),
-    api.getStays({ pageSize: 20 }),
+    api.getReviews(stay.id, "stay").catch((err) => {
+      console.error(`Failed to load reviews for stay ${stay.id}:`, err);
+      reviewsError = true;
+      return [];
+    }),
+    api.getStays({ pageSize: 20 }).catch((err) => {
+      console.error(`Failed to load related stays for ${stay.id}:`, err);
+      relatedError = true;
+      return { data: [], total: 0, page: 1, totalPages: 1, hasMore: false };
+    }),
   ]);
 
   const relatedStays = allStays.data
@@ -78,8 +89,11 @@ export default async function StayDetailPage({ params }: Props) {
       <StayDetailClient
         stay={stay}
         reviews={reviews}
+        reviewsError={reviewsError}
         relatedStays={relatedStays}
+        relatedError={relatedError}
       />
     </>
   );
 }
+

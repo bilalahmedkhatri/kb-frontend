@@ -10,7 +10,7 @@ export interface Product {
   rating: number;
   reviewCount: number;
   stock: number;
-  status: "active" | "pending" | "rejected";
+  status: "active" | "pending" | "rejected" | "draft";
   description: string;
   origin: string;
   material: string;
@@ -36,7 +36,7 @@ export interface Stay {
   type: "homestay" | "eco-lodge" | "villa" | "guesthouse";
   amenities: string[];
   description: string;
-  status: "active" | "pending" | "rejected";
+  status: "active" | "pending" | "rejected" | "draft";
   createdAt: string;
 }
 

@@ -26,13 +26,17 @@ import type { Stay, Review } from "@/src/types";
 interface StayDetailClientProps {
   stay: Stay;
   reviews: Review[];
+  reviewsError?: boolean;
   relatedStays: Stay[];
+  relatedError?: boolean;
 }
 
 export default function StayDetailClient({
   stay,
   reviews,
+  reviewsError = false,
   relatedStays,
+  relatedError = false,
 }: StayDetailClientProps) {
   const { openBookingModal } = useUIStore();
   const [checkIn, setCheckIn] = useState("");
@@ -243,16 +247,17 @@ export default function StayDetailClient({
 
       {/* Reviews */}
       <div className="mt-16 border-t border-[var(--gray-200)] pt-12">
-        <ReviewList reviews={reviews} />
+        <ReviewList reviews={reviews} isError={reviewsError} />
       </div>
 
       {/* Similar Stays Rail */}
-      {relatedStays.length > 0 && (
+      {(relatedStays.length > 0 || relatedError) && (
         <div className="mt-16">
           <FeaturedRail
             items={relatedStays}
             type="stay"
             title={`Similar Kiribati ${stay.type}s`}
+            isError={relatedError}
             viewAllHref="/search?tab=stays"
           />
         </div>
@@ -262,3 +267,4 @@ export default function StayDetailClient({
     </div>
   );
 }
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,33 +8,19 @@ import { Button } from "@/src/components/atoms/Button";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Skeleton } from "@/src/components/atoms/Skeleton";
 import { formatCurrency } from "@/src/lib/utils";
-import { api } from "@/src/lib/api";
+import { useStay } from "@/src/hooks";
 import { HiCheckCircle, HiMapPin } from "react-icons/hi2";
-import type { Stay } from "@/src/types";
 
 export default function BookingConfirmationPage() {
   const params = useParams();
   const stayId = typeof params.id === "string" ? params.id : "";
 
-  const [stay, setStay] = useState<Stay | null>(null);
-  const [loading, setLoading] = useState(true);
   const [referenceNumber] = useState(() => `KBB-${Date.now().toString(36).toUpperCase()}`);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await api.getStay(stayId);
-        setStay(data || null);
-      } catch {
-        setStay(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, [stayId]);
+  const stayQuery = useStay(stayId, Boolean(stayId));
+  const stay = stayQuery.data ?? null;
 
-  if (loading) {
+  if (stayQuery.isLoading) {
     return (
       <div className="container-app flex flex-col items-center justify-center py-20">
         <Skeleton className="h-20 w-20 rounded-full" />
@@ -44,23 +30,35 @@ export default function BookingConfirmationPage() {
     );
   }
 
+  if (stayQuery.isError) {
+    return (
+      <div className="container-app flex flex-col items-center justify-center py-20">
+        <h2 className="text-xl font-bold text-ink">Could not load booking details</h2>
+        <p className="mt-2 text-sm text-gray-500">Please try again or browse stays.</p>
+        <Button variant="outline" className="mt-4" onClick={() => void stayQuery.refetch()}>
+          Try again
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="container-app flex flex-col items-center justify-center py-20">
       <HiCheckCircle className="mb-4 h-20 w-20 text-green-500" />
-      <h1 className="mb-2 text-2xl font-bold text-[#222222]">Inquiry Sent!</h1>
-      <p className="mb-2 max-w-md text-center text-sm text-[#717171]">
+      <h1 className="mb-2 text-2xl font-bold text-ink">Inquiry Sent!</h1>
+      <p className="mb-2 max-w-md text-center text-sm text-gray-500">
         Your inquiry has been sent to the host. You will receive a response
         within 24 hours.
       </p>
       {referenceNumber && (
-        <p className="mb-8 text-sm text-[#717171]">
+        <p className="mb-8 text-sm text-gray-500">
           Reference:{" "}
-          <span className="font-semibold text-[#222222]">{referenceNumber}</span>
+          <span className="font-semibold text-ink">{referenceNumber}</span>
         </p>
       )}
 
       {stay && (
-        <div className="mb-8 w-full max-w-md rounded-xl border border-[#DDDDDD] p-4">
+        <div className="mb-8 w-full max-w-md rounded-xl border border-gray-300 p-4">
           <div className="flex items-center gap-3">
             <Image
               src={stay.images[0] || "/placeholder.svg"}
@@ -70,8 +68,8 @@ export default function BookingConfirmationPage() {
               className="h-16 w-16 rounded-lg object-cover shrink-0"
             />
             <div>
-              <p className="text-sm font-semibold text-[#222222]">{stay.name}</p>
-              <div className="flex items-center gap-1 text-xs text-[#717171]">
+              <p className="text-sm font-semibold text-ink">{stay.name}</p>
+              <div className="flex items-center gap-1 text-xs text-gray-500">
                 <HiMapPin className="h-3 w-3" />
                 <span>{stay.location}</span>
               </div>
@@ -79,7 +77,7 @@ export default function BookingConfirmationPage() {
                 <Badge variant="primary" className="capitalize text-[10px]">
                   {stay.type}
                 </Badge>
-                <span className="text-xs font-medium text-[#222222]">
+                <span className="text-xs font-medium text-ink">
                   {formatCurrency(stay.pricePerNight)} / night
                 </span>
               </div>

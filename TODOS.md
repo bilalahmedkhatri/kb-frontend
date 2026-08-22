@@ -28,4 +28,4 @@ interaction-state table). These tasks implement that spec in code.
 
 ## Skipped (spec only)
 
-- **T3 (error + empty states)** - user chose to skip tracking, but the full loading/empty/error/success/partial table is specified in `DESIGN.md` §7. Implement before launch; a failed fetch MUST render a recoverable error UI, not a blank page.
+- [x] **T3 (error + empty states)** - Implemented custom recoverable ErrorState components, built global not-found.tsx and error.tsx handlers, and integrated on the Search page results grid.

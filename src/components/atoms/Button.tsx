@@ -16,6 +16,7 @@ const buttonVariants = cva(
         destructive: "bg-red-600 text-white hover:bg-red-700",
       },
       size: {
+        xs: "h-7 px-2 text-xs",
         sm: "h-9 px-3 text-sm",
         md: "h-11 px-5 text-sm",
         lg: "h-13 px-8 text-base",

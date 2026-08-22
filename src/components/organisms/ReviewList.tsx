@@ -2,16 +2,19 @@ import { cn } from "@/src/lib/utils";
 import { ReviewCard } from "@/src/components/molecules/ReviewCard";
 import { Spinner } from "@/src/components/atoms/Spinner";
 import { Rating } from "@/src/components/atoms/Rating";
+import { ErrorState } from "@/src/components/molecules/ErrorState";
 import { HiChatBubbleLeftRight } from "react-icons/hi2";
 import type { Review } from "@/src/types";
 
 interface ReviewListProps {
   reviews: Review[];
   isLoading?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
   className?: string;
 }
 
-export function ReviewList({ reviews, isLoading, className }: ReviewListProps) {
+export function ReviewList({ reviews, isLoading, isError, onRetry, className }: ReviewListProps) {
   const averageRating =
     reviews.length > 0
       ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
@@ -21,6 +24,19 @@ export function ReviewList({ reviews, isLoading, className }: ReviewListProps) {
     return (
       <div className={cn("flex items-center justify-center py-12", className)}>
         <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className={cn("py-6", className)}>
+        <ErrorState
+          variant="compact"
+          title="Could not load reviews"
+          description="We were unable to retrieve customer feedback for this item."
+          onRetry={onRetry}
+        />
       </div>
     );
   }
@@ -53,3 +69,4 @@ export function ReviewList({ reviews, isLoading, className }: ReviewListProps) {
     </div>
   );
 }
+
