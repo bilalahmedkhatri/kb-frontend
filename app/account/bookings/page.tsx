@@ -81,7 +81,7 @@ function VoucherModal({
 
         <div className="mb-6 rounded-xl bg-[#F7F7F7] p-4">
           <div className="mb-3 flex items-center gap-3">
-            <Image src={booking.image || "/placeholder.svg"} alt={booking.stayName} width={64} height={64} className="h-16 w-16 shrink-0 rounded-lg object-cover" />
+            <Image src={booking.image || "/placeholder.svg"} alt={booking.stayName} width={64} height={64} loading="eager" className="h-16 w-16 shrink-0 rounded-lg object-cover" />
             <div>
               <h4 className="text-base font-bold text-[#222222]">{booking.stayName}</h4>
               <div className="flex items-center gap-1 text-xs text-[#717171]">

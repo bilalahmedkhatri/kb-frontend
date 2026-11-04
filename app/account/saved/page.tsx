@@ -72,7 +72,7 @@ export default function SavedPage() {
             {savedStays.map((stay) => (
               <div key={stay.id} className="group flex flex-col rounded-xl border border-[#DDDDDD] overflow-hidden">
                 <div className="relative h-44">
-                  <Image src={stay.images[0] || "/placeholder.svg"} alt={stay.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+                  <Image src={stay.images[0] || "/placeholder.svg"} alt={stay.name} fill sizes="(max-width: 768px) 100vw, 33vw" loading="eager" className="object-cover" />
                   <button
                     onClick={() => setSavedStayIds((prev) => prev.filter((id) => id !== stay.id))}
                     className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-[#FF385C] hover:bg-white"
@@ -119,7 +119,7 @@ export default function SavedPage() {
             {savedProducts.map((product) => (
               <div key={product.id} className="group flex flex-col rounded-xl border border-[#DDDDDD] overflow-hidden">
                 <div className="relative h-44">
-                  <Image src={product.images[0] || "/placeholder.svg"} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+                  <Image src={product.images[0] || "/placeholder.svg"} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" loading="eager" className="object-cover" />
                   <button
                     onClick={() => setSavedProductIds((prev) => prev.filter((id) => id !== product.id))}
                     className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-[#FF385C] hover:bg-white"

@@ -65,7 +65,7 @@ export function FileUploadInput({
 
         {value ? (
           <div className="relative h-24 w-full max-w-[200px] overflow-hidden rounded-lg bg-[var(--gray-100)]">
-            <Image src={value} alt="Preview" fill className="object-cover" />
+            <Image src={value} alt="Preview" fill loading="eager" className="object-cover" />
             <button
               type="button"
               onClick={(e) => {

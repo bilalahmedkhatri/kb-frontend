@@ -95,7 +95,7 @@ export function ArtisanStoryClip({
                 <video src={videoUrl} controls autoPlay className="h-full w-full object-cover" />
               ) : (
                 <div className="relative h-full w-full">
-                  <Image src={videoPoster} alt={craftName} fill sizes="100vw" className="object-cover opacity-80" />
+                  <Image src={videoPoster} alt={craftName} fill sizes="100vw" loading="eager" className="object-cover opacity-80" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 p-6 text-center text-white">
                     <GiPolarStar className="h-12 w-12 text-amber-400 mb-2 animate-bounce" />
                     <h4 className="text-xl font-black mb-1">Authentic Kiribati Craftsmanship</h4>

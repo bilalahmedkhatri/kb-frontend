@@ -192,7 +192,7 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
                       i === activeIndex ? "border-white scale-105 opacity-100" : "border-transparent opacity-50 hover:opacity-90"
                     )}
                   >
-                    <Image src={img} alt={`${alt} thumb ${i + 1}`} width={56} height={56} unoptimized className="h-full w-full object-cover" />
+                    <Image src={img} alt={`${alt} thumb ${i + 1}`} loading="eager" width={56} height={56} unoptimized className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
