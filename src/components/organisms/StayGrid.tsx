@@ -37,8 +37,8 @@ export function StayGrid({
   if (stays.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <HiMapPin className="mb-3 h-12 w-12 text-[#DDDDDD]" />
-        <p className="text-base font-medium text-[#717171]">{emptyMessage}</p>
+        <HiMapPin className="mb-3 h-12 w-12 text-[var(--gray-300)]" />
+        <p className="text-base font-medium text-[var(--gray-500)]">{emptyMessage}</p>
       </div>
     );
   }

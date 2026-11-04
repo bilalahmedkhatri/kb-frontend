@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/src/components/atoms/Button";
 import { ProductCard } from "@/src/components/molecules/ProductCard";
 import {
@@ -19,16 +20,21 @@ import {
   HiSparkles,
 } from "react-icons/hi2";
 import type { Product } from "@/src/types";
+import { useAuthStore } from "@/src/store/authStore";
+import { utilsApi } from "@/src/lib/api/utils";
+import { productsApi } from "@/src/lib/api/products";
 
 const ARTISAN_PRESETS = [
-  { label: "Woven Pandanus Mat", url: "/favicon.png" },
-  { label: "Kiribati Shell Necklace", url: "/favicon.png" },
-  { label: "Artisan Coconut Fiber Basket", url: "/favicon.png" },
-  { label: "Shark Tooth Sword Replica", url: "/favicon.png" },
+  { label: "Woven Pandanus Mat", url: "https://images.unsplash.com/photo-1606744888344-498238f01740?w=800&auto=format&fit=crop&q=80" },
+  { label: "Kiribati Shell Necklace", url: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&auto=format&fit=crop&q=80" },
+  { label: "Artisan Coconut Fiber Basket", url: "https://images.unsplash.com/photo-1590736969955-71cc94801759?w=800&auto=format&fit=crop&q=80" },
+  { label: "Shark Tooth Sword Replica", url: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80" },
 ];
 
 export default function VendorAddProductPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
 
   // Step 1: Details
@@ -39,8 +45,12 @@ export default function VendorAddProductPage() {
   const [material, setMaterial] = useState("Pandanus Leaf & Coconut Fiber");
 
   // Step 2: Media
-  const [images, setImages] = useState<string[]>(["/favicon.png"]);
+  const [images, setImages] = useState<string[]>([]);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   // Step 3: Pricing & Inventory
   const [price, setPrice] = useState("65.00");
@@ -53,17 +63,48 @@ export default function VendorAddProductPage() {
   const [dimensions, setDimensions] = useState("30 x 20 x 10 cm");
   const [isFragile, setIsFragile] = useState(false);
 
+  // Submitting
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleFileUpload = async (files: FileList | File[]) => {
+    const fileList = Array.from(files);
+    if (fileList.length === 0) return;
+
+    setUploading(true);
+    setUploadError(null);
+
+    const uploadedUrls: string[] = [];
+    for (const file of fileList) {
+      if (!file.type.startsWith("image/")) {
+        setUploadError("Only image files (PNG, JPG, WEBP, GIF) are allowed");
+        continue;
+      }
+      try {
+        const res = await utilsApi.uploadFile(file);
+        if (res.url) {
+          uploadedUrls.push(res.url);
+        }
+      } catch (err: any) {
+        setUploadError(err?.message || "Failed to upload image");
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      setImages((prev) => [...prev, ...uploadedUrls]);
+    }
+    setUploading(false);
+  };
+
   const addPresetImage = (url: string, label: string) => {
     if (!images.includes(url)) {
-      setImages([...images, url]);
+      setImages((prev) => [...prev, url]);
     }
     setSelectedPreset(label);
   };
 
   const removeImage = (index: number) => {
-    if (images.length > 1) {
-      setImages(images.filter((_, i) => i !== index));
-    }
+    setImages(images.filter((_, i) => i !== index));
   };
 
   const currentPreviewProduct: Product = {
@@ -71,10 +112,10 @@ export default function VendorAddProductPage() {
     name: name || "Authentic Kiribati Handicraft",
     price: parseFloat(price) || 65,
     currency: "AUD",
-    images: images.length > 0 ? images : ["/favicon.png"],
+    images: images.length > 0 ? images : ["https://images.unsplash.com/photo-1606744888344-498238f01740?w=800&auto=format&fit=crop&q=80"],
     category: category || "Handicrafts",
-    vendorId: "v-1",
-    vendorName: "Tebwa Artisans Cooperative",
+    vendorId: user?.id || "v-1",
+    vendorName: user?.name || "Kiribati Artisan",
     rating: 5.0,
     reviewCount: 0,
     stock: parseInt(stock) || 10,
@@ -85,8 +126,39 @@ export default function VendorAddProductPage() {
     createdAt: new Date().toISOString(),
   };
 
-  const handleFinalSubmit = (isDraft: boolean) => {
-    router.push("/vendor/products");
+  const handleFinalSubmit = async (isDraft: boolean) => {
+    if (!name.trim()) {
+      setSubmitError("Product name is required.");
+      setStep(1);
+      return;
+    }
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const finalImages = images.length > 0
+        ? images
+        : ["https://images.unsplash.com/photo-1606744888344-498238f01740?w=800&auto=format&fit=crop&q=80"];
+
+      await productsApi.createProduct({
+        name: name.trim(),
+        description: description.trim() || `${name} hand-crafted in ${origin}.`,
+        price: parseFloat(price) || 10,
+        currency: "AUD",
+        category: category || "Handicrafts",
+        origin_island: origin || "Tarawa",
+        material: material || "Pandanus Leaf",
+        stock: parseInt(stock) || 1,
+        status: isDraft ? "draft" : "active",
+        images: finalImages,
+      });
+
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
+      router.push("/vendor/products");
+    } catch (err: any) {
+      setSubmitError(err?.message || "Failed to create product. Make sure you are logged in as vendor.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const stepsList = [
@@ -203,9 +275,58 @@ export default function VendorAddProductPage() {
           <div className="flex flex-col gap-5">
             <h3 className="text-sm font-bold text-ink border-b border-gray-100 pb-2">Step 2: Product Media & Gallery</h3>
 
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files) handleFileUpload(e.target.files);
+                e.target.value = "";
+              }}
+            />
+
+            {/* Upload Drag Drop Area */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
+                if (e.dataTransfer.files) handleFileUpload(e.dataTransfer.files);
+              }}
+              className={`cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center transition-all ${
+                isDragging
+                  ? "border-[#FF385C] bg-red-50/60 scale-[1.01]"
+                  : "border-gray-300 hover:border-[#FF385C] bg-gray-50/50 hover:bg-red-50/20"
+              }`}
+            >
+              <HiPhoto className={`mx-auto h-12 w-12 transition-colors ${isDragging ? "text-[#FF385C]" : "text-gray-400"}`} />
+              <p className="mt-2 text-sm font-semibold text-ink">
+                {uploading ? "Uploading images to server..." : isDragging ? "Drop images here" : "Click to browse or drag and drop images"}
+              </p>
+              <p className="text-xs text-gray-400 mt-0.5">Supports PNG, JPG, WEBP up to 5MB</p>
+              {uploading && (
+                <div className="mt-3 flex items-center justify-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#FF385C] border-t-transparent" />
+                  <span className="text-xs text-gray-500">Uploading...</span>
+                </div>
+              )}
+            </div>
+
+            {uploadError && (
+              <p className="text-xs text-red-500 font-medium">{uploadError}</p>
+            )}
+
             {/* Artisan Presets Quick Selector */}
             <div>
-              <label className="mb-2 block text-xs font-semibold text-gray-700">Quick Test Image Presets</label>
+              <label className="mb-2 block text-xs font-semibold text-gray-700">Or Pick from Artisan Test Presets</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {ARTISAN_PRESETS.map((preset, idx) => (
                   <button
@@ -224,37 +345,39 @@ export default function VendorAddProductPage() {
               </div>
             </div>
 
-            {/* Upload Drag Drop Area */}
-            <div className="rounded-2xl border-2 border-dashed border-gray-300 p-8 text-center hover:border-gray-400 transition-colors bg-gray-50/50">
-              <HiPhoto className="mx-auto h-12 w-12 text-gray-400" />
-              <p className="mt-2 text-sm font-semibold text-ink">Drag and drop product images, or browse</p>
-              <p className="text-xs text-gray-400 mt-0.5">Supports PNG, JPG, WEBP up to 5MB</p>
-            </div>
-
             {/* Selected Images List */}
             <div>
-              <label className="mb-2 block text-xs font-semibold text-gray-700">Selected Gallery Images ({images.length})</label>
-              <div className="flex flex-wrap gap-3">
-                {images.map((img, idx) => (
-                  <div key={idx} className="group relative h-24 w-24 rounded-xl border border-gray-200 bg-gray-100 overflow-hidden shadow-xs">
-                    <img src={img} alt="preview" className="h-full w-full object-cover" />
-                    {idx === 0 && (
-                      <span className="absolute bottom-0 inset-x-0 bg-[#FF385C] py-0.5 text-center text-[10px] font-bold text-white">
-                        Main Cover
-                      </span>
-                    )}
-                    {images.length > 1 && (
+              <label className="mb-2 block text-xs font-semibold text-gray-700">
+                Selected Gallery Images ({images.length})
+              </label>
+              {images.length === 0 ? (
+                <div className="rounded-xl border border-gray-100 bg-gray-50 p-6 text-center text-xs text-gray-400">
+                  No images selected yet. Upload above or pick a preset.
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  {images.map((img, idx) => (
+                    <div key={idx} className="group relative h-24 w-24 rounded-xl border border-gray-200 bg-gray-100 overflow-hidden shadow-xs">
+                      <img src={img} alt="preview" className="h-full w-full object-cover" />
+                      {idx === 0 && (
+                        <span className="absolute bottom-0 inset-x-0 bg-[#FF385C] py-0.5 text-center text-[10px] font-bold text-white">
+                          Main Cover
+                        </span>
+                      )}
                       <button
                         type="button"
-                        onClick={() => removeImage(idx)}
-                        className="absolute right-1 top-1 rounded-full bg-black/70 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeImage(idx);
+                        }}
+                        className="absolute right-1 top-1 rounded-full bg-black/70 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black"
                       >
                         <HiTrash className="h-3.5 w-3.5" />
                       </button>
-                    )}
-                  </div>
-                ))}
-              </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -414,15 +537,22 @@ export default function VendorAddProductPage() {
             </Button>
           ) : (
             <>
+              {submitError && (
+                <span className="text-xs text-red-600 font-medium mr-2">{submitError}</span>
+              )}
               <Button
                 variant="outline"
                 size="sm"
+                isLoading={submitting}
+                disabled={submitting}
                 onClick={() => handleFinalSubmit(true)}
               >
                 Save as Draft
               </Button>
               <Button
                 size="sm"
+                isLoading={submitting}
+                disabled={submitting}
                 onClick={() => handleFinalSubmit(false)}
               >
                 Submit for Moderation

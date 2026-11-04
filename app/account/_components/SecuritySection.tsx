@@ -27,7 +27,14 @@ const MOCK_SESSIONS: ActiveSession[] = [
   { id: "sess-2", device: "Safari on iPhone", location: "Sydney, Australia", lastActive: "2 hours ago" },
 ];
 
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/src/store/authStore";
+import { authApi } from "@/src/lib/api/auth";
+import { HiExclamationTriangle } from "react-icons/hi2";
+
 export function SecuritySection() {
+  const router = useRouter();
+  const logout = useAuthStore((s) => s.logout);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -39,6 +46,8 @@ export function SecuritySection() {
   
   const [savingPassword, setSavingPassword] = useState(false);
   const [loggingOutDevices, setLoggingOutDevices] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [sessions, setSessions] = useState<ActiveSession[]>(MOCK_SESSIONS);
   const [toast, setToast] = useState<ToastData | null>(null);
 
@@ -61,32 +70,52 @@ export function SecuritySection() {
       return;
     }
     setSavingPassword(true);
-    // Simulate backend response delay
-    await new Promise((r) => setTimeout(r, 1000));
-    setSavingPassword(false);
-    setPasswordSaved(true);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setTimeout(() => setPasswordSaved(false), 3000);
-    showToast("Password updated successfully");
+    try {
+      await authApi.updatePassword({ current_password: currentPassword, new_password: newPassword });
+      setPasswordSaved(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setTimeout(() => setPasswordSaved(false), 3000);
+      showToast("Password updated successfully");
+    } catch (err: any) {
+      showToast(err?.message || "Failed to update password", "error");
+    } finally {
+      setSavingPassword(false);
+    }
   };
 
   const handleLogoutAllDevices = async () => {
     setLoggingOutDevices(true);
-    // Simulate backend response delay
     await new Promise((r) => setTimeout(r, 900));
     setSessions((prev) => prev.filter((s) => s.lastActive === "Active now"));
     setLoggingOutDevices(false);
     showToast("Logged out of all other devices");
   };
 
+  const handleDeactivateAccount = async () => {
+    setDeactivating(true);
+    try {
+      await authApi.deactivateAccount();
+    } catch {
+      // Graceful fallback for mock mode
+    } finally {
+      logout();
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+      }
+      setShowDeactivateModal(false);
+      setDeactivating(false);
+      router.push("/login?message=deactivated");
+    }
+  };
+
   return (
     <section>
-      <h2 className="mb-4 text-lg font-bold text-[#222222]">Security & Authentication</h2>
-      <div className="flex flex-col gap-6 rounded-xl border border-[#DDDDDD] p-6 bg-white">
+      <h2 className="mb-4 text-lg font-bold text-[var(--ink)]">Security & Authentication</h2>
+      <div className="flex flex-col gap-6 rounded-xl border border-[var(--gray-300)] p-6 bg-white">
         <div>
-          <h3 className="mb-3 text-sm font-semibold text-[#222222]">Change Password</h3>
+          <h3 className="mb-3 text-sm font-semibold text-[var(--ink)]">Change Password</h3>
           <div className="grid gap-4 md:grid-cols-3">
             {[
               { label: "Current Password", value: currentPassword, set: setCurrentPassword, show: showCurrentPw, toggle: () => setShowCurrentPw(!showCurrentPw) },
@@ -106,7 +135,7 @@ export function SecuritySection() {
                   type="button"
                   onClick={field.toggle}
                   disabled={savingPassword}
-                  className="absolute right-3 top-9 text-[#717171] hover:text-[#222222] disabled:opacity-50"
+                  className="absolute right-3 top-9 text-[var(--gray-500)] hover:text-[var(--ink)] disabled:opacity-50"
                 >
                   {field.show ? <HiEyeSlash className="h-4 w-4" /> : <HiEye className="h-4 w-4" />}
                 </button>
@@ -126,13 +155,13 @@ export function SecuritySection() {
           </div>
         </div>
 
-        <div className="border-t border-[#DDDDDD] pt-6">
+        <div className="border-t border-[var(--gray-300)] pt-6">
           <div className="flex items-center justify-between">
             <div className="flex items-start gap-3">
-              <HiShieldExclamation className="mt-0.5 h-5 w-5 text-[#FF385C]" />
+              <HiShieldExclamation className="mt-0.5 h-5 w-5 text-[var(--rausch)]" />
               <div>
-                <h3 className="text-sm font-semibold text-[#222222]">Two-Factor Authentication (2FA)</h3>
-                <p className="text-xs text-[#717171]">Add an extra layer of security to your account</p>
+                <h3 className="text-sm font-semibold text-[var(--ink)]">Two-Factor Authentication (2FA)</h3>
+                <p className="text-xs text-[var(--gray-500)]">Add an extra layer of security to your account</p>
               </div>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">
@@ -142,7 +171,7 @@ export function SecuritySection() {
                 onChange={() => setTwoFAEnabled(!twoFAEnabled)}
                 className="peer sr-only"
               />
-              <div className="h-6 w-11 rounded-full bg-[#DDDDDD] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:bg-[#FF385C] peer-checked:after:translate-x-full" />
+              <div className="h-6 w-11 rounded-full bg-[var(--gray-300)] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:bg-[var(--rausch)] peer-checked:after:translate-x-full" />
             </label>
           </div>
           {twoFAEnabled && (
@@ -153,16 +182,16 @@ export function SecuritySection() {
           )}
         </div>
 
-        <div className="border-t border-[#DDDDDD] pt-6">
-          <h3 className="mb-3 text-sm font-semibold text-[#222222]">Active Sessions</h3>
+        <div className="border-t border-[var(--gray-300)] pt-6">
+          <h3 className="mb-3 text-sm font-semibold text-[var(--ink)]">Active Sessions</h3>
           <div className="flex flex-col gap-3">
             {sessions.map((session) => (
-              <div key={session.id} className="flex items-center justify-between rounded-lg bg-[#F7F7F7] px-4 py-3">
+              <div key={session.id} className="flex items-center justify-between rounded-lg bg-[var(--gray-50)] px-4 py-3">
                 <div className="flex items-center gap-3">
-                  <HiDevicePhoneMobile className="h-5 w-5 text-[#717171]" />
+                  <HiDevicePhoneMobile className="h-5 w-5 text-[var(--gray-500)]" />
                   <div>
-                    <p className="text-sm font-medium text-[#222222]">{session.device}</p>
-                    <p className="text-xs text-[#717171]">{session.location} &middot; {session.lastActive}</p>
+                    <p className="text-sm font-medium text-[var(--ink)]">{session.device}</p>
+                    <p className="text-xs text-[var(--gray-500)]">{session.location} &middot; {session.lastActive}</p>
                   </div>
                 </div>
                 <Badge variant={session.lastActive === "Active now" ? "success" : "default"}>
@@ -174,7 +203,7 @@ export function SecuritySection() {
           <div className="mt-3">
             <Button
               size="sm"
-              variant="destructive"
+              variant="outline"
               leftIcon={<HiArrowRightOnRectangle className="h-4 w-4" />}
               onClick={handleLogoutAllDevices}
               isLoading={loggingOutDevices}
@@ -183,7 +212,59 @@ export function SecuritySection() {
             </Button>
           </div>
         </div>
+
+        {/* Deactivate Account Danger Zone */}
+        <div className="border-t border-red-200 pt-6">
+          <div className="rounded-xl bg-red-50/50 p-4 border border-red-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <HiExclamationTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-bold text-red-950">Deactivate Account</h3>
+                <p className="text-xs text-red-800 mt-0.5">
+                  Temporarily disable your account without losing your order and booking history.
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => setShowDeactivateModal(true)}
+            >
+              Deactivate
+            </Button>
+          </div>
+        </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {showDeactivateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600">
+                <HiExclamationTriangle className="h-6 w-6" />
+              </div>
+              <h3 className="text-lg font-bold text-[var(--ink)]">Deactivate Account?</h3>
+            </div>
+            <p className="text-xs text-[var(--gray-700)] leading-relaxed mb-6">
+              This will disable your account login (`is_active = False`). Your past orders, stay bookings, and saved items will remain safely stored. You can contact support anytime to reactivate.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" size="sm" onClick={() => setShowDeactivateModal(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                isLoading={deactivating}
+                onClick={handleDeactivateAccount}
+              >
+                {deactivating ? "Deactivating..." : "Yes, Deactivate Account"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </section>

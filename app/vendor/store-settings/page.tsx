@@ -1,26 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/src/components/atoms/Button";
 import { useAuthStore } from "@/src/store/authStore";
-import { HiCheckCircle, HiBuildingStorefront, HiBanknotes } from "react-icons/hi2";
+import { HiCheckCircle, HiBuildingStorefront, HiBanknotes, HiXCircle } from "react-icons/hi2";
+import { vendorsApi } from "@/src/lib/api/vendors";
 
 export default function VendorStoreSettingsPage() {
   const { user } = useAuthStore();
-  const [storeName, setStoreName] = useState("Tebwa Artisans & Weavers");
-  const [island, setIsland] = useState("Tarawa");
-  const [bio, setBio] = useState("Traditional I-Kiribati handicraft weaving cooperative empowering local women artisans.");
-  const [bankAccount, setBankAccount] = useState("ANZ Kiribati: 1029384756");
+  const [storeName, setStoreName] = useState("");
+  const [island, setIsland] = useState("");
+  const [bio, setBio] = useState("");
+  const [bankAccount, setBankAccount] = useState("ANZ Kiribati: ");
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<"success" | "error">("success");
+
+  const showToast = (message: string, type: "success" | "error" = "success") => {
+    setToastMsg(message);
+    setToastType(type);
+    setTimeout(() => setToastMsg(null), 3000);
+  };
+
+  useEffect(() => {
+    vendorsApi.getMyProfile()
+      .then((profile) => {
+        setStoreName(profile.business_name || "");
+        setBio(profile.business_description || "");
+        setIsland(profile.business_address || "");
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setSaving(false);
-    setToastMsg("Storefront settings updated successfully!");
-    setTimeout(() => setToastMsg(null), 3000);
+    try {
+      await vendorsApi.updateMyProfile({
+        business_name: storeName,
+        business_description: bio,
+        business_address: island,
+      });
+      showToast("Storefront settings updated successfully!");
+    } catch (err: any) {
+      showToast(err?.message || "Failed to save settings", "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -30,6 +60,11 @@ export default function VendorStoreSettingsPage() {
         <p className="text-xs text-gray-500">Update public store details, artisan story, and bank transfer payout info.</p>
       </div>
 
+      {loading ? (
+        <div className="flex items-center justify-center rounded-xl border border-gray-200 bg-white p-12">
+          <span className="text-sm text-gray-400">Loading store settings...</span>
+        </div>
+      ) : (
       <form onSubmit={handleSave} className="flex flex-col gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
           <HiBuildingStorefront className="h-6 w-6 text-[#FF385C]" />
@@ -87,11 +122,15 @@ export default function VendorStoreSettingsPage() {
           </Button>
         </div>
       </form>
+      )}
 
       {/* Toast */}
       {toastMsg && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-[#222222] px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5">
-          <HiCheckCircle className="h-5 w-5 text-green-400" />
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl px-5 py-3 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-5 ${toastType === "error" ? "bg-red-600" : "bg-[#222222]"}`}>
+          {toastType === "error"
+            ? <HiXCircle className="h-5 w-5 text-white" />
+            : <HiCheckCircle className="h-5 w-5 text-green-400" />
+          }
           <span>{toastMsg}</span>
         </div>
       )}

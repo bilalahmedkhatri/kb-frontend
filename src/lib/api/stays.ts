@@ -15,9 +15,19 @@ export interface BackendStay {
   beds: number;
   bathrooms: number;
   amenities: string[];
+  eco_credentials?: {
+    solar_power_percent?: number;
+    rainwater_collection?: boolean;
+    lagoon_access?: boolean;
+    composting_toilets?: boolean;
+    coral_reef_protection?: boolean;
+  };
   status: string;
   images: string[];
   host_id: string;
+  host_name?: string;
+  host_verified?: boolean;
+  host_languages?: string[];
   created_at?: string;
   updated_at?: string;
 }
@@ -37,10 +47,19 @@ export function mapBackendStayToFrontend(bs: BackendStay): Stay {
     beds: bs.beds,
     bathrooms: bs.bathrooms,
     amenities: Array.isArray(bs.amenities) ? bs.amenities : [],
+    ecoCredentials: bs.eco_credentials ? {
+      solarPowerPercent: bs.eco_credentials.solar_power_percent,
+      rainwaterCollection: bs.eco_credentials.rainwater_collection,
+      lagoonAccess: bs.eco_credentials.lagoon_access,
+      compostingToilets: bs.eco_credentials.composting_toilets,
+      coralReefProtection: bs.eco_credentials.coral_reef_protection,
+    } : undefined,
     status: (bs.status as any) || 'active',
     images: Array.isArray(bs.images) ? bs.images : [],
     hostId: bs.host_id,
-    hostName: 'Kiribati Host',
+    hostName: bs.host_name || 'Kiribati Host',
+    hostVerified: bs.host_verified ?? false,
+    hostLanguages: bs.host_languages ?? ['English', 'Gilbertese'],
     rating: 4.9,
     reviewCount: 8,
     createdAt: bs.created_at || new Date().toISOString(),

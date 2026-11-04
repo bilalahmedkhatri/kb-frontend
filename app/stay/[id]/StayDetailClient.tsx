@@ -19,8 +19,9 @@ import {
   HiShare,
   HiArrowPath,
   HiCheckBadge,
+  HiLanguage,
 } from "react-icons/hi2";
-import { GiPolarStar } from "react-icons/gi";
+import { GiPolarStar, GiPalmTree } from "react-icons/gi";
 import type { Stay, Review } from "@/src/types";
 
 interface StayDetailClientProps {
@@ -97,32 +98,63 @@ export default function StayDetailClient({
           {/* Host & Accommodation Summary */}
           <div className="flex items-center justify-between border-b border-[var(--gray-200)] pb-6">
             <div>
-              <h2 className="text-xl font-bold text-[var(--ink)]">
-                Entire {stay.type} hosted by Kiribati Island Host
+              <h2 className="text-xl font-bold text-[var(--ink)] flex items-center gap-2">
+                Entire {stay.type.replace("-", " ")} hosted by {stay.hostName}
+                {stay.hostVerified && (
+                  <HiCheckBadge className="h-5 w-5 text-[var(--babu)] shrink-0" />
+                )}
               </h2>
               <p className="text-xs text-[var(--gray-500)] mt-1 font-medium">
-                Up to {stay.maxGuests} guests · {stay.bedrooms} bedroom(s) · Private Atoll Lagoon Access
+                Up to {stay.maxGuests} guests · {stay.bedrooms} bedroom(s) · {stay.beds} bed(s) · {stay.bathrooms} bath(s)
               </p>
+              {stay.hostLanguages && stay.hostLanguages.length > 0 && (
+                <p className="text-xs text-[var(--gray-500)] mt-1 flex items-center gap-1">
+                  <HiLanguage className="h-3.5 w-3.5 shrink-0" />
+                  Speaks {stay.hostLanguages.join(", ")}
+                </p>
+              )}
             </div>
-            <Avatar name={stay.name} size="lg" />
+            <Avatar name={stay.hostName} size="lg" />
           </div>
 
           {/* Highlights & Eco Credentials */}
           <div className="flex flex-col gap-4 border-b border-[var(--gray-200)] pb-6">
-            <div className="flex items-start gap-3">
-              <GiPolarStar className="h-6 w-6 text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-sm font-bold text-[var(--ink)]">100% Eco-Certified Lodge</h3>
-                <p className="text-xs text-[var(--gray-500)]">Powered by solar energy and local fresh coconut spring water.</p>
+            {stay.ecoCredentials?.solarPowerPercent && (
+              <div className="flex items-start gap-3">
+                <GiPolarStar className="h-6 w-6 text-amber-500 shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--ink)]">{stay.ecoCredentials.solarPowerPercent}% Solar Powered</h3>
+                  <p className="text-xs text-[var(--gray-500)]">This property runs on renewable solar energy.</p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <HiShieldCheck className="h-6 w-6 text-[var(--babu)] shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-sm font-bold text-[var(--ink)]">Verified Atoll Homestay</h3>
-                <p className="text-xs text-[var(--gray-500)]">Direct fair-trade payout to local Kiribati island families.</p>
+            )}
+            {stay.ecoCredentials?.rainwaterCollection && (
+              <div className="flex items-start gap-3">
+                <GiPalmTree className="h-6 w-6 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--ink)]">Rainwater Collection</h3>
+                  <p className="text-xs text-[var(--gray-500)]">Sustainable freshwater sourced through rainwater harvesting.</p>
+                </div>
               </div>
-            </div>
+            )}
+            {stay.ecoCredentials?.lagoonAccess && (
+              <div className="flex items-start gap-3">
+                <HiMapPin className="h-6 w-6 text-sky-500 shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--ink)]">Atoll Lagoon Access</h3>
+                  <p className="text-xs text-[var(--gray-500)]">Direct access to a pristine lagoon for swimming and kayaking.</p>
+                </div>
+              </div>
+            )}
+            {stay.hostVerified && (
+              <div className="flex items-start gap-3">
+                <HiShieldCheck className="h-6 w-6 text-[var(--babu)] shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--ink)]">Verified Host</h3>
+                  <p className="text-xs text-[var(--gray-500)]">Identity verified. Direct fair-trade payout to local Kiribati families.</p>
+                </div>
+              </div>
+            )}
             <div className="flex items-start gap-3">
               <HiArrowPath className="h-6 w-6 text-emerald-600 shrink-0 mt-0.5" />
               <div>
@@ -247,7 +279,7 @@ export default function StayDetailClient({
 
       {/* Reviews */}
       <div className="mt-16 border-t border-[var(--gray-200)] pt-12">
-        <ReviewList reviews={reviews} isError={reviewsError} />
+        <ReviewList reviews={reviews} isError={reviewsError} showCategoryBreakdown />
       </div>
 
       {/* Similar Stays Rail */}

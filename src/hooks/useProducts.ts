@@ -7,6 +7,10 @@ import type { FilterState, PaginatedResponse, Product } from "@/src/types";
 export interface ProductQueryParams {
   page?: number;
   pageSize?: number;
+  category?: string;
+  island?: string;
+  status?: string;
+  vendorId?: string;
   filters?: Partial<FilterState>;
   enabled?: boolean;
   initialData?: PaginatedResponse<Product>;
@@ -17,13 +21,17 @@ export function useProducts(params: ProductQueryParams = {}) {
   const {
     page = 1,
     pageSize = 10,
+    category,
+    island,
+    status,
+    vendorId,
     filters,
     enabled = true,
     initialData,
   } = params;
   return useQuery({
-    queryKey: ["products", "page", page, pageSize, filters],
-    queryFn: () => api.getProducts({ page, pageSize, filters }),
+    queryKey: ["products", "page", page, pageSize, category, island, status, vendorId, filters],
+    queryFn: () => api.getProducts({ page, pageSize, category, island, status, vendorId, filters }),
     enabled,
     initialData,
   });

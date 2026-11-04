@@ -6,3 +6,5 @@ export * from "./useCategories";
 export * from "./useReviews";
 export * from "./useOrders";
 export * from "./useVendors";
+export * from "./useWishlist";
+

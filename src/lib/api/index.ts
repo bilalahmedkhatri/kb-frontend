@@ -18,6 +18,11 @@ export * from './bookings';
 export * from './reviews';
 export * from './conversations';
 export * from './auth';
+export * from './utils';
+export * from './wishlist';
+export * from './admin';
+export * from './vendors';
+
 
 /**
  * Unified API Client Interface bridging all dedicated endpoint modules.
@@ -62,10 +67,11 @@ export const api = {
 
   // Vendors
   async getVendor(id: string) {
-    return authApi.getMe();
+    // Avoid calling getMe() on unauthenticated public routes
+    return null;
   },
   async getVendorProducts(vendorId: string) {
-    return (await productsApi.getProducts({ pageSize: 50 })).data;
+    return (await productsApi.getProducts({ pageSize: 50, vendorId })).data;
   },
 
   // Orders

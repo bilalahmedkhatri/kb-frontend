@@ -7,13 +7,14 @@ import { Button } from "@/src/components/atoms/Button";
 import { Input } from "@/src/components/atoms/Input";
 import { HiPhone, HiMapPin, HiCamera, HiTrash } from "react-icons/hi2";
 import { Toast, ToastData } from "./AccountToast";
+import { authApi } from "@/src/lib/api/auth";
 
 export function ProfileSection() {
   const { user, updateProfile } = useAuthStore();
   const [firstName, setFirstName] = useState(user?.name?.split(" ")[0] || "");
   const [lastName, setLastName] = useState(user?.name?.split(" ").slice(1).join(" ") || "");
   const [email, setEmail] = useState(user?.email || "");
-  const [phone, setPhone] = useState(user?.location || "");
+  const [phone, setPhone] = useState(user?.phone || "");
   const [bio, setBio] = useState(user?.bio || "");
   const [location, setLocation] = useState(user?.location || "");
   
@@ -31,11 +32,25 @@ export function ProfileSection() {
       return;
     }
     setSavingProfile(true);
-    // Simulate backend response delay
-    await new Promise((r) => setTimeout(r, 900));
-    updateProfile({ name: `${firstName} ${lastName}`.trim() || firstName, location, bio });
-    setSavingProfile(false);
-    showToast("Profile changes saved successfully");
+    try {
+      const updatedUser = await authApi.updateMe({
+        full_name: `${firstName} ${lastName}`.trim() || firstName,
+        email: email || undefined,
+        phone: phone || undefined,
+      });
+      updateProfile({
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        bio,
+        location,
+      });
+      showToast("Profile changes saved successfully");
+    } catch (err: any) {
+      showToast(err?.message || "Failed to save profile", "error");
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   return (

@@ -62,6 +62,7 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
               alt={`${alt} main`}
               fill
               priority
+              unoptimized
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
@@ -80,6 +81,7 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
                   src={img}
                   alt={`${alt} view ${idx + 2}`}
                   fill
+                  unoptimized
                   sizes="(max-width: 768px) 100vw, 25vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -107,6 +109,7 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
           alt={`${alt} ${activeIndex + 1}`}
           fill
           priority
+          unoptimized
           sizes="100vw"
           className="object-cover"
           onClick={() => setLightboxOpen(true)}
@@ -149,6 +152,7 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
                 src={images[activeIndex]}
                 alt={`${alt} ${activeIndex + 1}`}
                 fill
+                unoptimized
                 sizes="100vw"
                 className="rounded-xl object-contain shadow-2xl"
               />
@@ -188,7 +192,7 @@ export function HeroGallery({ images, alt }: HeroGalleryProps) {
                       i === activeIndex ? "border-white scale-105 opacity-100" : "border-transparent opacity-50 hover:opacity-90"
                     )}
                   >
-                    <Image src={img} alt={`${alt} thumb ${i + 1}`} width={56} height={56} className="h-full w-full object-cover" />
+                    <Image src={img} alt={`${alt} thumb ${i + 1}`} width={56} height={56} unoptimized className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>

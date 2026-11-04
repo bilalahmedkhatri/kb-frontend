@@ -17,6 +17,14 @@ export interface Product {
   createdAt: string;
 }
 
+export interface EcoCredentials {
+  solarPowerPercent?: number;
+  rainwaterCollection?: boolean;
+  lagoonAccess?: boolean;
+  compostingToilets?: boolean;
+  coralReefProtection?: boolean;
+}
+
 export interface Stay {
   id: string;
   name: string;
@@ -27,14 +35,17 @@ export interface Stay {
   images: string[];
   hostId: string;
   hostName: string;
+  hostVerified?: boolean;
+  hostLanguages?: string[];
   rating: number;
   reviewCount: number;
   maxGuests: number;
   bedrooms: number;
   beds: number;
   bathrooms: number;
-  type: "homestay" | "eco-lodge" | "villa" | "guesthouse";
+  type: "homestay" | "eco-lodge" | "villa" | "guesthouse" | "overwater-villa" | "beachfront-bungalow";
   amenities: string[];
+  ecoCredentials?: EcoCredentials;
   description: string;
   status: "active" | "pending" | "rejected" | "draft";
   createdAt: string;
@@ -63,6 +74,8 @@ export interface User {
   role: "customer" | "vendor" | "admin";
   bio?: string;
   location?: string;
+  phone?: string;
+  whatsapp?: string;
   createdAt: string;
 }
 
@@ -124,6 +137,13 @@ export interface CartItem {
   guests?: number;
 }
 
+export interface ReviewCategoryRatings {
+  cleanliness?: number;
+  location?: number;
+  hospitality?: number;
+  value?: number;
+}
+
 export interface Review {
   id: string;
   targetId: string;
@@ -132,6 +152,7 @@ export interface Review {
   userName: string;
   userAvatar?: string;
   rating: number;
+  categoryRatings?: ReviewCategoryRatings;
   title: string;
   comment: string;
   createdAt: string;
@@ -168,4 +189,6 @@ export interface FilterState {
   checkOut?: string;
   type?: string;
   topic?: string;
+  vendorId?: string;
+  status?: string;
 }

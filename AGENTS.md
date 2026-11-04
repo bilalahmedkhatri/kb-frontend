@@ -21,11 +21,11 @@ The following 12 architectural decisions are locked and MUST NOT be modified or 
 | 1 | **Stack** | Next.js 16 (App Router) + FastAPI + SQLModel + PostgreSQL (`../kb-back-adm`). Custom build (never WordPress or monolithic CMS). |
 | 2 | **Domain** | Primary brand and domain is `islandconnects.com`. "Island Connects" is the wordmark ("Kiribati" is the locale subtitle, never the standalone brand wordmark). |
 | 3 | **Payment Model** | Manual inquiry-based booking + ANZ Get bank transfer. There is NO live payment gateway or instant card capture at MVP. |
-| 4 | **Currency** | AUD-only at MVP. |
+| 4 | **Currency** | AUD primary at MVP. All price fields MUST remain string-configurable (`currency: str = 'AUD'`) for multi-currency roadmap (USD, EUR, NZD, FJD). |
 | 5 | **Pagination** | Cursor-based pagination for catalog stability under concurrent inventory changes. Mobile category feeds use **infinite scroll** via IntersectionObserver. |
-| 6 | **Image Storage** | Cloudflare R2 for all image assets. |
-| 7 | **Roles & Auth** | Explicit 4-role system: **Guest** (unauthenticated), **Customer** (buyer), **Vendor** (seller/artisan), and **Admin** (platform moderator). |
-| 8 | **Backend Modules** | Delete generic `items` scaffold in Phase C; use domain models (products, stays, guides, vendors, orders, bookings, reviews). |
+| 6 | **Image Storage** | Local `/static/uploads` via `POST /api/v1/utils/upload` at dev; Cloudflare R2 for all production image assets. |
+| 7 | **Roles & Auth** | Explicit 4-role system: **Guest** (unauthenticated), **Customer** (buyer), **Vendor** (seller/artisan), and **Admin** (platform moderator). Supports Google OAuth 2.0 One-Tap (`POST /auth/google`) and soft account deactivation (`is_active = False`). |
+| 8 | **Backend Modules** | Explicit 12 modular domains under `backend/app/modules/`: `auth`, `users`, `vendors`, `products`, `stays`, `orders`, `bookings`, `reviews`, `conversations`, `wishlist`, `payments`, and `admin`. |
 | 9 | **Atomic Design** | Strict separation of `src/components/` into `atoms`, `molecules`, `organisms`, and `templates`. |
 | 10 | **Route Count** | Exactly 24 core routes across Discovery (7), Transaction (5), Auth (4), Customer Account (4), and Vendor Workspace (4), plus `/admin/*` moderation. |
 | 11 | **Responsive Contract** | One component, one state, responsive presentation shells (e.g. sidebar at desktop, slide-up BottomSheet at mobile). |
@@ -91,7 +91,9 @@ Every data-bearing component or page MUST explicitly implement all five interact
 
 ### 5.2 Phase C API Integration Protocol
 - During Phase C, AI agents will replace mock functions in `src/lib/api.ts` with REST calls to the real **FastAPI** backend (`../kb-back-adm`).
-- **Schema Verification**: Before modifying API calls or types, agents MUST inspect the live FastAPI OpenAPI schema (`http://localhost:8000/openapi.json`) or PostgreSQL schema using MCP tools (`postgres`, `fastapi-openapi`) to guarantee that frontend TypeScript interfaces in `src/types/index.ts` match backend SQLModel schemas 1-to-1.
+- **Schema Verification & Synchronization**: Before modifying API calls or types, agents MUST inspect the live FastAPI OpenAPI schema (`http://localhost:8000/openapi.json`) or PostgreSQL schema using MCP tools (`postgres`, `fastapi-openapi`) to guarantee that frontend TypeScript interfaces in `src/types/index.ts` match backend SQLModel schemas 1-to-1.
+- **Frontend Client Generation**: When backend FastAPI endpoints or schemas change, execute `npm run generate-client` in `frontend` to sync API services (`ProductsService`, `OrdersService`, `VendorsService`, `StaysService`, `BookingsService`, `ReviewsService`, `ConversationsService`, `WishlistService`, `PaymentsService`, `UtilsService`).
+
 
 ---
 
@@ -119,3 +121,14 @@ When creating or refactoring ANY future component or page, AI agents MUST follow
   - Reuse vendor product/order components with elevated permission flags from `permissions.ts`.
 - **Island Guides CMS (`/guides/*`)**:
   - Maintain Culture-Trip asymmetric magazine layouts; use topic-tag pills (`TagPill.tsx`) for filtering cultural and travel stories.
+
+### 6.2 Stays & Accommodations Architectural Rule Mandate
+All Stays, Lodges, Atoll Homestays, and Accommodations MUST adhere to these explicit architecture rules:
+1. **Property Types**: Support 5 explicit stay categories: `Overwater Villa`, `Atoll Eco-Lodge`, `Traditional Buia/Maneaba Homestay`, `Beachfront Bungalow`, and `Villa/Guesthouse`.
+2. **Island & Location Filtering**: Support filtering stays by Kiribati atolls (`South Tarawa`, `Kiritimati`, `Abaiang`, `Butaritari`, `Maiana`, `Abemama`, `Outer Atolls`).
+3. **Inquiry-First Booking**: Every stay reservation is an **Inquiry Booking** (No live credit card processing). Guests submit check-in/out dates and receive an official **ANZ Get Bank Transfer Invoice** + direct **WhatsApp Host Desk** link.
+4. **Hero Photo Mosaic**: Stay detail views (`/stay/[id]`) MUST support up to 10 photos in a responsive Airbnb-style mosaic gallery with fullscreen lightbox modal.
+5. **Local Eco-Credentials**: Mandatory display of eco metrics (`solarPowerPercent`, `rainwaterCollection`, `lagoonAccess`, `compostingToilets`, `coralReefProtection`).
+6. **Host Trust & 4-Axis Review System**: Detail views must display host verification (`hostVerified`), spoken languages (`hostLanguages`), and 4-axis rating category breakdowns (`Cleanliness`, `Location`, `Hospitality`, `Value`).
+
+

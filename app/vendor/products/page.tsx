@@ -7,6 +7,7 @@ import { Button } from "@/src/components/atoms/Button";
 import { Spinner } from "@/src/components/atoms/Spinner";
 import { ErrorState } from "@/src/components/molecules/ErrorState";
 import { useProducts } from "@/src/hooks";
+import { useAuthStore } from "@/src/store/authStore";
 import { formatCurrency } from "@/src/lib/utils";
 import {
   HiPlus,
@@ -20,14 +21,19 @@ import {
 import type { Product } from "@/src/types";
 
 export default function VendorProductsPage() {
+  const { user } = useAuthStore();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const productsQuery = useProducts({ pageSize: 50 });
+  const productsQuery = useProducts({
+    pageSize: 100,
+    vendorId: user?.id,
+    status: statusFilter === "all" ? undefined : statusFilter,
+  });
   const products = productsQuery.data?.data ?? [];
 
   // Filter products based on search & status

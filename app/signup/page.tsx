@@ -10,6 +10,8 @@ import { Checkbox } from "@/src/components/atoms/Checkbox";
 import { cn } from "@/src/lib/utils";
 import { HiEnvelope, HiLockClosed, HiUser } from "react-icons/hi2";
 import { Logo } from "@/src/components/atoms/Logo";
+import { authApi } from "@/src/lib/api/auth";
+import { vendorsApi } from "@/src/lib/api/vendors";
 
 function SignupPageContent() {
   const router = useRouter();
@@ -48,17 +50,30 @@ function SignupPageContent() {
     }
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    login({
-      id: role === "vendor" ? "v-9" : "u-5",
-      name,
-      email,
-      avatar: "",
-      role,
-      createdAt: new Date().toISOString().split("T")[0],
-    });
-    setLoading(false);
-    router.push(role === "vendor" ? "/vendor/dashboard" : "/");
+    try {
+      if (role === "vendor") {
+        // Vendor register → POST /api/v1/vendors/register
+        await vendorsApi.registerVendor({
+          email,
+          password,
+          full_name: name,
+          business_name: name, // default, vendor can update later in store-settings
+        });
+      } else {
+        // Customer register → POST /api/v1/users/signup
+        await authApi.register({ email, password, full_name: name, role: "customer" });
+      }
+
+      // Now login to get the token and fetch real user data
+      await authApi.login(email, password);
+      const user = await authApi.getMe();
+      login(user);
+      router.push(role === "vendor" ? "/vendor/dashboard" : "/");
+    } catch (err: any) {
+      setError(err?.message || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

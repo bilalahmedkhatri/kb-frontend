@@ -94,19 +94,19 @@ function ConversationList({
 }) {
   return (
     <>
-      <div className="relative border-b border-[#DDDDDD] p-3">
-        <HiMagnifyingGlass className="absolute left-6 top-1/2 h-4 w-4 -translate-y-1/2 text-[#717171]" />
+      <div className="relative border-b border-[var(--gray-300)] p-3">
+        <HiMagnifyingGlass className="absolute left-6 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--gray-500)]" />
         <input
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search conversations..."
-          className="w-full rounded-lg border border-[#DDDDDD] bg-white py-2 pl-10 pr-4 text-sm text-[#222222] placeholder:text-[#717171] focus:border-[#222222] focus:outline-none focus:ring-1 focus:ring-[#222222]"
+          className="w-full rounded-lg border border-[var(--gray-300)] bg-white py-2 pl-10 pr-4 text-sm text-[var(--ink)] placeholder:text-[var(--gray-500)] focus:border-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
         />
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {conversations.length === 0 ? (
-          <div className="flex items-center justify-center py-8 text-sm text-[#717171]">
+          <div className="flex items-center justify-center py-8 text-sm text-[var(--gray-500)]">
             No conversations found
           </div>
         ) : (
@@ -115,24 +115,24 @@ function ConversationList({
               key={conv.id}
               onClick={() => onSelect(conv.id)}
               className={cn(
-                "flex w-full items-start gap-3 border-b border-[#DDDDDD] p-4 text-left transition-colors hover:bg-[#F7F7F7]",
-                activeConvId === conv.id && "bg-[#F7F7F7]"
+                "flex w-full items-start gap-3 border-b border-[var(--gray-300)] p-4 text-left transition-colors hover:bg-[var(--gray-50)]",
+                activeConvId === conv.id && "bg-[var(--gray-50)]"
               )}
             >
               <Avatar name={conv.participantName} size="md" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className={cn("text-sm", conv.unread ? "font-bold text-[#222222]" : "font-medium text-[#222222]")}>
+                  <span className={cn("text-sm", conv.unread ? "font-bold text-[var(--ink)]" : "font-medium text-[var(--ink)]")}>
                     {conv.participantName}
                   </span>
-                  <span className="text-xs text-[#717171]">{conv.lastMessageTime}</span>
+                  <span className="text-xs text-[var(--gray-500)]">{conv.lastMessageTime}</span>
                 </div>
-                <p className="truncate text-xs text-[#717171]">{conv.context}</p>
-                <p className={cn("mt-0.5 truncate text-xs", conv.unread ? "font-semibold text-[#222222]" : "text-[#717171]")}>
+                <p className="truncate text-xs text-[var(--gray-500)]">{conv.context}</p>
+                <p className={cn("mt-0.5 truncate text-xs", conv.unread ? "font-semibold text-[var(--ink)]" : "text-[var(--gray-500)]")}>
                   {conv.lastMessage}
                 </p>
               </div>
-              {conv.unread && <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-[#FF385C]" />}
+              {conv.unread && <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-[var(--rausch)]" />}
             </button>
           ))
         )}
@@ -158,14 +158,14 @@ function ChatView({
 }) {
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex items-center gap-3 border-b border-[#DDDDDD] px-4 py-4 md:px-6">
-        <button onClick={onBack} className="mr-1 text-[#717171] hover:text-[#222222] md:hidden">
+      <div className="flex items-center gap-3 border-b border-[var(--gray-300)] px-4 py-4 md:px-6">
+        <button onClick={onBack} className="mr-1 text-[var(--gray-500)] hover:text-[var(--ink)] md:hidden">
           <HiChevronLeft className="h-5 w-5" />
         </button>
         <Avatar name={conversation.participantName} size="md" />
         <div>
-          <h3 className="text-sm font-bold text-[#222222]">{conversation.participantName}</h3>
-          <p className="text-xs text-[#717171]">{conversation.context}</p>
+          <h3 className="text-sm font-bold text-[var(--ink)]">{conversation.participantName}</h3>
+          <p className="text-xs text-[var(--gray-500)]">{conversation.context}</p>
         </div>
         <span className="ml-auto text-xs text-green-600">Usually replies in 1 hour</span>
       </div>
@@ -180,12 +180,12 @@ function ChatView({
                   className={cn(
                     "max-w-[70%] rounded-2xl px-4 py-2.5",
                     isMe
-                      ? "bg-[#FF385C] text-white"
-                      : "bg-[#F7F7F7] text-[#222222]"
+                      ? "bg-[var(--rausch)] text-white"
+                      : "bg-[var(--gray-100)] text-[var(--ink)]"
                   )}
                 >
                   <p className="text-sm">{msg.text}</p>
-                  <p className={cn("mt-1 text-right text-xs", isMe ? "text-white/70" : "text-[#717171]")}>
+                  <p className={cn("mt-1 text-right text-xs", isMe ? "text-white/70" : "text-[var(--gray-500)]")}>
                     {formatDate(msg.timestamp)}
                   </p>
                 </div>
@@ -194,12 +194,12 @@ function ChatView({
           })}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="flex items-center gap-2 rounded-2xl rounded-bl-none bg-[#F7F7F7] px-4 py-3">
-                  <span className="text-xs text-[#717171]">{conversation.participantName} is typing</span>
+                <div className="flex items-center gap-2 rounded-2xl rounded-bl-none bg-[var(--gray-100)] px-4 py-3">
+                  <span className="text-xs text-[var(--gray-500)]">{conversation.participantName} is typing</span>
                   <span className="flex gap-1">
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#717171] [animation-delay:-0.3s]" />
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#717171] [animation-delay:-0.15s]" />
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#717171]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--gray-500)] [animation-delay:-0.3s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--gray-500)] [animation-delay:-0.15s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--gray-500)]" />
                   </span>
                 </div>
               </div>
@@ -207,12 +207,12 @@ function ChatView({
         </div>
       </div>
 
-      <div className="border-t border-[#DDDDDD] px-4 py-4 md:px-6">
+      <div className="border-t border-[var(--gray-300)] px-4 py-4 md:px-6">
         <div className="flex items-center gap-3">
-          <button className="text-[#717171] hover:text-[#222222]">
+          <button className="text-[var(--gray-500)] hover:text-[var(--ink)]">
             <HiPhoto className="h-5 w-5" />
           </button>
-          <button className="text-[#717171] hover:text-[#222222]">
+          <button className="text-[var(--gray-500)] hover:text-[var(--ink)]">
             <HiFaceSmile className="h-5 w-5" />
           </button>
           <div className="relative flex-1">
@@ -221,7 +221,7 @@ function ChatView({
               onChange={(e) => onMessageChange(e.target.value)}
               disabled={isTyping}
               placeholder={isTyping ? "Waiting for response..." : "Type a message..."}
-              className="w-full rounded-full border border-[#DDDDDD] bg-[#F7F7F7] px-4 py-2.5 pr-12 text-sm text-[#222222] placeholder:text-[#717171] transition-colors focus:border-[#222222] focus:outline-none focus:ring-1 focus:ring-[#222222] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full rounded-full border border-[var(--gray-300)] bg-[var(--gray-50)] px-4 py-2.5 pr-12 text-sm text-[var(--ink)] placeholder:text-[var(--gray-500)] transition-colors focus:border-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--ink)] disabled:opacity-50 disabled:cursor-not-allowed"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && messageInput.trim() && !isTyping) {
                   onSend();
@@ -231,7 +231,7 @@ function ChatView({
             <button
               onClick={onSend}
               disabled={isTyping || !messageInput.trim()}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-[#FF385C] p-1.5 text-white transition-colors hover:bg-[#E31C5F] disabled:bg-[#DDDDDD] disabled:cursor-not-allowed"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-[var(--rausch)] p-1.5 text-white transition-colors hover:bg-[var(--rausch-dark)] disabled:bg-[var(--gray-300)] disabled:cursor-not-allowed"
             >
               {isTyping ? (
                 <HiOutlineArrowPath className="h-4 w-4 animate-spin text-white" />
@@ -314,10 +314,10 @@ export default function MessagesPage() {
   const showChat = !!activeConvId;
 
   return (
-      <div className="flex h-[calc(100vh-200px)] min-h-[500px] overflow-hidden rounded-xl border border-[#DDDDDD]">
+      <div className="flex h-[calc(100vh-200px)] min-h-[500px] overflow-hidden rounded-xl border border-[var(--gray-300)]">
         <aside
           className={cn(
-            "flex w-full flex-col border-r border-[#DDDDDD] md:w-80",
+            "flex w-full flex-col border-r border-[var(--gray-300)] md:w-80",
             showChat && "hidden md:flex"
           )}
         >
@@ -348,9 +348,9 @@ export default function MessagesPage() {
           ) : (
             <div className="flex flex-1 items-center justify-center">
               <div className="text-center">
-                <HiFaceSmile className="mx-auto mb-2 h-12 w-12 text-[#DDDDDD]" />
-                <p className="text-base font-medium text-[#717171]">Select a conversation</p>
-                <p className="text-sm text-[#717171]">Choose a conversation from the left to start chatting</p>
+                <HiFaceSmile className="mx-auto mb-2 h-12 w-12 text-[var(--gray-300)]" />
+                <p className="text-base font-medium text-[var(--gray-500)]">Select a conversation</p>
+                <p className="text-sm text-[var(--gray-500)]">Choose a conversation from the left to start chatting</p>
               </div>
             </div>
           )}

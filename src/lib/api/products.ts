@@ -19,6 +19,13 @@ export interface BackendProduct {
 }
 
 export function mapBackendProductToFrontend(bp: BackendProduct): Product {
+  const validImages = (Array.isArray(bp.images) ? bp.images : []).filter(
+    (img) => typeof img === 'string' && !img.startsWith('blob:')
+  );
+  if (validImages.length === 0 && bp.images && bp.images.length > 0) {
+    validImages.push('https://images.unsplash.com/photo-1606744888344-498238f01740?w=800&auto=format&fit=crop&q=80');
+  }
+
   return {
     id: bp.id,
     name: bp.name,
@@ -30,7 +37,7 @@ export function mapBackendProductToFrontend(bp: BackendProduct): Product {
     material: bp.material || '',
     stock: bp.stock,
     status: (bp.status as any) || 'active',
-    images: Array.isArray(bp.images) ? bp.images : [],
+    images: validImages,
     vendorId: bp.vendor_id,
     vendorName: 'Kiribati Artisan',
     rating: 4.8,
@@ -46,10 +53,27 @@ export const productsApi = {
     category?: string;
     island?: string;
     status?: string;
+    vendorId?: string;
     filters?: Partial<FilterState>;
   }): Promise<PaginatedResponse<Product>> {
     const skip = ((params?.page ?? 1) - 1) * (params?.pageSize ?? 10);
     const limit = params?.pageSize ?? 10;
+
+    let effectiveStatus: string | undefined = undefined;
+    if (params?.status) {
+      if (params.status !== 'all') {
+        effectiveStatus = params.status;
+      }
+    } else if (params?.filters?.status) {
+      if (params.filters.status !== 'all') {
+        effectiveStatus = params.filters.status;
+      }
+    } else if (!params?.vendorId && !params?.filters?.vendorId) {
+      // Public marketplace storefront defaults to active
+      effectiveStatus = 'active';
+    }
+
+    const effectiveVendorId = params?.vendorId || params?.filters?.vendorId;
 
     const res = await apiClient<{ data: BackendProduct[]; count: number }>('/products/', {
       params: {
@@ -57,7 +81,8 @@ export const productsApi = {
         limit,
         category: params?.category || params?.filters?.categories?.[0],
         island: params?.island || params?.filters?.island,
-        status: params?.status || 'active',
+        status: effectiveStatus,
+        vendor_id: effectiveVendorId,
       },
     });
 

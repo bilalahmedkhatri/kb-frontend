@@ -8,8 +8,10 @@ import { users } from "@/src/data/users";
 import { Button } from "@/src/components/atoms/Button";
 import { Input } from "@/src/components/atoms/Input";
 import { Checkbox } from "@/src/components/atoms/Checkbox";
+import { GoogleSignInButton } from "@/src/components/atoms/GoogleSignInButton";
 import { HiEnvelope, HiLockClosed } from "react-icons/hi2";
 import { Logo } from "@/src/components/atoms/Logo";
+import { authApi } from "@/src/lib/api/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,23 +31,36 @@ export default function LoginPage() {
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 500));
 
-    const found = users.find((u) => u.email === email);
-    if (!found) {
-      setError("No account found with that email. Try one of the demo accounts below.");
+    try {
+      await authApi.login(email, password);
+      const user = await authApi.getMe();
+      login(user);
+      if (user.role === "vendor") {
+        router.push("/vendor/dashboard");
+      } else {
+        router.push("/account");
+      }
+    } catch (err: any) {
+      setError(err?.message || "Invalid email or password");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    login(found);
-    setLoading(false);
-    router.push("/account");
   };
 
-  const demoLogin = (user: (typeof users)[0]) => {
-    login(user);
-    router.push("/account");
+  const demoLogin = async (demoUser: (typeof users)[0]) => {
+    setLoading(true);
+    try {
+      await authApi.login(demoUser.email, "password123");
+      const user = await authApi.getMe();
+      login(user);
+      router.push(user.role === "vendor" ? "/vendor/dashboard" : "/account");
+    } catch {
+      login(demoUser as any);
+      router.push("/account");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const demoAccounts = [
@@ -115,16 +130,25 @@ export default function LoginPage() {
             <Button type="submit" isLoading={loading} className="w-full">
               Sign in
             </Button>
+
+            <div className="relative my-2 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[var(--gray-300)]" />
+              </div>
+              <span className="relative bg-white px-3 text-xs text-[var(--gray-500)]">or</span>
+            </div>
+
+            <GoogleSignInButton label="Sign in with Google" />
           </form>
 
-          <div className="mt-6 flex flex-col items-center gap-3 text-sm text-[#717171]">
+          <div className="mt-6 flex flex-col items-center gap-3 text-sm text-[var(--gray-500)]">
             <p>
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="font-medium text-[#FF385C] hover:underline">
+              <Link href="/signup" className="font-medium text-[var(--rausch)] hover:underline">
                 Sign up
               </Link>
             </p>
-            <Link href="/signup?role=vendor" className="font-medium text-[#FF385C] hover:underline">
+            <Link href="/signup?role=vendor" className="font-medium text-[var(--rausch)] hover:underline">
               Become a vendor
             </Link>
           </div>

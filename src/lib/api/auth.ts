@@ -11,6 +11,8 @@ export interface BackendUser {
   phone?: string;
   whatsapp?: string;
   avatar_url?: string;
+  google_sub?: string;
+  google_picture?: string;
   created_at?: string;
 }
 
@@ -24,9 +26,11 @@ export function mapBackendUserToFrontend(bu: BackendUser): User {
     id: bu.id,
     email: bu.email,
     name: bu.full_name || bu.email.split('@')[0],
-    avatar: bu.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb',
+    avatar: bu.google_picture || bu.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb',
     role: (bu.role as any) || 'customer',
     location: 'Kiribati',
+    phone: bu.phone,
+    whatsapp: bu.whatsapp,
     createdAt: bu.created_at || new Date().toISOString(),
   };
 }
@@ -56,6 +60,17 @@ export const authApi = {
     return token;
   },
 
+  async loginWithGoogle(idToken: string): Promise<TokenResponse> {
+    const token = await apiClient<TokenResponse>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ token: idToken }),
+    });
+    if (typeof window !== 'undefined' && token?.access_token) {
+      localStorage.setItem('token', token.access_token);
+    }
+    return token;
+  },
+
   async register(data: { email: string; password: string; full_name?: string; role?: string }): Promise<User> {
     const bu = await apiClient<BackendUser>('/users/signup', {
       method: 'POST',
@@ -76,5 +91,20 @@ export const authApi = {
       token,
     });
     return mapBackendUserToFrontend(bu);
+  },
+
+  async deactivateAccount(token?: string): Promise<{ message: string }> {
+    return apiClient<{ message: string }>('/users/me', {
+      method: 'DELETE',
+      token,
+    });
+  },
+
+  async updatePassword(data: { current_password: string; new_password: string }, token?: string): Promise<{ message: string }> {
+    return apiClient<{ message: string }>('/users/me/password', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      token,
+    });
   },
 };
