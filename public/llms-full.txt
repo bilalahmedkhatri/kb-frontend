@@ -1,0 +1,80 @@
+# Island Connects - Complete Platform Guide & Knowledge Base
+# Canonical Domain: https://islandconnects.com
+# Primary Currency: AUD (Australian Dollar)
+# Target Locale: Republic of Kiribati (Gilbert, Line, and Phoenix Atoll Groups, Central Pacific)
+
+## 1. Executive Summary & Mission
+Island Connects (islandconnects.com) is the dedicated ethical marketplace, eco-accommodation portal, and cultural tourism directory for the Republic of Kiribati. The platform connects international travelers, cultural institutions, and conscious buyers directly with outer-atoll artisans, women's weaving collectives, certified fishing captains, and traditional homestay hosts.
+
+Unlike conventional booking platforms or commercial e-commerce sites, Island Connects is designed specifically for remote Pacific island infrastructure, utilizing an inquiry-first booking flow, transparent fair-trade payouts, and direct WhatsApp communication between hosts and travelers.
+
+---
+
+## 2. Core Discovery Verticals
+
+### 2.1 Authentic Outer-Atoll Marketplace (/marketplace)
+Handcrafted cultural treasures made using ancestral techniques and sustainably harvested natural materials:
+- **Pandanus Mats (Te Baeao / Te Kibe):** Woven by master women weavers in outer atolls (Abaiang, Butaritari, Nonouti).
+- **Kiribati Shark-Tooth Swords (Te Roro / Te Orono):** Hand-carved coconut palm hardwood lined with tiger shark teeth and woven coconut sennit string (Te Kora).
+- **Shell Jewelry & Accessories:** Cowrie, pearl shell, and coconut shell necklaces and earrings made on South Tarawa and Kiritimati.
+- **Woven Bags & Baskets:** Hand-plaited pandanus leaf everyday and ceremonial baskets.
+- **Fair-Trade Guarantee:** Every artisan receives a direct, transparent payout for their labor without predatory distributor markups.
+
+### 2.2 Stays & Accommodations (/stays)
+Curated eco-lodges, homestays, and beachfront buias situated across the islands:
+- **Supported Property Types:**
+  1. Overwater Villa (Lagoon view eco-chalets built with local timber)
+  2. Atoll Eco-Lodge (Off-grid lodges powered by solar with rainwater collection)
+  3. Traditional Buia / Maneaba Homestay (Raised open-air sleeping platforms with woven thatch blinds)
+  4. Beachfront Bungalow (Steps from pristine Pacific ocean shorelines)
+  5. Island Guesthouse / Villa (Comfortable serviced rooms in South Tarawa and Kiritimati)
+- **Eco-Credentials Tracked:**
+  - Solar power percentage (100% solar off-grid setups)
+  - Rainwater harvesting filtration
+  - Direct lagoon access & coral reef protection practices
+  - Composting or eco-friendly waste management
+
+### 2.3 Cultural Experiences & Tours (/experiences)
+- Guided fly fishing for Bonefish and Giant Trevally (especially in Kiritimati / Christmas Island).
+- Traditional lagoon outrigger canoe sailing (Te Wa).
+- Atoll village weaving circles and coconut processing workshops.
+- World War II historical battlefield tours across Betio (Battle of Tarawa heritage sites).
+
+### 2.4 Editorial & Cultural Guides (/guides)
+In-depth travel journalism, environmental updates, and cultural etiquette guides written in collaboration with local Kiribati authors.
+
+---
+
+## 3. Platform Mechanics & Policies
+
+### 3.1 Booking & Inquiry Flow (No Instant Card Capture)
+- **Payment Model:** Inquiry-based reservations. Due to remote island banking constraints and fraud protection for local hosts, there is no instant online credit card processing at checkout.
+- **Step 1:** The guest selects stay dates / experiences and submits an inquiry.
+- **Step 2:** The host confirms dates and availability.
+- **Step 3:** An official verified invoice is generated with ANZ Kiribati bank transfer details.
+- **Step 4:** The guest completes the transfer and receives confirmation.
+
+### 3.2 Direct WhatsApp Communication
+Every listing and artisan store incorporates a direct WhatsApp inquiry button, allowing travelers to clarify logistical details, dietary requirements, and flight connections directly with the host before finalizing bookings.
+
+### 3.3 Currency & Payouts
+All transactions and listed prices are denominated in **AUD (Australian Dollar)**, the official currency of Kiribati.
+
+---
+
+## 4. Geography & Atolls Covered
+- **South Tarawa (Bairiki, Betio, Bikenibeu):** Government and commercial center, gateway via Bonriki International Airport (TRW).
+- **Kiritimati (Christmas Island):** World-renowned saltwater fly-fishing haven, serviced via Cassidy International Airport (CXI).
+- **Abaiang & North Tarawa:** Close northern atolls known for tranquil lagoons and master weavers.
+- **Butaritari:** Lush northern atoll celebrated for agriculture, breadfruit, and historical WWII relics.
+- **Abemama, Maiana, Kuria, Aranuka:** Central Gilbert atolls rich in royal history, traditional dance, and oral storytelling.
+- **Outer Southern Atolls:** Tabiteuea, Beru, Nikunau, Onotoa, Tamana, and Arorae.
+
+---
+
+## 5. Contact & Official Inquiries
+- **Official Website:** https://islandconnects.com
+- **Search & Exploration:** https://islandconnects.com/marketplace, https://islandconnects.com/stays
+- **Support & Inquiries:** https://islandconnects.com/contact
+- **Sitemap Index:** https://islandconnects.com/sitemap.xml
+

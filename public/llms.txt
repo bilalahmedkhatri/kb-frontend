@@ -1,7 +1,11 @@
 # Island Connects - islandconnects.com
+# Full Knowledge Base: https://islandconnects.com/llms-full.txt
 
 ## About
 Island Connects is an ethical marketplace and travel platform for the Kiribati Islands (Gilbert, Line, and Phoenix groups in the Central Pacific). It serves as a direct bridge connecting travelers and global buyers with local outer-atoll weavers, master woodcarvers, eco-lodges, and cultural guides.
+
+## Full Context Document
+- [Complete Platform Guide & Geography](/llms-full.txt): Complete details on outer-atoll craft lineages, stay categories, eco-credentials, and booking mechanisms.
 
 ## Key Sections
 - /marketplace - Authentic handmade Kiribati handicrafts (pandanus mats, shell jewelry, wood carvings)

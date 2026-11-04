@@ -5,6 +5,7 @@ import { Header } from "@/src/components/organisms/Header";
 import { Footer } from "@/src/components/organisms/Footer";
 import { CartDrawer } from "@/src/components/organisms/CartDrawer";
 import { WhatsAppInquireButton } from "@/src/components/atoms/WhatsAppInquireButton";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://islandconnects.com"),
@@ -69,6 +70,7 @@ export default function RootLayout({
           <CartDrawer />
           <WhatsAppInquireButton variant="floating" />
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
